@@ -25,6 +25,12 @@ This roadmap delivers the Warehouse Pickup Queue System in 10 phases, progressin
 3. Database migrations can be applied via Supabase CLI
 4. Schema supports all queue states: pending, approved, in_queue, completed, cancelled
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md - Initialize Supabase and create core tables (gates, pickup_requests, business_hours)
+- [ ] 01-02-PLAN.md - Add RLS policies, triggers, and seed data
+
 ---
 
 ### Phase 2: NetSuite Integration
@@ -210,7 +216,7 @@ This roadmap delivers the Warehouse Pickup Queue System in 10 phases, progressin
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 1 | Database Foundation | INFRA-01 | Not Started |
+| 1 | Database Foundation | INFRA-01 | Planned |
 | 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Not Started |
 | 3 | Staff Authentication | INFRA-03, STAFF-01 | Not Started |
 | 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Not Started |
