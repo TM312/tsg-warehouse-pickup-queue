@@ -1,0 +1,12 @@
+-- Automatic updated_at timestamp triggers
+--
+-- NOTE: Triggers for updated_at are already created in the individual table migrations:
+--   - gates_updated_at (in 20260128000001_create_gates_table.sql)
+--   - pickup_requests_updated_at (in 20260128000002_create_pickup_requests_table.sql)
+--   - business_hours_updated_at (in 20260128000003_create_business_hours_table.sql)
+--
+-- All triggers use the moddatetime extension to automatically update the updated_at
+-- column on any row update.
+--
+-- This migration file is retained for documentation and migration ordering consistency.
+-- No additional SQL statements are needed.
