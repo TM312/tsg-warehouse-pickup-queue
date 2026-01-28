@@ -15,14 +15,15 @@ INSERT INTO gates (gate_number, is_active) VALUES
 -- BUSINESS HOURS
 -- =============================================================================
 -- Standard warehouse schedule: Monday-Friday 7:00-17:00, Saturday-Sunday closed
-INSERT INTO business_hours (day_of_week, is_open, open_time, close_time) VALUES
-  (0, false, NULL, NULL),          -- Sunday: closed
-  (1, true, '07:00:00', '17:00:00'), -- Monday
-  (2, true, '07:00:00', '17:00:00'), -- Tuesday
-  (3, true, '07:00:00', '17:00:00'), -- Wednesday
-  (4, true, '07:00:00', '17:00:00'), -- Thursday
-  (5, true, '07:00:00', '17:00:00'), -- Friday
-  (6, false, NULL, NULL);          -- Saturday: closed
+-- Note: is_closed = true overrides times, but times are NOT NULL so we provide placeholder values
+INSERT INTO business_hours (day_of_week, is_closed, open_time, close_time) VALUES
+  (0, true, '00:00:00', '00:00:01'),  -- Sunday: closed
+  (1, false, '07:00:00', '17:00:00'), -- Monday
+  (2, false, '07:00:00', '17:00:00'), -- Tuesday
+  (3, false, '07:00:00', '17:00:00'), -- Wednesday
+  (4, false, '07:00:00', '17:00:00'), -- Thursday
+  (5, false, '07:00:00', '17:00:00'), -- Friday
+  (6, true, '00:00:00', '00:00:01');  -- Saturday: closed
 
 -- =============================================================================
 -- PICKUP REQUESTS
