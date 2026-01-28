@@ -54,12 +54,15 @@ Plans:
 4. System can compare submitted email domain against NetSuite customer record
 5. Order data is cached per session to reduce API calls
 
-**Plans:** 3 plans
+**Plans:** 3 plans (Code Complete, Deployment Deferred)
 
 Plans:
-- [ ] 02-01-PLAN.md - Create OpenTofu infrastructure (Lambda, API Gateway, IAM)
-- [ ] 02-02-PLAN.md - Implement Lambda function with NetSuite SuiteQL integration
-- [ ] 02-03-PLAN.md - Build layer, deploy, and verify endpoint
+- [x] 02-01-PLAN.md - Create OpenTofu infrastructure (Lambda, API Gateway, IAM)
+- [x] 02-02-PLAN.md - Implement Lambda function with NetSuite SuiteQL integration
+- [x] 02-03-PLAN.md - Build layer, deploy, and verify endpoint (deployment deferred)
+
+**Code Completed:** 2026-01-28
+**Deployment:** Deferred — run `make deploy ENV=dev` when credentials ready
 
 ---
 
@@ -226,7 +229,7 @@ Plans:
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 1 | Database Foundation | INFRA-01 | Complete |
-| 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Planned |
+| 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Code Complete (deploy deferred) |
 | 3 | Staff Authentication | INFRA-03, STAFF-01 | Not Started |
 | 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Not Started |
 | 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Not Started |

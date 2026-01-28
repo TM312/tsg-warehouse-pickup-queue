@@ -1,25 +1,25 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-28
-**Status:** Phase 2 In Progress
+**Status:** Phase 2 Code Complete (Deployment Deferred)
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** NetSuite Integration - Infrastructure and Lambda code complete
+**Current Focus:** Ready for Phase 3 - Staff Authentication
 
 ## Current Position
 
-**Phase:** 2 of 10 (NetSuite Integration)
-**Plan:** 2 of 3 in phase (02-01 and 02-02 complete)
-**Status:** In progress
-**Last activity:** 2026-01-28 - Completed 02-01-PLAN.md (OpenTofu infrastructure)
+**Phase:** 2 of 10 (NetSuite Integration) — Code Complete
+**Plan:** 3 of 3 in phase (all plans executed, deployment deferred)
+**Status:** Code complete, deployment deferred until credentials available
+**Last activity:** 2026-01-28 - Deferred deployment, ready for Phase 3
 
 **Progress:**
 ```
 Phase 1  [===] Database Foundation (2/2 plans) COMPLETE
-Phase 2  [== ] NetSuite Integration (2/3 plans)
+Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [   ] Staff Authentication
 Phase 4  [   ] Staff Dashboard Core
 Phase 5  [   ] Staff Queue Management
@@ -30,15 +30,21 @@ Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 4 plans complete (Phase 1 complete, Phase 2 in progress)
+**Overall:** 5 plans complete (Phase 1 complete, Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 4 |
+| Plans Completed | 5 |
 | Requirements Delivered | 0/28 |
-| Phases Completed | 1/10 |
+| Phases Completed | 1/10 (+ 1 code complete) |
+
+## Deferred Items
+
+| Item | Phase | How to Complete |
+|------|-------|-----------------|
+| NetSuite Lambda deployment | 02 | Fill `infra/dev.tfvars`, run `make deploy ENV=dev` |
 
 ## Accumulated Context
 
@@ -62,6 +68,7 @@ Phase 10 [   ] Customer Queue Experience
 | Lambda layer for dependencies | Separates code from dependencies for faster deployments | 02-01 |
 | Regional API Gateway endpoint | Appropriate for single-region deployment | 02-01 |
 | Usage plan rate limiting 100 req/s, 200 burst | Protect backend from overload | 02-01 |
+| Environment-specific tfvars (dev/prod) | Clean separation of credentials per environment | 02-03 |
 
 ### Technical Debt
 
@@ -83,36 +90,34 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 2 (NetSuite Integration)
 - [x] Execute 02-01-PLAN.md (OpenTofu infrastructure configuration)
 - [x] Execute 02-02-PLAN.md (Lambda function code)
-- [ ] Execute 02-03-PLAN.md (AWS deployment and verification)
+- [x] Execute 02-03-PLAN.md (Build scripts and layer - deployment deferred)
+- [ ] Deploy NetSuite Lambda when credentials ready (`make deploy ENV=dev`)
+- [ ] Plan and execute Phase 3 (Staff Authentication)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Plan 02-01: OpenTofu Infrastructure Configuration:
-- Created main.tf with AWS provider and OpenTofu settings
-- Defined 7 credential variables (5 NetSuite + 2 Supabase), all sensitive
-- Created Lambda resource with Python 3.12, 30s timeout, 256MB memory
-- Created API Gateway REST API with POST /validate-order and CORS
-- Added API key and usage plan with rate limiting (100 req/s, 10k/day)
-- Created outputs for API endpoint, key values, and Lambda function name
+Completed Phase 2 code (deployment deferred):
+- Plan 02-01: OpenTofu infrastructure configuration (Lambda, API Gateway, API key)
+- Plan 02-02: Lambda function code (NetSuite SuiteQL, Supabase caching)
+- Plan 02-03: Build script, layer built (23MB), Makefile added
+- Deployment deferred until credentials configured in `infra/dev.tfvars`
 
 ### Next Actions
 
-1. Execute 02-03-PLAN.md (AWS deployment and verification)
-2. Apply Supabase migration for cache columns
-3. Build Lambda layer with dependencies
-4. Run `tofu apply` with credentials
+1. Plan Phase 3 (Staff Authentication) via /gsd:plan-phase 3
+2. When ready: configure `infra/dev.tfvars` and run `make deploy ENV=dev`
 
 ### Context for Next Session
 
-- OpenTofu configuration complete in `infra/` directory
-- Lambda code in `lambda/` directory ready for deployment
-- Migration in `supabase/migrations/20260128100000_add_netsuite_cache_columns.sql`
-- Layer must be built: `pip install -r requirements.txt -t layer/python/ && zip -r layer/python.zip layer/python/`
-- Need terraform.tfvars with NetSuite and Supabase credentials
+- Phase 2 infrastructure code complete in `infra/` and `lambda/` directories
+- Lambda layer built at `lambda/layer/python.zip` (23MB)
+- Makefile added for project management (`make help` for commands)
+- Deployment requires: fill `infra/dev.tfvars` with credentials
+- Phase 3 can proceed independently (Supabase Auth doesn't depend on Lambda)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-28T10:37:00Z*
+*Last updated: 2026-01-28*
