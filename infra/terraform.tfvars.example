@@ -1,23 +1,47 @@
+# Environment-specific Configuration
+# ===================================
+#
+# This project uses environment-specific tfvars files:
+#   - dev.tfvars   -> Development environment
+#   - prod.tfvars  -> Production environment
+#
+# These files are gitignored. Copy the values below into the appropriate file.
+#
+# Usage:
+#   tofu plan -var-file="dev.tfvars"
+#   tofu apply -var-file="prod.tfvars"
+
 # AWS Configuration
 aws_region  = "us-east-1"
-environment = "production"
+environment = "dev"  # or "production"
 
-# NetSuite Credentials (obtain from NetSuite admin console)
-# WARNING: Never commit actual credentials to git!
-# Either:
-# 1. Copy this file to terraform.tfvars and fill in values (terraform.tfvars is gitignored)
-# 2. Set environment variables: TF_VAR_netsuite_account_id, etc.
+# NetSuite Credentials
+# --------------------
+# Where to find:
+#   Account ID:      NetSuite -> Setup -> Company -> Company Information
+#   Consumer Key:    NetSuite -> Setup -> Integration -> Manage Integrations -> Your Integration
+#   Consumer Secret: Same location as Consumer Key
+#   Token ID:        NetSuite -> Setup -> Users/Roles -> Access Tokens -> Your Token
+#   Token Secret:    Same location as Token ID
 
-netsuite_account_id     = "YOUR_ACCOUNT_ID"
-netsuite_consumer_key   = "YOUR_CONSUMER_KEY"
+netsuite_account_id      = "YOUR_ACCOUNT_ID"
+netsuite_consumer_key    = "YOUR_CONSUMER_KEY"
 netsuite_consumer_secret = "YOUR_CONSUMER_SECRET"
-netsuite_token_id       = "YOUR_TOKEN_ID"
-netsuite_token_secret   = "YOUR_TOKEN_SECRET"
+netsuite_token_id        = "YOUR_TOKEN_ID"
+netsuite_token_secret    = "YOUR_TOKEN_SECRET"
 
-# Supabase Credentials (from Supabase dashboard -> Project Settings -> API)
-supabase_url             = "https://YOUR_PROJECT.supabase.co"
+# Supabase Credentials
+# --------------------
+# Where to find:
+#   URL:              Supabase Dashboard -> Project Settings -> API -> Project URL
+#   Service Role Key: Supabase Dashboard -> Project Settings -> API -> service_role (secret)
+
+supabase_url              = "https://YOUR_PROJECT.supabase.co"
 supabase_service_role_key = "YOUR_SERVICE_ROLE_KEY"
 
 # CORS Configuration
-# Set to specific origin in production (e.g., "https://pickup.yourcompany.com")
+# ------------------
+# Development: "http://localhost:3000"
+# Production:  "https://pickup.yourcompany.com"
+
 allowed_origins = "*"
