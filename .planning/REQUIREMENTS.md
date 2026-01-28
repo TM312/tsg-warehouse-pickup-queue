@@ -41,7 +41,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **RT-01**: Queue position updates via Supabase Realtime
 - [ ] **RT-02**: Wait time estimate recalculation on queue changes
 - [ ] **RT-03**: Gate assignment change notifications
-- [ ] **RT-04**: Status change notifications (pending → approved → in_queue → completed)
+- [ ] **RT-04**: Status change notifications (pending -> approved -> in_queue -> completed)
 
 ### Infrastructure
 
@@ -86,40 +86,40 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CUST-01 | TBD | Pending |
-| CUST-02 | TBD | Pending |
-| CUST-03 | TBD | Pending |
-| CUST-04 | TBD | Pending |
-| CUST-05 | TBD | Pending |
-| STAFF-01 | TBD | Pending |
-| STAFF-02 | TBD | Pending |
-| STAFF-03 | TBD | Pending |
-| STAFF-04 | TBD | Pending |
-| STAFF-05 | TBD | Pending |
-| STAFF-06 | TBD | Pending |
-| STAFF-07 | TBD | Pending |
-| STAFF-08 | TBD | Pending |
-| STAFF-09 | TBD | Pending |
-| STAFF-10 | TBD | Pending |
-| VAL-01 | TBD | Pending |
-| VAL-02 | TBD | Pending |
-| VAL-03 | TBD | Pending |
-| VAL-04 | TBD | Pending |
-| VAL-05 | TBD | Pending |
-| RT-01 | TBD | Pending |
-| RT-02 | TBD | Pending |
-| RT-03 | TBD | Pending |
-| RT-04 | TBD | Pending |
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| INFRA-03 | TBD | Pending |
-| INFRA-04 | TBD | Pending |
+| CUST-01 | Phase 7 | Pending |
+| CUST-02 | Phase 7 | Pending |
+| CUST-03 | Phase 7 | Pending |
+| CUST-04 | Phase 10 | Pending |
+| CUST-05 | Phase 10 | Pending |
+| STAFF-01 | Phase 3 | Pending |
+| STAFF-02 | Phase 4 | Pending |
+| STAFF-03 | Phase 4 | Pending |
+| STAFF-04 | Phase 5 | Pending |
+| STAFF-05 | Phase 5 | Pending |
+| STAFF-06 | Phase 5 | Pending |
+| STAFF-07 | Phase 6 | Pending |
+| STAFF-08 | Phase 6 | Pending |
+| STAFF-09 | Phase 6 | Pending |
+| STAFF-10 | Phase 6 | Pending |
+| VAL-01 | Phase 2 | Pending |
+| VAL-02 | Phase 2 | Pending |
+| VAL-03 | Phase 2 | Pending |
+| VAL-04 | Phase 4 | Pending |
+| VAL-05 | Phase 7 | Pending |
+| RT-01 | Phase 9 | Pending |
+| RT-02 | Phase 9 | Pending |
+| RT-03 | Phase 9 | Pending |
+| RT-04 | Phase 9 | Pending |
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 2 | Pending |
+| INFRA-03 | Phase 3 | Pending |
+| INFRA-04 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 0
-- Unmapped: 28 (pending roadmap)
+- Mapped to phases: 28
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after initial definition*
+*Last updated: 2026-01-28 after roadmap creation*
