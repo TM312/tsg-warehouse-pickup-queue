@@ -18,8 +18,9 @@ mkdir -p "${LAYER_DIR}/python"
 docker run --rm \
     -v "${SCRIPT_DIR}:/var/task" \
     -w /var/task \
+    --entrypoint /bin/bash \
     public.ecr.aws/lambda/python:3.12 \
-    pip install -r requirements.txt -t layer/python --no-cache-dir
+    -c "pip install -r requirements.txt -t layer/python --no-cache-dir"
 
 # Create zip for Lambda layer
 cd "${LAYER_DIR}"
