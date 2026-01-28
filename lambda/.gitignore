@@ -1,12 +1,12 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-
-# Lambda layer (built separately)
+# Built layer (large, regenerated)
 layer/
 
-# Virtual environment
-venv/
-.venv/
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/

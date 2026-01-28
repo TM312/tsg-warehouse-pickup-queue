@@ -1,0 +1,23 @@
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "production"
+
+# NetSuite Credentials (obtain from NetSuite admin console)
+# WARNING: Never commit actual credentials to git!
+# Either:
+# 1. Copy this file to terraform.tfvars and fill in values (terraform.tfvars is gitignored)
+# 2. Set environment variables: TF_VAR_netsuite_account_id, etc.
+
+netsuite_account_id     = "YOUR_ACCOUNT_ID"
+netsuite_consumer_key   = "YOUR_CONSUMER_KEY"
+netsuite_consumer_secret = "YOUR_CONSUMER_SECRET"
+netsuite_token_id       = "YOUR_TOKEN_ID"
+netsuite_token_secret   = "YOUR_TOKEN_SECRET"
+
+# Supabase Credentials (from Supabase dashboard -> Project Settings -> API)
+supabase_url             = "https://YOUR_PROJECT.supabase.co"
+supabase_service_role_key = "YOUR_SERVICE_ROLE_KEY"
+
+# CORS Configuration
+# Set to specific origin in production (e.g., "https://pickup.yourcompany.com")
+allowed_origins = "*"
