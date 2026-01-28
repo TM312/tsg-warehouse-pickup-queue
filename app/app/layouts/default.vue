@@ -12,9 +12,14 @@ async function logout() {
     <header class="border-b">
       <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <h1 class="text-lg font-semibold">Warehouse Pickup Queue</h1>
-        <Button variant="ghost" size="sm" @click="logout">
-          Logout
-        </Button>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/settings" class="text-sm text-muted-foreground hover:underline">
+            Settings
+          </NuxtLink>
+          <Button variant="ghost" size="sm" @click="logout">
+            Logout
+          </Button>
+        </div>
       </div>
     </header>
     <main class="container mx-auto px-4 py-6">
