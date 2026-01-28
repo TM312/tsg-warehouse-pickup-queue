@@ -45,7 +45,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Supabase database schema (SQL files in supabase/)
+- [x] **INFRA-01**: Supabase database schema (SQL files in supabase/)
 - [ ] **INFRA-02**: AWS Lambda for NetSuite integration (OpenTofu in infra/)
 - [ ] **INFRA-03**: Supabase Auth configuration
 - [ ] **INFRA-04**: Supabase Realtime subscriptions
@@ -110,7 +110,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RT-02 | Phase 9 | Pending |
 | RT-03 | Phase 9 | Pending |
 | RT-04 | Phase 9 | Pending |
-| INFRA-01 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 2 | Pending |
 | INFRA-03 | Phase 3 | Pending |
 | INFRA-04 | Phase 8 | Pending |
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after roadmap creation*
+*Last updated: 2026-01-28 after Phase 1 completion*
