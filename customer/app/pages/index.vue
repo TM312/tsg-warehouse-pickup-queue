@@ -1,20 +1,25 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
+const { isOpen, closedMessage, isLoading } = useBusinessHours()
 </script>
 
 <template>
-  <Card>
+  <!-- Loading State -->
+  <Card v-if="isLoading">
     <CardHeader class="text-center space-y-2">
-      <CardTitle class="text-xl md:text-2xl">Request Pickup</CardTitle>
-      <CardDescription>
-        Enter your sales order information to join the pickup queue.
-      </CardDescription>
+      <CardTitle class="text-xl md:text-2xl">Checking Hours...</CardTitle>
     </CardHeader>
-    <CardContent>
-      <!-- Form will be added in Plan 03 -->
-      <p class="text-center text-muted-foreground py-8">
-        Pickup request form coming soon.
+    <CardContent class="text-center">
+      <p class="text-muted-foreground py-4">
+        Please wait while we check business hours.
       </p>
     </CardContent>
   </Card>
+
+  <!-- Open: Show Form -->
+  <PickupRequestForm v-else-if="isOpen" />
+
+  <!-- Closed: Show Message -->
+  <ClosedMessage v-else :message="closedMessage" />
 </template>
