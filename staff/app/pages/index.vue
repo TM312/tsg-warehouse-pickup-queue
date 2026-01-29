@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RefreshCw } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
+import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import DataTable from '@/components/dashboard/DataTable.vue'
@@ -8,6 +9,7 @@ import { createColumns, type PickupRequest } from '@/components/dashboard/column
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
 import GateManagement from '@/components/gates/GateManagement.vue'
+import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
 import { useGateManagement } from '@/composables/useGateManagement'
 
@@ -159,6 +161,26 @@ async function handleToggleGateActive(gateId: string, isActive: boolean) {
   await refreshGates()
 }
 
+// Manual order creation
+async function handleCreateOrder(data: { salesOrderNumber: string; email: string; phone: string }) {
+  try {
+    const { error } = await (client as any)
+      .from('pickup_requests')
+      .insert({
+        sales_order_number: data.salesOrderNumber,
+        customer_email: data.email,
+        customer_phone: data.phone || null,
+        status: 'pending',
+      })
+
+    if (error) throw error
+    toast.success('Pickup request created')
+    await refresh()
+  } catch (e) {
+    toast.error('Failed to create pickup request')
+  }
+}
+
 // Computed for per-gate queue items
 const gatesWithQueues = computed(() => {
   return (gates.value ?? []).map(gate => ({
@@ -232,10 +254,13 @@ const refreshing = computed(() => status.value === 'pending')
   <div>
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Pickup Queue</h1>
-      <Button variant="outline" size="sm" :disabled="refreshing" @click="refresh()">
-        <RefreshCw :class="['h-4 w-4 mr-2', { 'animate-spin': refreshing }]" />
-        Refresh
-      </Button>
+      <div class="flex items-center gap-2">
+        <AddOrderDialog @create="handleCreateOrder" />
+        <Button variant="outline" size="sm" :disabled="refreshing" @click="refresh()">
+          <RefreshCw :class="['h-4 w-4 mr-2', { 'animate-spin': refreshing }]" />
+          Refresh
+        </Button>
+      </div>
     </div>
 
     <Tabs default-value="all" class="w-full">
