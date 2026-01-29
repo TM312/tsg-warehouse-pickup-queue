@@ -6,7 +6,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import DataTable from '@/components/dashboard/DataTable.vue'
 import { createColumns, type PickupRequest } from '@/components/dashboard/columns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
+import GateQueueList from '@/components/dashboard/GateQueueList.vue'
+import GateManagement from '@/components/gates/GateManagement.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
+import { useGateManagement } from '@/composables/useGateManagement'
 
 definePageMeta({
   middleware: 'auth'
@@ -20,7 +23,7 @@ const { data: requests, refresh: refreshRequests, status } = await useAsyncData<
   async () => {
     const { data, error } = await client
       .from('pickup_requests')
-      .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, created_at, gate:gates(id, gate_number)')
+      .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, is_priority, created_at, gate:gates(id, gate_number)')
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -36,12 +39,11 @@ interface GateWithCount {
   queue_count: number
 }
 
-// Fetch gates with queue counts
-const { data: gates, refresh: refreshGates } = await useAsyncData<GateWithCount[]>('gates-with-counts', async () => {
+// Fetch ALL gates for management tab (not just active)
+const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCount[]>('all-gates', async () => {
   const { data, error } = await client
     .from('gates')
     .select('id, gate_number, is_active')
-    .eq('is_active', true)
     .order('gate_number')
 
   if (error) throw error
@@ -66,8 +68,14 @@ const { data: gates, refresh: refreshGates } = await useAsyncData<GateWithCount[
   }))
 })
 
+// Active gates for tabs (filter from allGates)
+const gates = computed(() => (allGates.value ?? []).filter(g => g.is_active))
+
 // Queue actions composable
-const { pending, assignGate, cancelRequest, completeRequest } = useQueueActions()
+const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, moveToGate } = useQueueActions()
+
+// Gate management composable
+const { createGate, renameGate, deleteGate, toggleGateActive } = useGateManagement()
 
 // Refresh all data
 async function refresh() {
@@ -76,7 +84,14 @@ async function refresh() {
 
 // Action handlers
 async function handleGateSelect(requestId: string, gateId: string) {
-  await assignGate(requestId, gateId)
+  const request = requests.value?.find(r => r.id === requestId)
+  if (request?.status === 'in_queue') {
+    // Already in queue - this is a move operation
+    await moveToGate(requestId, gateId)
+  } else {
+    // Not in queue - assign to queue
+    await assignGate(requestId, gateId)
+  }
   await refresh()
   // Update selected request if it's the one being modified
   if (selectedRequest.value?.id === requestId) {
@@ -102,6 +117,61 @@ async function handleCancel(requestId: string) {
     selectedRequest.value = null
   }
 }
+
+// Reorder handler with optimistic rollback
+async function handleReorder(gateId: string, requestIds: string[]) {
+  const success = await reorderQueue(gateId, requestIds)
+  if (!success) {
+    // Refresh to restore correct order on failure
+    await refresh()
+  } else {
+    await refresh() // Sync with server state
+  }
+}
+
+// Priority handler
+async function handleSetPriority(requestId: string) {
+  await setPriority(requestId)
+  await refresh()
+}
+
+// Gate management handlers
+async function handleCreateGate(gateNumber: number) {
+  await createGate(gateNumber)
+  await refreshGates()
+}
+
+async function handleRenameGate(gateId: string, newNumber: number) {
+  await renameGate(gateId, newNumber)
+  await refreshGates()
+}
+
+async function handleDeleteGate(gateId: string) {
+  await deleteGate(gateId)
+  await refreshGates()
+}
+
+async function handleToggleGateActive(gateId: string, isActive: boolean) {
+  await toggleGateActive(gateId, isActive)
+  await refreshGates()
+}
+
+// Computed for per-gate queue items
+const gatesWithQueues = computed(() => {
+  return (gates.value ?? []).map(gate => ({
+    ...gate,
+    queue: (requests.value ?? [])
+      .filter(r => r.assigned_gate_id === gate.id && r.status === 'in_queue')
+      .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
+      .map(r => ({
+        id: r.id,
+        sales_order_number: r.sales_order_number,
+        company_name: r.company_name,
+        queue_position: r.queue_position ?? 0,
+        is_priority: r.is_priority ?? false
+      }))
+  }))
+})
 
 // Create columns with callbacks
 const columns = computed(() => createColumns({
@@ -165,35 +235,59 @@ const refreshing = computed(() => status.value === 'pending')
       </Button>
     </div>
 
-    <Tabs default-value="active" class="w-full">
-      <TabsList>
-        <TabsTrigger value="active">
-          Active Queue
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">
-            {{ activeRequests.length }}
-          </span>
+    <Tabs default-value="all" class="w-full">
+      <TabsList class="flex-wrap">
+        <TabsTrigger value="all">
+          All Requests
+          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ activeRequests.length }}</span>
         </TabsTrigger>
         <TabsTrigger value="history">
           History
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">
-            {{ historyRequests.length }}
-          </span>
+          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ historyRequests.length }}</span>
+        </TabsTrigger>
+        <TabsTrigger
+          v-for="gate in gatesWithQueues"
+          :key="gate.id"
+          :value="`gate-${gate.id}`"
+        >
+          Gate {{ gate.gate_number }}
+          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.queue.length }}</span>
+        </TabsTrigger>
+        <TabsTrigger value="manage">
+          Manage Gates
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="active" class="mt-4">
-        <DataTable
-          :columns="columns"
-          :data="activeRequests"
-          @row-click="handleRowClick"
-        />
+      <TabsContent value="all" class="mt-4">
+        <DataTable :columns="columns" :data="activeRequests" @row-click="handleRowClick" />
       </TabsContent>
 
       <TabsContent value="history" class="mt-4">
-        <DataTable
-          :columns="columns"
-          :data="historyRequests"
-          @row-click="handleRowClick"
+        <DataTable :columns="columns" :data="historyRequests" @row-click="handleRowClick" />
+      </TabsContent>
+
+      <TabsContent
+        v-for="gate in gatesWithQueues"
+        :key="gate.id"
+        :value="`gate-${gate.id}`"
+        class="mt-4"
+      >
+        <GateQueueList
+          :key="gate.id"
+          :gate-id="gate.id"
+          :items="gate.queue"
+          @reorder="(ids) => handleReorder(gate.id, ids)"
+          @set-priority="handleSetPriority"
+        />
+      </TabsContent>
+
+      <TabsContent value="manage" class="mt-4">
+        <GateManagement
+          :gates="allGates ?? []"
+          @create="handleCreateGate"
+          @rename="handleRenameGate"
+          @delete="handleDeleteGate"
+          @toggle-active="handleToggleGateActive"
         />
       </TabsContent>
     </Tabs>

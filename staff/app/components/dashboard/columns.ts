@@ -15,6 +15,7 @@ export interface PickupRequest {
   email_flagged: boolean
   assigned_gate_id: string | null
   queue_position: number | null
+  is_priority?: boolean
   created_at: string
   gate?: { id: string; gate_number: number } | null
 }
