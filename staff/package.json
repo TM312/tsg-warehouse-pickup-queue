@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxtjs/supabase": "^2.0.3",
     "@supabase/supabase-js": "^2.93.2",
+    "@tanstack/vue-table": "^8.21.3",
     "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.1.0",
     "class-variance-authority": "^0.7.1",
