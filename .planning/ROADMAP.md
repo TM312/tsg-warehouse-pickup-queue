@@ -281,6 +281,12 @@ Plans:
 4. When pickup is marked complete, customer sees clear completion confirmation
 5. All updates appear without manual page refresh
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md - Foundation components (Skeleton, LiveIndicator, CompletedStatus)
+- [ ] 10-02-PLAN.md - Status page integration and enhanced states
+
 ---
 
 ## Progress
