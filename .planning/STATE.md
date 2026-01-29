@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 6 Complete
+**Status:** Phase 7 In Progress
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 7 - Customer Submission Flow (next)
+**Current Focus:** Phase 7 - Customer Submission Flow
 
 ## Current Position
 
-**Phase:** 6 of 10 (Staff Advanced Queue Operations) - COMPLETE
-**Plan:** 3 of 3 in phase
-**Status:** Phase complete
-**Last activity:** 2026-01-29 - Completed 06-03-PLAN.md (Drag-Drop Reorder and Priority)
+**Phase:** 7 of 10 (Customer Submission Flow)
+**Plan:** 2 of 4 in phase
+**Status:** In progress
+**Last activity:** 2026-01-29 - Completed 07-02-PLAN.md (Anonymous INSERT Policy)
 
 **Progress:**
 ```
@@ -24,19 +24,19 @@ Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
 Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
-Phase 7  [   ] Customer Submission Flow
+Phase 7  [=  ] Customer Submission Flow (2/4 plans)
 Phase 8  [   ] Real-time Infrastructure
 Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 14 plans complete (Phases 1, 3, 4, 5, 6 complete; Phase 2 code complete)
+**Overall:** 16 plans complete (Phases 1, 3, 4, 5, 6 complete; Phase 2 code complete; Phase 7 in progress)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 14 |
+| Plans Completed | 16 |
 | Requirements Delivered | 9/28 (INFRA-01, INFRA-03, STAFF-01-06, VAL-04) |
 | Phases Completed | 5/10 (+ 1 code complete) |
 
@@ -91,6 +91,8 @@ Phase 10 [   ] Customer Queue Experience
 | Grid layout for gate cards | Responsive columns (1-2-3) for varying screen sizes | 06-02 |
 | Add @types/sortablejs for TypeScript | sortablejs lacks bundled types, SortableEvent needed | 06-03 |
 | ArrowUp icon for priority button | Clear metaphor for 'move up in queue' to position 2 | 06-03 |
+| WITH CHECK constraints for RLS field control | Enforce field defaults at policy level, not app | 07-02 |
+| Anon can only insert pending status | Cannot skip approval process via direct insert | 07-02 |
 
 ### Technical Debt
 
@@ -133,34 +135,40 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Execute 06-01-PLAN.md (Advanced Queue Functions)
 - [x] Execute 06-02-PLAN.md (Gate CRUD Operations)
 - [x] Execute 06-03-PLAN.md (Drag-Drop Reorder and Priority)
-- [ ] Plan Phase 7 (Customer Submission Flow)
+- [x] Plan Phase 7 (Customer Submission Flow)
+- [x] Execute 07-01-PLAN.md (Customer App Initialization)
+- [x] Execute 07-02-PLAN.md (Anonymous INSERT Policy)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 6 Plan 03 (Drag-Drop Reorder and Priority):
-- Installed sortablejs and @vueuse/integrations for drag-and-drop
-- Extended useQueueActions with reorderQueue, setPriority, moveToGate functions
-- Created GateQueueList component with useSortable for per-gate queue reordering
-- Created PriorityButton component with ArrowUp icon
+Completed Phase 7 Plan 02 (Anonymous INSERT Policy):
+- Created RLS policy allowing anonymous INSERT on pickup_requests
+- Added GRANT INSERT to anon role
+- Implemented WITH CHECK constraints for security:
+  - Status must be 'pending'
+  - Cannot set gate, queue_position, is_priority
+  - Cannot set email_verified or completed_at
 
 ### Next Actions
 
-1. Plan Phase 7 (Customer Submission Flow)
-2. (Optional) Deploy NetSuite Lambda when credentials ready
+1. Execute 07-03-PLAN.md (Customer Submission Form)
+2. Execute 07-04-PLAN.md (Verification Token System)
+3. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- **Phase 6 COMPLETE: All advanced queue operations ready**
-- GateQueueList component ready for dashboard integration
-- useQueueActions now includes reorder/priority/move functions
-- useGateManagement composable for gate CRUD
+- Customer app in `customer/` directory (Nuxt 4)
+- **Phase 7 in progress: Anonymous INSERT policy ready**
+- Anon can insert pickup_requests with security constraints
+- Existing SELECT policy allows returning created rows
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
+- Customer dev server: `cd customer && pnpm dev` (http://localhost:3001)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-29*
+*Last updated: 2026-01-29 09:56 UTC*
