@@ -5,6 +5,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/supabase', 'shadcn-nuxt', 'nuxt-api-shield'],
+  runtimeConfig: {
+    // Server-only config (not exposed to client)
+    netsuiteValidationUrl: '', // Set via NUXT_NETSUITE_VALIDATION_URL env var
+  },
   css: ['~/assets/css/tailwind.css'],
   vite: {
     plugins: [
