@@ -137,6 +137,13 @@ Plans:
 4. Staff can mark an in-queue pickup as complete
 5. Status transitions are reflected immediately in the dashboard
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Foundation: atomic queue function, UI components (sonner, select, alert-dialog, tabs, sheet)
+- [ ] 05-02-PLAN.md — Queue actions composable, GateSelect and ActionButtons components
+- [ ] 05-03-PLAN.md — Dashboard integration with tabs, sheet, and wired actions
+
 ---
 
 ### Phase 6: Staff Advanced Queue Operations
