@@ -1,0 +1,207 @@
+<script setup lang="ts">
+import { toast } from 'vue-sonner'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRealtimeStatus, type PickupRequestPayload } from '~/composables/useRealtimeStatus'
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+
+interface PickupRequest {
+  id: string
+  status: string
+  queue_position: number | null
+  assigned_gate_id: string | null
+  order_number: string
+  customer_name: string
+}
+
+interface Gate {
+  id: string
+  gate_number: number
+}
+
+const route = useRoute()
+const client = useSupabaseClient()
+const requestId = computed(() => route.params.id as string)
+
+// Fetch initial request data with gate info
+const { data: request, pending, error: fetchError, refresh } = await useAsyncData(
+  `request-${requestId.value}`,
+  async () => {
+    const { data, error } = await client
+      .from('pickup_requests')
+      .select(`
+        id,
+        status,
+        queue_position,
+        assigned_gate_id,
+        order_number,
+        customer_name,
+        gates:assigned_gate_id (
+          id,
+          gate_number
+        )
+      `)
+      .eq('id', requestId.value)
+      .single()
+
+    if (error) throw error
+    return data as PickupRequest & { gates: Gate | null }
+  }
+)
+
+// Track previous gate ID for toast notifications
+const previousGateId = ref<string | null>(null)
+
+// Setup realtime subscription
+const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeStatus(requestId.value)
+
+onMounted(() => {
+  // Initialize previous gate ID
+  if (request.value) {
+    previousGateId.value = request.value.assigned_gate_id
+  }
+
+  subscribe((payload: RealtimePostgresChangesPayload<PickupRequestPayload>) => {
+    if (payload.eventType === 'UPDATE' && payload.new) {
+      const newData = payload.new
+
+      // Check for gate assignment change and show toast
+      if (newData.assigned_gate_id && newData.assigned_gate_id !== previousGateId.value) {
+        // Fetch gate number for toast
+        fetchGateNumber(newData.assigned_gate_id).then((gateNumber) => {
+          if (gateNumber) {
+            toast.info(`You've been assigned to Gate ${gateNumber}`, {
+              duration: 5000,
+            })
+          }
+        })
+      }
+      previousGateId.value = newData.assigned_gate_id ?? null
+
+      // Refresh data to get updated request with gate join
+      refresh()
+    } else if (payload.eventType === 'DELETE') {
+      // Request was deleted - likely cancelled
+      refresh()
+    }
+  })
+})
+
+onUnmounted(() => {
+  unsubscribe()
+})
+
+// Helper to fetch gate number for toast
+async function fetchGateNumber(gateId: string): Promise<number | null> {
+  const { data } = await client
+    .from('gates')
+    .select('gate_number')
+    .eq('id', gateId)
+    .single()
+  return data?.gate_number ?? null
+}
+
+// Computed display values
+const statusDisplay = computed(() => {
+  if (!request.value) return null
+
+  switch (request.value.status) {
+    case 'pending':
+      return {
+        title: 'Request Received',
+        message: 'Your request is being reviewed by our staff.',
+        showPosition: false,
+      }
+    case 'approved':
+      return {
+        title: 'Approved',
+        message: 'Your request has been approved. You\'ll be added to the queue shortly.',
+        showPosition: false,
+      }
+    case 'in_queue':
+      return {
+        title: 'In Queue',
+        message: null,
+        showPosition: true,
+      }
+    case 'completed':
+      return {
+        title: 'Pickup Complete',
+        message: 'Thank you for your pickup!',
+        showPosition: false,
+      }
+    case 'cancelled':
+      return {
+        title: 'Request Cancelled',
+        message: 'This request has been cancelled.',
+        showPosition: false,
+      }
+    default:
+      return {
+        title: 'Status Unknown',
+        message: 'Please contact staff for assistance.',
+        showPosition: false,
+      }
+  }
+})
+
+const gateNumber = computed(() => {
+  return request.value?.gates?.gate_number ?? null
+})
+</script>
+
+<template>
+  <!-- Loading State -->
+  <Card v-if="pending">
+    <CardHeader class="text-center">
+      <CardTitle class="text-xl md:text-2xl">Loading...</CardTitle>
+    </CardHeader>
+    <CardContent class="text-center">
+      <p class="text-muted-foreground py-4">Fetching your request status...</p>
+    </CardContent>
+  </Card>
+
+  <!-- Error State (Not Found) -->
+  <Card v-else-if="fetchError || !request">
+    <CardHeader class="text-center">
+      <CardTitle class="text-xl md:text-2xl text-destructive">Request Not Found</CardTitle>
+    </CardHeader>
+    <CardContent class="text-center">
+      <p class="text-muted-foreground py-4">
+        We couldn't find a pickup request with this ID. Please check your link and try again.
+      </p>
+    </CardContent>
+  </Card>
+
+  <!-- Status Display -->
+  <Card v-else>
+    <CardHeader class="text-center space-y-2">
+      <CardTitle class="text-xl md:text-2xl">{{ statusDisplay?.title }}</CardTitle>
+      <p class="text-sm text-muted-foreground">
+        Order: {{ request.order_number }}
+      </p>
+    </CardHeader>
+    <CardContent class="text-center space-y-6">
+      <!-- Message for non-queue statuses -->
+      <p v-if="statusDisplay?.message" class="text-muted-foreground py-4">
+        {{ statusDisplay.message }}
+      </p>
+
+      <!-- Queue Position Display -->
+      <div v-if="statusDisplay?.showPosition && request.queue_position" class="py-4">
+        <PositionDisplay :position="request.queue_position" />
+      </div>
+
+      <!-- Gate Assignment -->
+      <div
+        v-if="gateNumber && request.status === 'in_queue'"
+        class="bg-primary/10 rounded-lg p-4 mt-4"
+      >
+        <p class="text-sm text-muted-foreground">Assigned Gate</p>
+        <p class="text-3xl font-bold text-primary">Gate {{ gateNumber }}</p>
+      </div>
+    </CardContent>
+  </Card>
+
+  <!-- Connection Status -->
+  <ConnectionStatus :status="realtimeStatus" />
+</template>
