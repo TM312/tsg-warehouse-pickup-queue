@@ -14,7 +14,7 @@ endif
 STATE_FILE := terraform.$(ENV).tfstate
 
 .PHONY: help dev build preview lint format test clean \
-        db-start db-stop db-reset db-migrate db-status db-seed db-push db-pull \
+        db-start db-stop db-reset db-migrate db-status db-seed db-create-test-user db-push db-pull \
         layer plan apply deploy logs verify status \
         release rollback health-check
 
@@ -44,6 +44,7 @@ help:
 	@echo "  make db-migrate     - Run pending migrations"
 	@echo "  make db-status      - Show migration status"
 	@echo "  make db-seed        - Seed database with sample data"
+	@echo "  make db-create-test-user - Create test staff user"
 	@echo "  make db-push        - Push local schema to remote Supabase"
 	@echo "  make db-pull        - Pull remote schema to local"
 	@echo ""
@@ -138,6 +139,17 @@ db-seed:
 	@echo "🌱 Seeding database..."
 	@npx supabase db reset --db-only
 	@echo "✅ Database seeded"
+
+# Create test user for local development
+db-create-test-user:
+	@echo "👤 Creating test user..."
+	@SERVICE_KEY=$$(supabase status -o json | jq -r '.SERVICE_ROLE_KEY') && \
+	curl -s -X POST "http://127.0.0.1:54321/auth/v1/admin/users" \
+		-H "Authorization: Bearer $$SERVICE_KEY" \
+		-H "apikey: $$SERVICE_KEY" \
+		-H "Content-Type: application/json" \
+		-d '{"email":"staff@example.com","password":"password123","email_confirm":true}' | jq .
+	@echo "✅ Test user created: staff@example.com / password123"
 
 # Push local schema to remote
 db-push:
