@@ -17,9 +17,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Warehouse Staff App
 
-- [ ] **STAFF-01**: Email/password authentication via Supabase
-- [ ] **STAFF-02**: Dashboard with table view of all pickup requests
-- [ ] **STAFF-03**: Visual highlighting of requests requiring attention (flagged/pending)
+- [x] **STAFF-01**: Email/password authentication via Supabase
+- [x] **STAFF-02**: Dashboard with table view of all pickup requests
+- [x] **STAFF-03**: Visual highlighting of requests requiring attention (flagged/pending)
 - [ ] **STAFF-04**: Gate assignment functionality
 - [ ] **STAFF-05**: Add to queue / Cancel request actions
 - [ ] **STAFF-06**: Mark pickup as complete
@@ -33,7 +33,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **VAL-01**: Validate sales order exists in NetSuite and is valid for pickup
 - [ ] **VAL-02**: Retrieve order details from NetSuite (company name, item count, PO number)
 - [ ] **VAL-03**: Email domain verification against NetSuite customer record
-- [ ] **VAL-04**: Flag indicator for email-mismatched requests
+- [x] **VAL-04**: Flag indicator for email-mismatched requests
 - [ ] **VAL-05**: Rate limiting to prevent brute-force order number attempts
 
 ### Real-time Updates
@@ -47,7 +47,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **INFRA-01**: Supabase database schema (SQL files in supabase/)
 - [ ] **INFRA-02**: AWS Lambda for NetSuite integration (OpenTofu in infra/)
-- [ ] **INFRA-03**: Supabase Auth configuration
+- [x] **INFRA-03**: Supabase Auth configuration
 - [ ] **INFRA-04**: Supabase Realtime subscriptions
 
 ## v2 Requirements
@@ -91,9 +91,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CUST-03 | Phase 7 | Pending |
 | CUST-04 | Phase 10 | Pending |
 | CUST-05 | Phase 10 | Pending |
-| STAFF-01 | Phase 3 | Pending |
-| STAFF-02 | Phase 4 | Pending |
-| STAFF-03 | Phase 4 | Pending |
+| STAFF-01 | Phase 3 | Complete |
+| STAFF-02 | Phase 4 | Complete |
+| STAFF-03 | Phase 4 | Complete |
 | STAFF-04 | Phase 5 | Pending |
 | STAFF-05 | Phase 5 | Pending |
 | STAFF-06 | Phase 5 | Pending |
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VAL-01 | Phase 2 | Pending |
 | VAL-02 | Phase 2 | Pending |
 | VAL-03 | Phase 2 | Pending |
-| VAL-04 | Phase 4 | Pending |
+| VAL-04 | Phase 4 | Complete |
 | VAL-05 | Phase 7 | Pending |
 | RT-01 | Phase 9 | Pending |
 | RT-02 | Phase 9 | Pending |
@@ -112,7 +112,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RT-04 | Phase 9 | Pending |
 | INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 2 | Pending |
-| INFRA-03 | Phase 3 | Pending |
+| INFRA-03 | Phase 3 | Complete |
 | INFRA-04 | Phase 8 | Pending |
 
 **Coverage:**
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-28 after Phase 1 completion*
+*Last updated: 2026-01-29 after Phase 4 completion*
