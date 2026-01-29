@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Customer App
 
-- [ ] **CUST-01**: Mobile-responsive web app accessible via static QR code/URL
-- [ ] **CUST-02**: Business hours check with message when warehouse is closed
-- [ ] **CUST-03**: Submission form with sales order number, email, optional phone
+- [x] **CUST-01**: Mobile-responsive web app accessible via static QR code/URL
+- [x] **CUST-02**: Business hours check with message when warehouse is closed
+- [x] **CUST-03**: Submission form with sales order number, email, optional phone
 - [ ] **CUST-04**: Real-time queue status display (position, gate, estimated wait)
 - [ ] **CUST-05**: Visual confirmation when pickup is complete
 
@@ -23,10 +23,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **STAFF-04**: Gate assignment functionality
 - [x] **STAFF-05**: Add to queue / Cancel request actions
 - [x] **STAFF-06**: Mark pickup as complete
-- [ ] **STAFF-07**: Reorder queue positions within a gate
-- [ ] **STAFF-08**: Move customer between gates
-- [ ] **STAFF-09**: Priority override capability
-- [ ] **STAFF-10**: Gate enable/disable (gates must be empty to disable)
+- [x] **STAFF-07**: Reorder queue positions within a gate
+- [x] **STAFF-08**: Move customer between gates
+- [x] **STAFF-09**: Priority override capability
+- [x] **STAFF-10**: Gate enable/disable (gates must be empty to disable)
 
 ### Validation & Security
 
@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **VAL-02**: Retrieve order details from NetSuite (company name, item count, PO number)
 - [ ] **VAL-03**: Email domain verification against NetSuite customer record
 - [x] **VAL-04**: Flag indicator for email-mismatched requests
-- [ ] **VAL-05**: Rate limiting to prevent brute-force order number attempts
+- [x] **VAL-05**: Rate limiting to prevent brute-force order number attempts
 
 ### Real-time Updates
 
@@ -86,9 +86,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CUST-01 | Phase 7 | Pending |
-| CUST-02 | Phase 7 | Pending |
-| CUST-03 | Phase 7 | Pending |
+| CUST-01 | Phase 7 | Complete |
+| CUST-02 | Phase 7 | Complete |
+| CUST-03 | Phase 7 | Complete |
 | CUST-04 | Phase 10 | Pending |
 | CUST-05 | Phase 10 | Pending |
 | STAFF-01 | Phase 3 | Complete |
@@ -97,15 +97,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAFF-04 | Phase 5 | Complete |
 | STAFF-05 | Phase 5 | Complete |
 | STAFF-06 | Phase 5 | Complete |
-| STAFF-07 | Phase 6 | Pending |
-| STAFF-08 | Phase 6 | Pending |
-| STAFF-09 | Phase 6 | Pending |
-| STAFF-10 | Phase 6 | Pending |
+| STAFF-07 | Phase 6 | Complete |
+| STAFF-08 | Phase 6 | Complete |
+| STAFF-09 | Phase 6 | Complete |
+| STAFF-10 | Phase 6 | Complete |
 | VAL-01 | Phase 2 | Pending |
 | VAL-02 | Phase 2 | Pending |
 | VAL-03 | Phase 2 | Pending |
 | VAL-04 | Phase 4 | Complete |
-| VAL-05 | Phase 7 | Pending |
+| VAL-05 | Phase 7 | Complete |
 | RT-01 | Phase 9 | Pending |
 | RT-02 | Phase 9 | Pending |
 | RT-03 | Phase 9 | Pending |
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 5 completion*
+*Last updated: 2026-01-29 after Phase 7 completion*
