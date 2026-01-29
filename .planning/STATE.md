@@ -12,9 +12,9 @@
 ## Current Position
 
 **Phase:** 9 of 10 (Real-time Queue Updates)
-**Plan:** 1 of 3 in phase
+**Plan:** 2 of 3 in phase
 **Status:** In progress
-**Last activity:** 2026-01-29 - Completed 09-01-PLAN.md (Customer Status Page)
+**Last activity:** 2026-01-29 - Completed 09-02-PLAN.md (Customer UI Components)
 
 **Progress:**
 ```
@@ -26,17 +26,17 @@ Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
 Phase 7  [===] Customer Submission Flow (3/3 plans) COMPLETE
 Phase 8  [===] Real-time Infrastructure (2/2 plans) COMPLETE
-Phase 9  [=  ] Real-time Queue Updates (1/3 plans)
+Phase 9  [== ] Real-time Queue Updates (2/3 plans)
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 20 plans complete (Phases 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 code complete)
+**Overall:** 21 plans complete (Phases 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 20 |
+| Plans Completed | 21 |
 | Requirements Delivered | 14/28 (INFRA-01, INFRA-03, INFRA-04, STAFF-01-10, VAL-04, VAL-05, CUST-01-03) |
 | Phases Completed | 7/10 (+ 1 code complete + 1 in progress) |
 
@@ -103,6 +103,9 @@ Phase 10 [   ] Customer Queue Experience
 | Add @supabase/supabase-js as direct dependency | Required for TypeScript types in customer app | 08-02 |
 | useTransition with 400ms easeOutCubic | Smooth position animation feels responsive but not jarring | 09-01 |
 | Toast for gate assignment changes | 5s duration, vue-sonner toast.info() for visibility | 09-01 |
+| Return null for insufficient wait time data | Fewer than 3 completed requests means hide wait estimate | 09-02 |
+| Wait time = avgTime * (position - 1) | Position 1 is next up with 0 wait | 09-02 |
+| Range with +/- 20% buffer | Accounts for variability in pickup times | 09-02 |
 
 ### Technical Debt
 
@@ -154,28 +157,28 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Execute 08-02-PLAN.md (Customer Realtime Subscription)
 - [x] Plan Phase 9 (Real-time Queue Updates)
 - [x] Execute 09-01-PLAN.md (Customer Status Page)
+- [x] Execute 09-02-PLAN.md (Customer UI Components)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 9 Plan 01 (Customer Status Page):
-- Created PositionDisplay component with animated number transitions using useTransition
-- Built status page at /status/[id] with realtime subscription
-- Updated form to navigate to status page after submission
-- Added toast notification for gate assignment changes
+Completed Phase 9 Plan 02 (Customer UI Components):
+- Created useWaitTimeEstimate composable with rolling average calculation
+- Built WaitTimeEstimate component that shows range or hides when no data
+- Built TurnTakeover full-screen overlay with gate number and animation
 
 ### Next Actions
 
-1. Execute 09-02-PLAN.md (Wait Time & Turn Takeover)
-2. Execute 09-03-PLAN.md (Staff Dashboard Realtime)
-3. (Optional) Deploy NetSuite Lambda when credentials ready
+1. Execute 09-03-PLAN.md (Staff Dashboard Realtime Integration)
+2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4) on port 3000
 - Customer app in `customer/` directory (Nuxt 4)
 - **Customer status page now functional at /status/[id]**
+- **Customer UI components ready:** useWaitTimeEstimate, WaitTimeEstimate, TurnTakeover
 - PositionDisplay shows animated position with "Your turn any moment" at #1
 - Form submission now navigates to status page automatically
 - Realtime updates work via useRealtimeStatus composable
