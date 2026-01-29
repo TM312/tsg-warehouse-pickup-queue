@@ -12,8 +12,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CUST-01**: Mobile-responsive web app accessible via static QR code/URL
 - [x] **CUST-02**: Business hours check with message when warehouse is closed
 - [x] **CUST-03**: Submission form with sales order number, email, optional phone
-- [ ] **CUST-04**: Real-time queue status display (position, gate, estimated wait)
-- [ ] **CUST-05**: Visual confirmation when pickup is complete
+- [x] **CUST-04**: Real-time queue status display (position, gate, estimated wait)
+- [x] **CUST-05**: Visual confirmation when pickup is complete
 
 ### Warehouse Staff App
 
@@ -89,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CUST-01 | Phase 7 | Complete |
 | CUST-02 | Phase 7 | Complete |
 | CUST-03 | Phase 7 | Complete |
-| CUST-04 | Phase 10 | Pending |
-| CUST-05 | Phase 10 | Pending |
+| CUST-04 | Phase 10 | Complete |
+| CUST-05 | Phase 10 | Complete |
 | STAFF-01 | Phase 3 | Complete |
 | STAFF-02 | Phase 4 | Complete |
 | STAFF-03 | Phase 4 | Complete |
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 9 completion*
+*Last updated: 2026-01-29 after Phase 10 completion*
