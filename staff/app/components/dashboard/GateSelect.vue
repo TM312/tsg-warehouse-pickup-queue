@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { AcceptableValue } from 'reka-ui'
 import { Loader2 } from 'lucide-vue-next'
 
 interface Gate {
@@ -25,8 +26,10 @@ const emit = defineEmits<{
   select: [gateId: string]
 }>()
 
-function handleSelect(value: string) {
-  emit('select', value)
+function handleSelect(value: AcceptableValue) {
+  if (typeof value === 'string') {
+    emit('select', value)
+  }
 }
 </script>
 

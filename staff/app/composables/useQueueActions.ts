@@ -1,8 +1,12 @@
 import { ref, readonly } from 'vue'
 import { toast } from 'vue-sonner'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export function useQueueActions() {
-  const client = useSupabaseClient()
+  // Cast to any to work around missing database types
+  // TODO: Generate proper database types with `supabase gen types typescript`
+  const client = useSupabaseClient() as SupabaseClient
+
   const pending = ref<Record<string, boolean>>({})
 
   async function assignGate(requestId: string, gateId: string): Promise<number> {
