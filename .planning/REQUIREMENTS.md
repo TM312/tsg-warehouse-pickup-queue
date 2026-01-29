@@ -38,10 +38,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Real-time Updates
 
-- [ ] **RT-01**: Queue position updates via Supabase Realtime
-- [ ] **RT-02**: Wait time estimate recalculation on queue changes
-- [ ] **RT-03**: Gate assignment change notifications
-- [ ] **RT-04**: Status change notifications (pending -> approved -> in_queue -> completed)
+- [x] **RT-01**: Queue position updates via Supabase Realtime
+- [x] **RT-02**: Wait time estimate recalculation on queue changes
+- [x] **RT-03**: Gate assignment change notifications
+- [x] **RT-04**: Status change notifications (pending -> approved -> in_queue -> completed)
 
 ### Infrastructure
 
@@ -106,10 +106,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VAL-03 | Phase 2 | Pending |
 | VAL-04 | Phase 4 | Complete |
 | VAL-05 | Phase 7 | Complete |
-| RT-01 | Phase 9 | Pending |
-| RT-02 | Phase 9 | Pending |
-| RT-03 | Phase 9 | Pending |
-| RT-04 | Phase 9 | Pending |
+| RT-01 | Phase 9 | Complete |
+| RT-02 | Phase 9 | Complete |
+| RT-03 | Phase 9 | Complete |
+| RT-04 | Phase 9 | Complete |
 | INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 2 | Pending |
 | INFRA-03 | Phase 3 | Complete |
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 8 completion*
+*Last updated: 2026-01-29 after Phase 9 completion*
