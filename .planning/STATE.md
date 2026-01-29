@@ -104,6 +104,12 @@ Phase 10 [   ] Customer Queue Experience
 |---------|--------|--------|
 | (none) | | |
 
+### Pending Todos
+
+| Todo | Area | Created |
+|------|------|---------|
+| Add "processing" status for active pickups | database | 2026-01-29 |
+
 ### TODOs
 
 - [x] Create plan for Phase 1 via /gsd:plan-phase 1
