@@ -22,6 +22,10 @@ const props = defineProps<{
   data: TData[]
 }>()
 
+const emit = defineEmits<{
+  'row-click': [row: TData]
+}>()
+
 const sorting = ref<SortingState>([])
 
 const table = useVueTable({
@@ -55,9 +59,11 @@ const table = useVueTable({
           <TableRow
             v-for="row in table.getRowModel().rows"
             :key="row.id"
+            class="cursor-pointer hover:bg-muted/50"
             :class="{
               'bg-destructive/10': (row.original as any).status === 'pending' || (row.original as any).email_flagged,
             }"
+            @click="emit('row-click', row.original)"
           >
             <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
               <FlexRender
