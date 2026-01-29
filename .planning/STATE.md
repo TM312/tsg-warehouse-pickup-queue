@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 6 In Progress
+**Status:** Phase 6 Complete
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 6 - Staff Advanced Queue Operations
+**Current Focus:** Phase 7 - Customer Submission Flow (next)
 
 ## Current Position
 
-**Phase:** 6 of 10 (Staff Advanced Queue Operations)
-**Plan:** 2 of 3 in phase
-**Status:** In progress
-**Last activity:** 2026-01-29 - Completed 06-02-PLAN.md (Gate CRUD Operations)
+**Phase:** 6 of 10 (Staff Advanced Queue Operations) - COMPLETE
+**Plan:** 3 of 3 in phase
+**Status:** Phase complete
+**Last activity:** 2026-01-29 - Completed 06-03-PLAN.md (Drag-Drop Reorder and Priority)
 
 **Progress:**
 ```
@@ -23,22 +23,22 @@ Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
 Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
-Phase 6  [== ] Staff Advanced Queue Operations (2/3 plans)
+Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
 Phase 7  [   ] Customer Submission Flow
 Phase 8  [   ] Real-time Infrastructure
 Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 13 plans complete (Phases 1, 3, 4, 5 complete; Phase 2 code complete; Phase 6 in progress)
+**Overall:** 14 plans complete (Phases 1, 3, 4, 5, 6 complete; Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 13 |
+| Plans Completed | 14 |
 | Requirements Delivered | 9/28 (INFRA-01, INFRA-03, STAFF-01-06, VAL-04) |
-| Phases Completed | 4/10 (+ 1 code complete, + 1 in progress) |
+| Phases Completed | 5/10 (+ 1 code complete) |
 
 ## Deferred Items
 
@@ -89,6 +89,8 @@ Phase 10 [   ] Customer Queue Experience
 | Block delete/disable with toast error | Simpler than offering reassignment UI | 06-02 |
 | Power/PowerOff icons for gate toggle | Familiar enable/disable visual metaphor | 06-02 |
 | Grid layout for gate cards | Responsive columns (1-2-3) for varying screen sizes | 06-02 |
+| Add @types/sortablejs for TypeScript | sortablejs lacks bundled types, SortableEvent needed | 06-03 |
+| ArrowUp icon for priority button | Clear metaphor for 'move up in queue' to position 2 | 06-03 |
 
 ### Technical Debt
 
@@ -124,30 +126,31 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 6 (Staff Advanced Queue Operations)
 - [x] Execute 06-01-PLAN.md (Advanced Queue Functions)
 - [x] Execute 06-02-PLAN.md (Gate CRUD Operations)
-- [ ] Execute 06-03-PLAN.md (Dashboard Integration)
+- [x] Execute 06-03-PLAN.md (Drag-Drop Reorder and Priority)
+- [ ] Plan Phase 7 (Customer Submission Flow)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 6 Plan 02 (Gate CRUD Operations):
-- Created useGateManagement composable with createGate, renameGate, deleteGate, toggleGateActive
-- Built CreateGateDialog, EditGateDialog, DeleteGateDialog components
-- Created GateManagement panel with responsive grid layout
-- Validation prevents delete/disable of gates with customers in queue
+Completed Phase 6 Plan 03 (Drag-Drop Reorder and Priority):
+- Installed sortablejs and @vueuse/integrations for drag-and-drop
+- Extended useQueueActions with reorderQueue, setPriority, moveToGate functions
+- Created GateQueueList component with useSortable for per-gate queue reordering
+- Created PriorityButton component with ArrowUp icon
 
 ### Next Actions
 
-1. Execute 06-03-PLAN.md (Dashboard Integration)
+1. Plan Phase 7 (Customer Submission Flow)
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- **Phase 6 Plan 2 COMPLETE: Gate CRUD components ready**
-- useGateManagement composable in staff/app/composables/
-- Gate dialog components in staff/app/components/gates/
-- GateManagement panel ready for integration into dashboard
+- **Phase 6 COMPLETE: All advanced queue operations ready**
+- GateQueueList component ready for dashboard integration
+- useQueueActions now includes reorder/priority/move functions
+- useGateManagement composable for gate CRUD
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
 
