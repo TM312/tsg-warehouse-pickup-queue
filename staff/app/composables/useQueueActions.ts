@@ -70,10 +70,63 @@ export function useQueueActions() {
     }
   }
 
+  async function reorderQueue(gateId: string, requestIds: string[]): Promise<boolean> {
+    try {
+      const { error } = await client.rpc('reorder_queue', {
+        p_gate_id: gateId,
+        p_request_ids: requestIds
+      })
+      if (error) throw error
+      toast.success('Queue reordered')
+      return true
+    } catch (e) {
+      toast.error('Failed to reorder queue')
+      return false
+    }
+  }
+
+  async function setPriority(requestId: string): Promise<boolean> {
+    pending.value[requestId] = true
+    try {
+      const { error } = await client.rpc('set_priority', {
+        p_request_id: requestId
+      })
+      if (error) throw error
+      toast.success('Marked as priority')
+      return true
+    } catch (e) {
+      toast.error('Failed to set priority')
+      return false
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
+  async function moveToGate(requestId: string, newGateId: string): Promise<number | null> {
+    pending.value[requestId] = true
+    try {
+      const { data, error } = await client.rpc('move_to_gate', {
+        p_request_id: requestId,
+        p_new_gate_id: newGateId
+      })
+      if (error) throw error
+      toast.success('Moved to new gate')
+      return data as number
+    } catch (e) {
+      toast.error('Failed to move to gate')
+      return null
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
   return {
     pending: readonly(pending),
     assignGate,
     cancelRequest,
-    completeRequest
+    completeRequest,
+    reorderQueue,
+    setPriority,
+    moveToGate
   }
 }
