@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
+import { computed } from 'vue'
 
 const props = defineProps<{
   status: 'pending' | 'approved' | 'in_queue' | 'completed' | 'cancelled'
 }>()
 
 const variantMap: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  pending: 'destructive',
+  pending: 'default',  // Will be styled blue via class
   approved: 'default',
   in_queue: 'default',
   completed: 'secondary',
@@ -20,10 +21,18 @@ const labelMap: Record<string, string> = {
   completed: 'Completed',
   cancelled: 'Cancelled',
 }
+
+// Blue styling for pending status
+const customClass = computed(() => {
+  if (props.status === 'pending') {
+    return 'bg-blue-500 hover:bg-blue-600 text-white'
+  }
+  return ''
+})
 </script>
 
 <template>
-  <Badge :variant="variantMap[status]">
+  <Badge :variant="variantMap[status]" :class="customClass">
     {{ labelMap[status] }}
   </Badge>
 </template>

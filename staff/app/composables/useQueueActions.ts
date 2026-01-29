@@ -56,7 +56,9 @@ export function useQueueActions() {
         .from('pickup_requests')
         .update({
           status: 'completed',
-          completed_at: new Date().toISOString()
+          completed_at: new Date().toISOString(),
+          queue_position: null,
+          assigned_gate_id: null,
         })
         .eq('id', requestId)
 
