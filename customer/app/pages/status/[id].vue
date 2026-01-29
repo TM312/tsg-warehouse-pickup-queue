@@ -7,6 +7,8 @@ import WaitTimeEstimate from '~/components/WaitTimeEstimate.vue'
 import TurnTakeover from '~/components/TurnTakeover.vue'
 import StatusSkeleton from '~/components/StatusSkeleton.vue'
 import LiveIndicator from '~/components/LiveIndicator.vue'
+import CompletedStatus from '~/components/CompletedStatus.vue'
+import { XCircle } from 'lucide-vue-next'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface PickupRequest {
@@ -235,19 +237,34 @@ const gateNumber = computed(() => {
       </p>
     </CardHeader>
     <CardContent class="text-center space-y-6">
-      <!-- Message for non-queue statuses -->
-      <p v-if="statusDisplay?.message" class="text-muted-foreground py-4">
-        {{ statusDisplay.message }}
-      </p>
+      <!-- Completed Status -->
+      <CompletedStatus
+        v-if="request.status === 'completed'"
+        :order-number="request.sales_order_number"
+        :gate-number="gateNumber"
+      />
+
+      <!-- Cancelled Status -->
+      <div v-else-if="request.status === 'cancelled'" class="space-y-4 py-4">
+        <XCircle class="w-12 h-12 mx-auto text-muted-foreground" />
+        <p class="text-lg font-medium">Request Cancelled</p>
+        <p class="text-muted-foreground text-sm">This pickup request has been cancelled.</p>
+        <NuxtLink to="/" class="text-primary hover:underline text-sm">Submit a new request</NuxtLink>
+      </div>
 
       <!-- Queue Position Display -->
-      <div v-if="statusDisplay?.showPosition && request.queue_position" class="py-4">
+      <div v-else-if="statusDisplay?.showPosition && request.queue_position" class="py-4">
         <PositionDisplay :position="request.queue_position" />
         <!-- Wait Time Estimate -->
         <div class="mt-4">
           <WaitTimeEstimate :estimate="waitEstimate" />
         </div>
       </div>
+
+      <!-- Message for pending/approved/unknown statuses -->
+      <p v-else-if="statusDisplay?.message" class="text-muted-foreground py-4">
+        {{ statusDisplay.message }}
+      </p>
 
       <!-- Gate Assignment -->
       <div
