@@ -1,27 +1,27 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 3 Complete
+**Status:** Phase 4 In Progress
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Ready for Phase 4 - Staff Dashboard Core
+**Current Focus:** Phase 4 - Staff Dashboard Core (Plan 01 complete)
 
 ## Current Position
 
-**Phase:** 3 of 10 (Staff Authentication) — Complete
-**Plan:** 2 of 2 in phase (all plans executed)
-**Status:** Phase complete, verified by user
-**Last activity:** 2026-01-29 - Completed Phase 3 (Staff Authentication)
+**Phase:** 4 of 10 (Staff Dashboard Core)
+**Plan:** 1 of 2 in phase (04-01 complete)
+**Status:** In progress
+**Last activity:** 2026-01-29 - Completed 04-01-PLAN.md (Data Table Foundation)
 
 **Progress:**
 ```
 Phase 1  [===] Database Foundation (2/2 plans) COMPLETE
 Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
-Phase 4  [   ] Staff Dashboard Core
+Phase 4  [=  ] Staff Dashboard Core (1/2 plans)
 Phase 5  [   ] Staff Queue Management
 Phase 6  [   ] Staff Advanced Queue Operations
 Phase 7  [   ] Customer Submission Flow
@@ -30,15 +30,15 @@ Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 7 plans complete (Phases 1, 3 complete; Phase 2 code complete)
+**Overall:** 8 plans complete (Phases 1, 3 complete; Phase 2 code complete; Phase 4 in progress)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 7 |
+| Plans Completed | 8 |
 | Requirements Delivered | 2/28 (INFRA-03, STAFF-01) |
-| Phases Completed | 2/10 (+ 1 code complete) |
+| Phases Completed | 2/10 (+ 1 code complete, + 1 in progress) |
 
 ## Deferred Items
 
@@ -73,6 +73,9 @@ Phase 10 [   ] Customer Queue Experience
 | shadcn-vue new-york style with neutral base | Modern aesthetic for professional appearance | 03-01 |
 | Local Supabase for development | No cloud setup needed, faster iteration | 03-02 |
 | Directory named staff/ not app/ | Distinguishes from future customer/ frontend | 03-02 |
+| Generic DataTable with TData/TValue | Reusable component for different data types | 04-01 |
+| valueUpdater utility for TanStack Table | Handles state updater pattern cleanly | 04-01 |
+| Row highlighting bg-destructive/10 | Visual distinction for pending/flagged requests | 04-01 |
 
 ### Technical Debt
 
@@ -99,31 +102,33 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 3 (Staff Authentication)
 - [x] Execute 03-01-PLAN.md (Nuxt app initialization)
 - [x] Execute 03-02-PLAN.md (Auth pages and login flow)
-- [ ] Plan Phase 4 (Staff Dashboard Core)
+- [x] Plan Phase 4 (Staff Dashboard Core)
+- [x] Execute 04-01-PLAN.md (Data Table Foundation)
+- [ ] Execute 04-02-PLAN.md (Action Buttons and Real-time)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 3 (Staff Authentication):
-- Plan 03-01: Nuxt 4 app with Supabase module, shadcn-vue, auth middleware
-- Plan 03-02: Login, logout, password reset, password change, protected routes
-- Configured local Supabase for development
-- Renamed app/ to staff/ for clarity (two frontends: staff + customer)
-- Human-verified auth flow works correctly
+Completed Phase 4 Plan 01 (Data Table Foundation):
+- Plan 04-01: TanStack Table with shadcn-vue components
+- DataTable generic component with sorting
+- Column definitions for pickup requests
+- StatusBadge component for status display
+- Dashboard page with Supabase data fetching and refresh
 
 ### Next Actions
 
-1. Plan Phase 4 (Staff Dashboard Core) via /gsd:plan-phase 4
+1. Execute 04-02-PLAN.md (Action Buttons and Real-time)
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- Auth working: login, logout, password management
+- Dashboard shows pickup requests table with sorting
+- DataTable component ready for extension with actions
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
-- Phase 4 will add pickup requests table to the dashboard
 
 ---
 
