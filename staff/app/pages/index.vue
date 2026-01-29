@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RefreshCw } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -10,8 +10,11 @@ import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
 import GateManagement from '@/components/gates/GateManagement.vue'
 import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
+import ShowCompletedToggle from '@/components/dashboard/ShowCompletedToggle.vue'
+import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
 import { useGateManagement } from '@/composables/useGateManagement'
+import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 
 definePageMeta({
   middleware: 'auth'
@@ -78,6 +81,21 @@ const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPr
 
 // Gate management composable
 const { createGate, toggleGateActive } = useGateManagement()
+
+// Realtime subscription
+const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeQueue()
+
+// Show completed/cancelled toggle
+const showCompleted = ref(false)
+
+// Setup realtime subscription
+onMounted(() => {
+  subscribe(() => refresh())
+})
+
+onUnmounted(() => {
+  unsubscribe()
+})
 
 // Refresh all data
 async function refresh() {
@@ -207,14 +225,14 @@ const columns = computed(() => createColumns({
   onCancel: handleCancel,
 }))
 
-// Filter requests for tabs
-const activeRequests = computed(() =>
-  (requests.value ?? []).filter(r => !['completed', 'cancelled'].includes(r.status))
-)
-
-const historyRequests = computed(() =>
-  (requests.value ?? []).filter(r => ['completed', 'cancelled'].includes(r.status))
-)
+// Filter requests based on showCompleted toggle
+const filteredRequests = computed(() => {
+  const all = requests.value ?? []
+  if (showCompleted.value) {
+    return all
+  }
+  return all.filter(r => !['completed', 'cancelled'].includes(r.status))
+})
 
 // Sheet state
 const selectedRequest = ref<PickupRequest | null>(null)
@@ -255,6 +273,7 @@ const refreshing = computed(() => status.value === 'pending')
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Pickup Queue</h1>
       <div class="flex items-center gap-2">
+        <ConnectionStatus :status="realtimeStatus" />
         <AddOrderDialog @create="handleCreateOrder" />
         <Button variant="outline" size="sm" :disabled="refreshing" @click="refresh()">
           <RefreshCw :class="['h-4 w-4 mr-2', { 'animate-spin': refreshing }]" />
@@ -267,11 +286,7 @@ const refreshing = computed(() => status.value === 'pending')
       <TabsList class="flex-wrap">
         <TabsTrigger value="all">
           All Requests
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ activeRequests.length }}</span>
-        </TabsTrigger>
-        <TabsTrigger value="history">
-          History
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ historyRequests.length }}</span>
+          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ filteredRequests.length }}</span>
         </TabsTrigger>
         <TabsTrigger
           v-for="gate in gatesWithQueues"
@@ -287,11 +302,10 @@ const refreshing = computed(() => status.value === 'pending')
       </TabsList>
 
       <TabsContent value="all" class="mt-4">
-        <DataTable :columns="columns" :data="activeRequests" @row-click="handleRowClick" />
-      </TabsContent>
-
-      <TabsContent value="history" class="mt-4">
-        <DataTable :columns="columns" :data="historyRequests" @row-click="handleRowClick" />
+        <div class="flex justify-end mb-4">
+          <ShowCompletedToggle v-model:showCompleted="showCompleted" />
+        </div>
+        <DataTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
       </TabsContent>
 
       <TabsContent
