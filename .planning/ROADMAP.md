@@ -224,6 +224,12 @@ Plans:
 3. Both customer app and staff dashboard can establish subscriptions
 4. Subscriptions properly filter to relevant data (customer sees only their request)
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Enable realtime publication and staff subscription composable
+- [ ] 08-02-PLAN.md — Customer realtime subscription composable with ID filtering
+
 ---
 
 ### Phase 9: Real-time Queue Updates
@@ -277,11 +283,11 @@ Plans:
 | 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Complete |
 | 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Complete |
 | 7 | Customer Submission Flow | CUST-01, CUST-02, CUST-03, VAL-05 | Complete |
-| 8 | Real-time Infrastructure | INFRA-04 | Not Started |
+| 8 | Real-time Infrastructure | INFRA-04 | Planned |
 | 9 | Real-time Queue Updates | RT-01, RT-02, RT-03, RT-04 | Not Started |
 | 10 | Customer Queue Experience | CUST-04, CUST-05 | Not Started |
 
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 7 execution*
+*Last updated: 2026-01-29 after Phase 8 planning*
