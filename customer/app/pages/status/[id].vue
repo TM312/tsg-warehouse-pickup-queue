@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { useRealtimeStatus, type PickupRequestPayload } from '~/composables/useRealtimeStatus'
 import { useWaitTimeEstimate } from '~/composables/useWaitTimeEstimate'
 import WaitTimeEstimate from '~/components/WaitTimeEstimate.vue'
@@ -216,12 +217,15 @@ const gateNumber = computed(() => {
   <!-- Error State (Not Found) -->
   <Card v-else-if="fetchError || !request">
     <CardHeader class="text-center">
-      <CardTitle class="text-xl md:text-2xl text-destructive">Request Not Found</CardTitle>
+      <CardTitle class="text-xl md:text-2xl">Request Not Found</CardTitle>
     </CardHeader>
-    <CardContent class="text-center">
-      <p class="text-muted-foreground py-4">
-        We couldn't find a pickup request with this ID. Please check your link and try again.
+    <CardContent class="text-center space-y-4">
+      <p class="text-muted-foreground">
+        We couldn't find a pickup request with this ID.
       </p>
+      <NuxtLink to="/">
+        <Button variant="outline">Submit a New Request</Button>
+      </NuxtLink>
     </CardContent>
   </Card>
 
