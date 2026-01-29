@@ -7,14 +7,14 @@
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 5 - Staff Queue Management (Plan 01 complete)
+**Current Focus:** Phase 5 - Staff Queue Management (Plan 02 complete)
 
 ## Current Position
 
 **Phase:** 5 of 10 (Staff Queue Management)
-**Plan:** 1 of N in phase
+**Plan:** 2 of 3 in phase
 **Status:** In progress
-**Last activity:** 2026-01-29 - Completed 05-01-PLAN.md (Queue Management Foundation)
+**Last activity:** 2026-01-29 - Completed 05-02-PLAN.md (Queue Action Components)
 
 **Progress:**
 ```
@@ -22,7 +22,7 @@ Phase 1  [===] Database Foundation (2/2 plans) COMPLETE
 Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
-Phase 5  [=  ] Staff Queue Management (1/? plans)
+Phase 5  [== ] Staff Queue Management (2/3 plans)
 Phase 6  [   ] Staff Advanced Queue Operations
 Phase 7  [   ] Customer Submission Flow
 Phase 8  [   ] Real-time Infrastructure
@@ -30,13 +30,13 @@ Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 9 plans complete (Phases 1, 3, 4 complete; Phase 2 code complete; Phase 5 started)
+**Overall:** 10 plans complete (Phases 1, 3, 4 complete; Phase 2 code complete; Phase 5 in progress)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 9 |
+| Plans Completed | 10 |
 | Requirements Delivered | 6/28 (INFRA-01, INFRA-03, STAFF-01, STAFF-02, STAFF-03, VAL-04) |
 | Phases Completed | 3/10 (+ 1 code complete) |
 
@@ -78,12 +78,14 @@ Phase 10 [   ] Customer Queue Experience
 | Row highlighting bg-destructive/10 | Visual distinction for pending/flagged requests | 04-01 |
 | SECURITY DEFINER for queue function | Required for atomic MAX calculation across all rows | 05-01 |
 | Manual AlertDialog creation | shadcn-vue CLI had issues, built from reka-ui primitives | 05-01 |
+| Cast SupabaseClient for RPC calls | Database types not yet generated, workaround for TypeScript | 05-02 |
+| AcceptableValue for Select handlers | Type-safe handling of reka-ui Select update events | 05-02 |
 
 ### Technical Debt
 
 | Item | Priority | Phase Introduced |
 |------|----------|------------------|
-| (none yet) | | |
+| Generate database types with `supabase gen types typescript` | Low | 05-02 |
 
 ### Blockers
 
@@ -108,21 +110,22 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Execute 04-01-PLAN.md (Data Table Foundation)
 - [x] Plan Phase 5 (Staff Queue Management)
 - [x] Execute 05-01-PLAN.md (Queue Management Foundation)
-- [ ] Execute remaining Phase 5 plans
+- [x] Execute 05-02-PLAN.md (Queue Action Components)
+- [ ] Execute 05-03-PLAN.md (Dashboard Integration)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 5 Plan 01 (Queue Management Foundation):
-- Created assign_to_queue(uuid, uuid) Postgres function with atomic position calculation
-- Installed vue-sonner for toast notifications
-- Added shadcn-vue components: Select, AlertDialog, Tabs, Sheet, Sonner, Dialog
-- Wired Toaster component in app.vue for global toast notifications
+Completed Phase 5 Plan 02 (Queue Action Components):
+- Created useQueueActions composable with assignGate, cancelRequest, completeRequest
+- Built GateSelect dropdown component showing gate numbers with queue counts
+- Built ActionButtons component with Complete/Cancel buttons wrapped in AlertDialog confirmations
+- Fixed AlertDialog type imports for reka-ui compatibility
 
 ### Next Actions
 
-1. Execute remaining Phase 5 plans (queue action implementation)
+1. Execute 05-03-PLAN.md (Dashboard Integration)
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
@@ -130,12 +133,15 @@ Completed Phase 5 Plan 01 (Queue Management Foundation):
 - Staff app in `staff/` directory (Nuxt 4)
 - Dashboard shows pickup requests table with sorting
 - DataTable component ready for extension with actions
-- **NEW: assign_to_queue() function available for atomic queue operations**
-- **NEW: UI components available: Select, AlertDialog, Tabs, Sheet, Sonner**
-- **NEW: Toast notifications ready via toast() from vue-sonner**
+- **NEW: useQueueActions composable available at staff/app/composables/useQueueActions.ts**
+- **NEW: GateSelect component for gate assignment dropdown**
+- **NEW: ActionButtons component for Complete/Cancel with confirmations**
+- assign_to_queue() function available for atomic queue operations
+- UI components available: Select, AlertDialog, Tabs, Sheet, Sonner
+- Toast notifications ready via toast() from vue-sonner
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
-- Next plans will implement queue actions (gate assignment, add to queue, complete, cancel)
+- Next plan will integrate these components into the DataTable columns
 
 ---
 
