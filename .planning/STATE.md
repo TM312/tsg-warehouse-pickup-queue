@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 7 Complete
+**Status:** Phase 8 Complete
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 8 - Real-time Infrastructure (next)
+**Current Focus:** Phase 9 - Real-time Queue Updates (next)
 
 ## Current Position
 
-**Phase:** 7 of 10 (Customer Submission Flow) - COMPLETE
-**Plan:** 3 of 3 in phase
+**Phase:** 8 of 10 (Real-time Infrastructure) - COMPLETE
+**Plan:** 2 of 2 in phase
 **Status:** Phase complete
-**Last activity:** 2026-01-29 - Phase 7 verified and complete
+**Last activity:** 2026-01-29 - Completed 08-02-PLAN.md (Customer Realtime)
 
 **Progress:**
 ```
@@ -25,20 +25,20 @@ Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
 Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
 Phase 7  [===] Customer Submission Flow (3/3 plans) COMPLETE
-Phase 8  [   ] Real-time Infrastructure
+Phase 8  [===] Real-time Infrastructure (2/2 plans) COMPLETE
 Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 17 plans complete (Phases 1, 3, 4, 5, 6, 7 complete; Phase 2 code complete)
+**Overall:** 19 plans complete (Phases 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 17 |
+| Plans Completed | 19 |
 | Requirements Delivered | 13/28 (INFRA-01, INFRA-03, STAFF-01-10, VAL-04, VAL-05, CUST-01-03) |
-| Phases Completed | 6/10 (+ 1 code complete) |
+| Phases Completed | 7/10 (+ 1 code complete) |
 
 ## Deferred Items
 
@@ -99,6 +99,8 @@ Phase 10 [   ] Customer Queue Experience
 | Hardcoded America/Los_Angeles timezone | Simpler than database config, can add later | 07-03 |
 | Dev mode mock for order validation | Allows testing without Lambda deployment | 07-03 |
 | Duplicate check for pending/approved/in_queue | Prevents multiple requests for same order | 07-03 |
+| Filter DELETE events in callback | Supabase limitation - filter param doesn't work for DELETE | 08-02 |
+| Add @supabase/supabase-js as direct dependency | Required for TypeScript types in customer app | 08-02 |
 
 ### Technical Debt
 
@@ -145,34 +147,33 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Execute 07-01-PLAN.md (Customer App Initialization)
 - [x] Execute 07-02-PLAN.md (Anonymous INSERT Policy)
 - [x] Execute 07-03-PLAN.md (Customer Submission Form)
+- [x] Plan Phase 8 (Real-time Infrastructure)
+- [x] Execute 08-01-PLAN.md (Staff Realtime Subscription)
+- [x] Execute 08-02-PLAN.md (Customer Realtime Subscription)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 7 Plan 03 (Customer Submission Form):
-- Created business hours server route with TZDate timezone handling
-- Created useBusinessHours composable for reactive open/closed state
-- Created order validation helper (dev mode mock, production Lambda)
-- Created rate-limited submission endpoint with duplicate checking
-- Created PickupRequestForm component (166 lines) with vee-validate
-- Created ClosedMessage component for off-hours display
-- Wired index page to conditionally show form or closed message
+Completed Phase 8 Plan 02 (Customer Realtime Subscription):
+- Created useRealtimeStatus composable with ID-based filtering
+- Handled DELETE filter limitation with callback filtering
+- Built mobile-friendly ConnectionStatus component with animated ping
+- Added @supabase/supabase-js for TypeScript type support
 
 ### Next Actions
 
-1. Plan Phase 8 (Real-time Infrastructure)
+1. Plan Phase 9 (Real-time Queue Updates)
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4) on port 3000
-- Customer app in `customer/` directory (Nuxt 4) - **PHASE 7 COMPLETE**
-- **Customer can submit pickup requests via mobile-first form**
-- Business hours check: GET /api/business-hours (TZDate, America/Los_Angeles)
-- Submission endpoint: POST /api/submit (rate-limited 5/60s, duplicate check)
-- Dev mode: Order validation mocks success when NETSUITE_VALIDATION_URL not set
-- Anonymous RLS policy allows INSERT with security constraints
+- Customer app in `customer/` directory (Nuxt 4) - **REALTIME READY**
+- **Realtime infrastructure complete for both apps**
+- Staff: useRealtimeQueue composable subscribes to all pickup_requests
+- Customer: useRealtimeStatus composable subscribes to single request by ID
+- Both apps have ConnectionStatus component for visual feedback
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Staff dev: `cd staff && pnpm dev` (http://localhost:3000)
 - Customer dev: `cd customer && pnpm dev` (next available port)
