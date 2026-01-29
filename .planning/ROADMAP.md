@@ -110,6 +110,11 @@ Plans:
 3. Email-mismatched requests show clear flag icon
 4. Table updates when new requests come in (manual refresh initially, real-time later)
 
+**Plans:** 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md — Dashboard data table with TanStack Table, status badges, and visual highlighting
+
 ---
 
 ### Phase 5: Staff Queue Management
@@ -239,7 +244,7 @@ Plans:
 | 1 | Database Foundation | INFRA-01 | Complete |
 | 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Code Complete (deploy deferred) |
 | 3 | Staff Authentication | INFRA-03, STAFF-01 | Complete |
-| 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Not Started |
+| 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Planned |
 | 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Not Started |
 | 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Not Started |
 | 7 | Customer Submission Flow | CUST-01, CUST-02, CUST-03, VAL-05 | Not Started |
@@ -250,4 +255,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-01-28*
+*Last updated: 2026-01-29*
