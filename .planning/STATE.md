@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 5 In Progress
+**Status:** Phase 5 Complete
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 5 - Staff Queue Management (Plan 02 complete)
+**Current Focus:** Phase 5 - Staff Queue Management (Complete)
 
 ## Current Position
 
 **Phase:** 5 of 10 (Staff Queue Management)
-**Plan:** 2 of 3 in phase
-**Status:** In progress
-**Last activity:** 2026-01-29 - Completed 05-02-PLAN.md (Queue Action Components)
+**Plan:** 3 of 3 in phase (Complete)
+**Status:** Phase complete
+**Last activity:** 2026-01-29 - Completed 05-03-PLAN.md (Dashboard Integration)
 
 **Progress:**
 ```
@@ -22,7 +22,7 @@ Phase 1  [===] Database Foundation (2/2 plans) COMPLETE
 Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
-Phase 5  [== ] Staff Queue Management (2/3 plans)
+Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [   ] Staff Advanced Queue Operations
 Phase 7  [   ] Customer Submission Flow
 Phase 8  [   ] Real-time Infrastructure
@@ -30,15 +30,15 @@ Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 10 plans complete (Phases 1, 3, 4 complete; Phase 2 code complete; Phase 5 in progress)
+**Overall:** 11 plans complete (Phases 1, 3, 4, 5 complete; Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 10 |
-| Requirements Delivered | 6/28 (INFRA-01, INFRA-03, STAFF-01, STAFF-02, STAFF-03, VAL-04) |
-| Phases Completed | 3/10 (+ 1 code complete) |
+| Plans Completed | 11 |
+| Requirements Delivered | 9/28 (INFRA-01, INFRA-03, STAFF-01-06, VAL-04) |
+| Phases Completed | 4/10 (+ 1 code complete) |
 
 ## Deferred Items
 
@@ -80,6 +80,9 @@ Phase 10 [   ] Customer Queue Experience
 | Manual AlertDialog creation | shadcn-vue CLI had issues, built from reka-ui primitives | 05-01 |
 | Cast SupabaseClient for RPC calls | Database types not yet generated, workaround for TypeScript | 05-02 |
 | AcceptableValue for Select handlers | Type-safe handling of reka-ui Select update events | 05-02 |
+| createColumns() factory function | Allows passing callbacks from parent to column cell renderers | 05-03 |
+| for-of loop for countMap | TypeScript narrowing works better than reduce with unknown types | 05-03 |
+| Close sheet after complete/cancel | User expects panel to close when request moves to history | 05-03 |
 
 ### Technical Debt
 
@@ -111,37 +114,39 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 5 (Staff Queue Management)
 - [x] Execute 05-01-PLAN.md (Queue Management Foundation)
 - [x] Execute 05-02-PLAN.md (Queue Action Components)
-- [ ] Execute 05-03-PLAN.md (Dashboard Integration)
+- [x] Execute 05-03-PLAN.md (Dashboard Integration)
+- [ ] Plan Phase 6 (Staff Advanced Queue Operations)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 5 Plan 02 (Queue Action Components):
-- Created useQueueActions composable with assignGate, cancelRequest, completeRequest
-- Built GateSelect dropdown component showing gate numbers with queue counts
-- Built ActionButtons component with Complete/Cancel buttons wrapped in AlertDialog confirmations
-- Fixed AlertDialog type imports for reka-ui compatibility
+Completed Phase 5 Plan 03 (Dashboard Integration):
+- Added row click handler to DataTable emitting typed events
+- Created createColumns() factory function with Gate dropdown and Action buttons
+- Built RequestDetail component for Sheet panel showing full request info
+- Integrated Tabs (Active Queue/History), Sheet, and all queue actions into dashboard
+- Fixed TypeScript compilation with explicit type casts for Supabase queries
 
 ### Next Actions
 
-1. Execute 05-03-PLAN.md (Dashboard Integration)
+1. Plan Phase 6 (Staff Advanced Queue Operations) - reordering, reassignment, batch ops
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- Dashboard shows pickup requests table with sorting
-- DataTable component ready for extension with actions
-- **NEW: useQueueActions composable available at staff/app/composables/useQueueActions.ts**
-- **NEW: GateSelect component for gate assignment dropdown**
-- **NEW: ActionButtons component for Complete/Cancel with confirmations**
-- assign_to_queue() function available for atomic queue operations
-- UI components available: Select, AlertDialog, Tabs, Sheet, Sonner
-- Toast notifications ready via toast() from vue-sonner
+- **Phase 5 COMPLETE: Full queue management dashboard functional**
+- Dashboard has Active Queue and History tabs with counts
+- Gate assignment dropdown in table rows (GateSelect component)
+- Complete/Cancel buttons with confirmation dialogs (ActionButtons component)
+- Row click opens Sheet with RequestDetail component
+- Data refreshes immediately after any status transition
+- useQueueActions composable handles all queue operations
+- assign_to_queue() database function for atomic queue operations
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
-- Next plan will integrate these components into the DataTable columns
+- Requirements STAFF-04, STAFF-05, STAFF-06 now complete
 
 ---
 
