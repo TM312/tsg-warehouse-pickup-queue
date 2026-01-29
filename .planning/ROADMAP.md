@@ -137,12 +137,14 @@ Plans:
 4. Staff can mark an in-queue pickup as complete
 5. Status transitions are reflected immediately in the dashboard
 
-**Plans:** 3 plans
+**Plans:** 3 plans (Complete)
 
 Plans:
-- [ ] 05-01-PLAN.md — Foundation: atomic queue function, UI components (sonner, select, alert-dialog, tabs, sheet)
-- [ ] 05-02-PLAN.md — Queue actions composable, GateSelect and ActionButtons components
-- [ ] 05-03-PLAN.md — Dashboard integration with tabs, sheet, and wired actions
+- [x] 05-01-PLAN.md — Foundation: atomic queue function, UI components (sonner, select, alert-dialog, tabs, sheet)
+- [x] 05-02-PLAN.md — Queue actions composable, GateSelect and ActionButtons components
+- [x] 05-03-PLAN.md — Dashboard integration with tabs, sheet, and wired actions
+
+**Completed:** 2026-01-29
 
 ---
 
@@ -254,7 +256,7 @@ Plans:
 | 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Code Complete (deploy deferred) |
 | 3 | Staff Authentication | INFRA-03, STAFF-01 | Complete |
 | 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Complete |
-| 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Not Started |
+| 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Complete |
 | 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Not Started |
 | 7 | Customer Submission Flow | CUST-01, CUST-02, CUST-03, VAL-05 | Not Started |
 | 8 | Real-time Infrastructure | INFRA-04 | Not Started |
@@ -264,4 +266,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 4 completion*
+*Last updated: 2026-01-29 after Phase 5 completion*

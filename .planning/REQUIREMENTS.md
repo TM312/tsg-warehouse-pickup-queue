@@ -20,9 +20,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **STAFF-01**: Email/password authentication via Supabase
 - [x] **STAFF-02**: Dashboard with table view of all pickup requests
 - [x] **STAFF-03**: Visual highlighting of requests requiring attention (flagged/pending)
-- [ ] **STAFF-04**: Gate assignment functionality
-- [ ] **STAFF-05**: Add to queue / Cancel request actions
-- [ ] **STAFF-06**: Mark pickup as complete
+- [x] **STAFF-04**: Gate assignment functionality
+- [x] **STAFF-05**: Add to queue / Cancel request actions
+- [x] **STAFF-06**: Mark pickup as complete
 - [ ] **STAFF-07**: Reorder queue positions within a gate
 - [ ] **STAFF-08**: Move customer between gates
 - [ ] **STAFF-09**: Priority override capability
@@ -94,9 +94,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAFF-01 | Phase 3 | Complete |
 | STAFF-02 | Phase 4 | Complete |
 | STAFF-03 | Phase 4 | Complete |
-| STAFF-04 | Phase 5 | Pending |
-| STAFF-05 | Phase 5 | Pending |
-| STAFF-06 | Phase 5 | Pending |
+| STAFF-04 | Phase 5 | Complete |
+| STAFF-05 | Phase 5 | Complete |
+| STAFF-06 | Phase 5 | Complete |
 | STAFF-07 | Phase 6 | Pending |
 | STAFF-08 | Phase 6 | Pending |
 | STAFF-09 | Phase 6 | Pending |
@@ -122,4 +122,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 4 completion*
+*Last updated: 2026-01-29 after Phase 5 completion*
