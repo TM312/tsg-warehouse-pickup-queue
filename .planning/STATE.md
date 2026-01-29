@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 5 Complete
+**Status:** Phase 6 In Progress
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Ready for Phase 6 - Staff Advanced Queue Operations
+**Current Focus:** Phase 6 - Staff Advanced Queue Operations
 
 ## Current Position
 
-**Phase:** 5 of 10 (Staff Queue Management) — Complete
-**Plan:** 3 of 3 in phase (all plans executed)
-**Status:** Phase complete, verified
-**Last activity:** 2026-01-29 - Completed Phase 5 (Staff Queue Management)
+**Phase:** 6 of 10 (Staff Advanced Queue Operations)
+**Plan:** 1 of 3 in phase
+**Status:** In progress
+**Last activity:** 2026-01-29 - Completed 06-01-PLAN.md (Advanced Queue Functions)
 
 **Progress:**
 ```
@@ -23,22 +23,22 @@ Phase 2  [===] NetSuite Integration (3/3 plans) CODE COMPLETE (deploy deferred)
 Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
 Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
-Phase 6  [   ] Staff Advanced Queue Operations
+Phase 6  [=  ] Staff Advanced Queue Operations (1/3 plans)
 Phase 7  [   ] Customer Submission Flow
 Phase 8  [   ] Real-time Infrastructure
 Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 11 plans complete (Phases 1, 3, 4, 5 complete; Phase 2 code complete)
+**Overall:** 12 plans complete (Phases 1, 3, 4, 5 complete; Phase 2 code complete; Phase 6 in progress)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 11 |
+| Plans Completed | 12 |
 | Requirements Delivered | 9/28 (INFRA-01, INFRA-03, STAFF-01-06, VAL-04) |
-| Phases Completed | 4/10 (+ 1 code complete) |
+| Phases Completed | 4/10 (+ 1 code complete, + 1 in progress) |
 
 ## Deferred Items
 
@@ -83,6 +83,9 @@ Phase 10 [   ] Customer Queue Experience
 | createColumns() factory function | Allows passing callbacks from parent to column cell renderers | 05-03 |
 | for-of loop for countMap | TypeScript narrowing works better than reduce with unknown types | 05-03 |
 | Close sheet after complete/cancel | User expects panel to close when request moves to history | 05-03 |
+| Position 2 for priority insertion | Priority goes behind current service at position 1 | 06-01 |
+| Gap compaction on move_to_gate | Prevents holes in queue numbering after transfer | 06-01 |
+| UNNEST WITH ORDINALITY for bulk reorder | Atomic position assignment from array index | 06-01 |
 
 ### Technical Debt
 
@@ -115,38 +118,36 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Execute 05-01-PLAN.md (Queue Management Foundation)
 - [x] Execute 05-02-PLAN.md (Queue Action Components)
 - [x] Execute 05-03-PLAN.md (Dashboard Integration)
-- [ ] Plan Phase 6 (Staff Advanced Queue Operations)
+- [x] Plan Phase 6 (Staff Advanced Queue Operations)
+- [x] Execute 06-01-PLAN.md (Advanced Queue Functions)
+- [ ] Execute 06-02-PLAN.md (Drag-and-Drop Reordering)
+- [ ] Execute 06-03-PLAN.md (Gate Management)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 5 Plan 03 (Dashboard Integration):
-- Added row click handler to DataTable emitting typed events
-- Created createColumns() factory function with Gate dropdown and Action buttons
-- Built RequestDetail component for Sheet panel showing full request info
-- Integrated Tabs (Active Queue/History), Sheet, and all queue actions into dashboard
-- Fixed TypeScript compilation with explicit type casts for Supabase queries
+Completed Phase 6 Plan 01 (Advanced Queue Functions):
+- Created reorder_queue function using UNNEST WITH ORDINALITY for bulk position updates
+- Created set_priority function that moves request to position 2 and shifts others
+- Created move_to_gate function with position compaction on source gate
+- All functions use SECURITY DEFINER with authenticated role GRANT
 
 ### Next Actions
 
-1. Plan Phase 6 (Staff Advanced Queue Operations) - reordering, reassignment, batch ops
-2. (Optional) Deploy NetSuite Lambda when credentials ready
+1. Execute 06-02-PLAN.md (Drag-and-Drop Reordering UI)
+2. Execute 06-03-PLAN.md (Gate Management)
+3. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- **Phase 5 COMPLETE: Full queue management dashboard functional**
-- Dashboard has Active Queue and History tabs with counts
-- Gate assignment dropdown in table rows (GateSelect component)
-- Complete/Cancel buttons with confirmation dialogs (ActionButtons component)
-- Row click opens Sheet with RequestDetail component
-- Data refreshes immediately after any status transition
-- useQueueActions composable handles all queue operations
-- assign_to_queue() database function for atomic queue operations
+- **Phase 6 Plan 1 COMPLETE: Advanced queue PostgreSQL functions**
+- Three new RPC functions: reorder_queue, set_priority, move_to_gate
+- Functions are SECURITY DEFINER with authenticated role permissions
+- Plan 06-02 will build drag-and-drop UI calling reorder_queue
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
-- Requirements STAFF-04, STAFF-05, STAFF-06 now complete
 
 ---
 
