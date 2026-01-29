@@ -83,11 +83,13 @@ Plans:
 4. Unauthenticated users are redirected to login page
 5. Only authenticated users can access staff dashboard routes
 
-**Plans:** 2 plans
+**Plans:** 2 plans (Complete)
 
 Plans:
-- [ ] 03-01-PLAN.md — Initialize Nuxt 3 app with Supabase module and shadcn-vue
-- [ ] 03-02-PLAN.md — Create auth pages (login, forgot password, settings) and protected routes
+- [x] 03-01-PLAN.md — Initialize Nuxt 4 app with Supabase module and shadcn-vue
+- [x] 03-02-PLAN.md — Create auth pages (login, forgot password, settings) and protected routes
+
+**Completed:** 2026-01-29
 
 ---
 
@@ -236,7 +238,7 @@ Plans:
 |-------|------|--------------|--------|
 | 1 | Database Foundation | INFRA-01 | Complete |
 | 2 | NetSuite Integration | INFRA-02, VAL-01, VAL-02, VAL-03 | Code Complete (deploy deferred) |
-| 3 | Staff Authentication | INFRA-03, STAFF-01 | Planned |
+| 3 | Staff Authentication | INFRA-03, STAFF-01 | Complete |
 | 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Not Started |
 | 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Not Started |
 | 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Not Started |
