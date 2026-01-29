@@ -24,10 +24,11 @@ export default defineNuxtConfig({
     componentDir: './app/components/ui',
   },
   supabase: {
-    // Customer app uses anonymous access only - no auth redirects
+    // Customer app uses anonymous access only - disable all auth redirects
+    redirect: false,
     redirectOptions: {
-      login: '',
-      callback: '',
+      login: '/login',
+      callback: '/confirm',
       include: undefined,
       exclude: [],
       cookieRedirect: false,
