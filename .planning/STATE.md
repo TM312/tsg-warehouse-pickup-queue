@@ -1,20 +1,20 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-29
-**Status:** Phase 9 In Progress
+**Status:** Phase 9 Complete
 
 ## Project Reference
 
 **Core Value:** Customers always know their queue position and which gate to go to
 
-**Current Focus:** Phase 9 - Real-time Queue Updates
+**Current Focus:** Phase 9 - Real-time Queue Updates (COMPLETE)
 
 ## Current Position
 
 **Phase:** 9 of 10 (Real-time Queue Updates)
-**Plan:** 2 of 3 in phase
-**Status:** In progress
-**Last activity:** 2026-01-29 - Completed 09-02-PLAN.md (Customer UI Components)
+**Plan:** 3 of 3 in phase
+**Status:** Phase complete
+**Last activity:** 2026-01-29 - Completed 09-03-PLAN.md (Staff/Customer Realtime Integration)
 
 **Progress:**
 ```
@@ -26,19 +26,19 @@ Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
 Phase 7  [===] Customer Submission Flow (3/3 plans) COMPLETE
 Phase 8  [===] Real-time Infrastructure (2/2 plans) COMPLETE
-Phase 9  [== ] Real-time Queue Updates (2/3 plans)
+Phase 9  [===] Real-time Queue Updates (3/3 plans) COMPLETE
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 21 plans complete (Phases 1, 3, 4, 5, 6, 7, 8 complete; Phase 2 code complete)
+**Overall:** 22 plans complete (Phases 1, 3, 4, 5, 6, 7, 8, 9 complete; Phase 2 code complete)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 21 |
+| Plans Completed | 22 |
 | Requirements Delivered | 14/28 (INFRA-01, INFRA-03, INFRA-04, STAFF-01-10, VAL-04, VAL-05, CUST-01-03) |
-| Phases Completed | 7/10 (+ 1 code complete + 1 in progress) |
+| Phases Completed | 8/10 (+ 1 code complete) |
 
 ## Deferred Items
 
@@ -106,6 +106,9 @@ Phase 10 [   ] Customer Queue Experience
 | Return null for insufficient wait time data | Fewer than 3 completed requests means hide wait estimate | 09-02 |
 | Wait time = avgTime * (position - 1) | Position 1 is next up with 0 wait | 09-02 |
 | Range with +/- 20% buffer | Accounts for variability in pickup times | 09-02 |
+| Subscribe callback refreshes all data | Ensures both requests and gates stay in sync | 09-03 |
+| Toggle inline in tab content | Replaced separate History tab with ShowCompletedToggle | 09-03 |
+| Track takeoverDismissed state | Prevents re-triggering takeover after user acknowledgment | 09-03 |
 
 ### Technical Debt
 
@@ -158,30 +161,31 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 9 (Real-time Queue Updates)
 - [x] Execute 09-01-PLAN.md (Customer Status Page)
 - [x] Execute 09-02-PLAN.md (Customer UI Components)
+- [x] Execute 09-03-PLAN.md (Staff/Customer Realtime Integration)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 9 Plan 02 (Customer UI Components):
-- Created useWaitTimeEstimate composable with rolling average calculation
-- Built WaitTimeEstimate component that shows range or hides when no data
-- Built TurnTakeover full-screen overlay with gate number and animation
+Completed Phase 9 Plan 03 (Staff/Customer Realtime Integration):
+- Staff dashboard now has live realtime updates via useRealtimeQueue subscription
+- Added ShowCompletedToggle to show/hide completed/cancelled requests
+- Customer status page now shows wait time estimate when in queue
+- Customer receives toast notification when gate changes
+- Customer sees full-screen TurnTakeover when at position 1 with gate assigned
 
 ### Next Actions
 
-1. Execute 09-03-PLAN.md (Staff Dashboard Realtime Integration)
+1. Plan Phase 10 (Customer Queue Experience) if additional features needed
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4) on port 3000
 - Customer app in `customer/` directory (Nuxt 4)
-- **Customer status page now functional at /status/[id]**
-- **Customer UI components ready:** useWaitTimeEstimate, WaitTimeEstimate, TurnTakeover
-- PositionDisplay shows animated position with "Your turn any moment" at #1
-- Form submission now navigates to status page automatically
-- Realtime updates work via useRealtimeStatus composable
+- **Phase 9 complete - Full realtime experience for staff and customer**
+- Staff dashboard auto-refreshes on queue changes, toggle for completed items
+- Customer status page: position display, wait time estimate, gate toast, turn takeover
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Staff dev: `cd staff && pnpm dev` (http://localhost:3000)
 - Customer dev: `cd customer && pnpm dev` (next available port)
