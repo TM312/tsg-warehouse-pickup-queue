@@ -93,6 +93,9 @@ Phase 10 [   ] Customer Queue Experience
 | ArrowUp icon for priority button | Clear metaphor for 'move up in queue' to position 2 | 06-03 |
 | WITH CHECK constraints for RLS field control | Enforce field defaults at policy level, not app | 07-02 |
 | Anon can only insert pending status | Cannot skip approval process via direct insert | 07-02 |
+| Separate customer/ app from staff/ | Clean separation of concerns, different auth requirements | 07-01 |
+| Supabase redirect: false for customer app | Anonymous access only, no auth flow needed | 07-01 |
+| Rate limit 5 req/60s on /api/submit | Prevent brute-force order number enumeration | 07-01 |
 
 ### Technical Debt
 
@@ -143,32 +146,31 @@ Phase 10 [   ] Customer Queue Experience
 
 ### Last Session Summary
 
-Completed Phase 7 Plan 02 (Anonymous INSERT Policy):
-- Created RLS policy allowing anonymous INSERT on pickup_requests
-- Added GRANT INSERT to anon role
-- Implemented WITH CHECK constraints for security:
-  - Status must be 'pending'
-  - Cannot set gate, queue_position, is_priority
-  - Cannot set email_verified or completed_at
+Completed Phase 7 Plan 01 (Customer App Scaffold):
+- Initialized Nuxt 4 app in customer/ directory
+- Added shadcn-vue components: button, card, input, label, form, sonner
+- Created mobile-first layout with max-w-md centered container
+- Configured Supabase for anonymous access (redirect: false)
+- Configured nuxt-api-shield rate limiting for /api/submit
 
 ### Next Actions
 
 1. Execute 07-03-PLAN.md (Customer Submission Form)
-2. Execute 07-04-PLAN.md (Verification Token System)
-3. (Optional) Deploy NetSuite Lambda when credentials ready
+2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
-- Staff app in `staff/` directory (Nuxt 4)
-- Customer app in `customer/` directory (Nuxt 4)
-- **Phase 7 in progress: Anonymous INSERT policy ready**
-- Anon can insert pickup_requests with security constraints
-- Existing SELECT policy allows returning created rows
+- Staff app in `staff/` directory (Nuxt 4) on port 3000
+- Customer app in `customer/` directory (Nuxt 4) - mobile-first layout ready
+- **Phase 7 Plans 01-02 COMPLETE: Customer app scaffold and RLS policy ready**
+- shadcn-vue components installed: button, card, input, label, form, sonner
+- vee-validate and zod ready for form validation
+- date-fns ready for business hours checking
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
-- Customer dev server: `cd customer && pnpm dev` (http://localhost:3001)
+- Customer dev server: `cd customer && pnpm dev` (uses next available port)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-29 09:56 UTC*
+*Last updated: 2026-01-29 18:10 UTC*
