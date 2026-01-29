@@ -52,7 +52,7 @@ pnpm add vee-validate @vee-validate/zod zod
 
 ### Recommended Project Structure
 ```
-app/
+staff/
 ├── components/
 │   └── ui/              # shadcn-vue components (auto-generated)
 ├── composables/

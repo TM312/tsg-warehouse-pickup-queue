@@ -45,7 +45,7 @@ Phase 10 [   ] Customer Queue Experience
 | Item | Phase | How to Complete |
 |------|-------|-----------------|
 | NetSuite Lambda deployment | 02 | Fill `infra/dev.tfvars`, run `make deploy ENV=dev` |
-| Supabase environment variables | 03 | Create `app/.env` with SUPABASE_URL and SUPABASE_KEY |
+| Supabase environment variables | 03 | Create `staff/.env` with SUPABASE_URL and SUPABASE_KEY |
 
 ## Accumulated Context
 
@@ -115,16 +115,16 @@ Completed Phase 3 Plan 01:
 ### Next Actions
 
 1. Execute 03-02-PLAN.md (Login page and email/password authentication)
-2. Configure `app/.env` with Supabase credentials for testing
+2. Configure `staff/.env` with Supabase credentials for testing
 
 ### Context for Next Session
 
-- Nuxt app in `app/` directory with Supabase auth infrastructure
-- shadcn-vue components available in `app/app/components/ui/`
-- Auth middleware at `app/app/middleware/auth.ts`
-- Layouts at `app/app/layouts/` (default.vue, auth.vue)
+- Nuxt app in `staff/` directory with Supabase auth infrastructure
+- shadcn-vue components available in `staff/staff/components/ui/`
+- Auth middleware at `staff/staff/middleware/auth.ts`
+- Layouts at `staff/staff/layouts/` (default.vue, auth.vue)
 - Dev server: `cd app && pnpm dev` (http://localhost:3000)
-- Needs `app/.env` with SUPABASE_URL and SUPABASE_KEY to test auth
+- Needs `staff/.env` with SUPABASE_URL and SUPABASE_KEY to test auth
 
 ---
 

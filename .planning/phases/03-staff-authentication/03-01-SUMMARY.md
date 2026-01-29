@@ -23,17 +23,17 @@ tech-stack:
 
 key-files:
   created:
-    - app/nuxt.config.ts
-    - app/app/middleware/auth.ts
-    - app/app/layouts/default.vue
-    - app/app/layouts/auth.vue
-    - app/components.json
-    - app/app/components/ui/button/Button.vue
-    - app/app/components/ui/card/Card.vue
-    - app/app/components/ui/input/Input.vue
-    - app/app/components/ui/label/Label.vue
-    - app/app/lib/utils.ts
-    - app/assets/css/tailwind.css
+    - staff/nuxt.config.ts
+    - staff/staff/middleware/auth.ts
+    - staff/staff/layouts/default.vue
+    - staff/staff/layouts/auth.vue
+    - staff/components.json
+    - staff/staff/components/ui/button/Button.vue
+    - staff/staff/components/ui/card/Card.vue
+    - staff/staff/components/ui/input/Input.vue
+    - staff/staff/components/ui/label/Label.vue
+    - staff/staff/lib/utils.ts
+    - staff/assets/css/tailwind.css
   modified: []
 
 key-decisions:
@@ -43,9 +43,9 @@ key-decisions:
   - "zod v3 for vee-validate compatibility (v4 peer dep mismatch)"
 
 patterns-established:
-  - "UI components in app/app/components/ui/ directory structure"
-  - "Layouts in app/app/layouts/ (default for authenticated, auth for public)"
-  - "Middleware in app/app/middleware/ for route protection"
+  - "UI components in staff/staff/components/ui/ directory structure"
+  - "Layouts in staff/staff/layouts/ (default for authenticated, auth for public)"
+  - "Middleware in staff/staff/middleware/ for route protection"
   - "CSS variables for theming in assets/css/tailwind.css"
 
 # Metrics
@@ -83,19 +83,19 @@ Each task was committed atomically:
 
 ## Files Created/Modified
 
-- `app/nuxt.config.ts` - Nuxt configuration with Supabase and Tailwind modules
-- `app/package.json` - Dependencies including Supabase, shadcn-vue, validation libs
-- `app/app/app.vue` - Root component with NuxtLayout and NuxtPage
-- `app/app/pages/index.vue` - Basic index page placeholder
-- `app/app/middleware/auth.ts` - Route protection middleware
-- `app/app/layouts/default.vue` - Authenticated pages layout with header and logout
-- `app/app/layouts/auth.vue` - Minimal layout for login/public pages
-- `app/components.json` - shadcn-vue configuration
-- `app/app/lib/utils.ts` - cn() helper utility for class names
-- `app/assets/css/tailwind.css` - Tailwind directives and CSS variables
-- `app/tailwind.config.ts` - Tailwind configuration
-- `app/app/components/ui/*/` - UI components (button, card, input, label)
-- `app/.env.example` - Environment variable documentation
+- `staff/nuxt.config.ts` - Nuxt configuration with Supabase and Tailwind modules
+- `staff/package.json` - Dependencies including Supabase, shadcn-vue, validation libs
+- `staff/staff/app.vue` - Root component with NuxtLayout and NuxtPage
+- `staff/staff/pages/index.vue` - Basic index page placeholder
+- `staff/staff/middleware/auth.ts` - Route protection middleware
+- `staff/staff/layouts/default.vue` - Authenticated pages layout with header and logout
+- `staff/staff/layouts/auth.vue` - Minimal layout for login/public pages
+- `staff/components.json` - shadcn-vue configuration
+- `staff/staff/lib/utils.ts` - cn() helper utility for class names
+- `staff/assets/css/tailwind.css` - Tailwind directives and CSS variables
+- `staff/tailwind.config.ts` - Tailwind configuration
+- `staff/staff/components/ui/*/` - UI components (button, card, input, label)
+- `staff/.env.example` - Environment variable documentation
 
 ## Decisions Made
 
@@ -127,8 +127,8 @@ Each task was committed atomically:
 **3. [Rule 3 - Blocking] Created index page for NuxtPage**
 - **Found during:** Task 1 (dev server verification)
 - **Issue:** NuxtPage needs at least one page component to render
-- **Fix:** Created app/pages/index.vue with basic placeholder content
-- **Files modified:** app/app/pages/index.vue
+- **Fix:** Created staff/pages/index.vue with basic placeholder content
+- **Files modified:** staff/staff/pages/index.vue
 - **Verification:** Dev server starts and renders page
 - **Committed in:** 822b0b4 (Task 1 commit)
 
@@ -144,13 +144,13 @@ Each task was committed atomically:
 
 ## User Setup Required
 
-**Environment variables needed for Supabase.** Create `app/.env` with:
+**Environment variables needed for Supabase.** Create `staff/.env` with:
 ```
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-anon-key
 ```
 
-See `app/.env.example` for template.
+See `staff/.env.example` for template.
 
 ## Next Phase Readiness
 

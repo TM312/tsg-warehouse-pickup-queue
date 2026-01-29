@@ -29,12 +29,12 @@ help:
 	@echo "Warehouse Pickup Queue - Available Commands"
 	@echo "============================================"
 	@echo ""
-	@echo "DEVELOPMENT"
-	@echo "  make dev            - Start Nuxt dev server"
-	@echo "  make build          - Build for production"
-	@echo "  make preview        - Preview production build locally"
-	@echo "  make lint           - Run ESLint"
-	@echo "  make format         - Auto-fix formatting (Prettier + ESLint)"
+	@echo "STAFF APP (Nuxt)"
+	@echo "  make dev            - Start staff app dev server"
+	@echo "  make build          - Build staff app for production"
+	@echo "  make preview        - Preview staff app production build"
+	@echo "  make lint           - Run ESLint on staff app"
+	@echo "  make format         - Auto-fix formatting"
 	@echo "  make test           - Run tests"
 	@echo ""
 	@echo "DATABASE (Supabase)"
@@ -70,40 +70,39 @@ help:
 	@echo "  State: infra/$(STATE_FILE)"
 
 # ============================================================================
-# DEVELOPMENT
+# STAFF APP (Nuxt)
 # ============================================================================
 
-# Start Nuxt development server
+# Start staff app development server
 dev:
-	@echo "🚀 Starting Nuxt dev server..."
-	@npx nuxt dev
+	@echo "🚀 Starting staff app dev server..."
+	@cd staff && pnpm dev
 
-# Build for production
+# Build staff app for production
 build:
-	@echo "📦 Building for production..."
-	@npx nuxt build
+	@echo "📦 Building staff app for production..."
+	@cd staff && pnpm build
 
-# Preview production build
+# Preview staff app production build
 preview:
-	@echo "👀 Previewing production build..."
-	@npx nuxt preview
+	@echo "👀 Previewing staff app production build..."
+	@cd staff && pnpm preview
 
-# Run ESLint
+# Run ESLint on staff app
 lint:
 	@echo "🔍 Running ESLint..."
-	@npx eslint . --ext .vue,.js,.ts,.tsx
+	@cd staff && pnpm lint
 
 # Auto-fix formatting
 format:
 	@echo "🔧 Fixing formatting..."
-	@npx prettier --write "**/*.{vue,js,ts,json,md}"
-	@npx eslint . --ext .vue,.js,.ts,.tsx --fix
+	@cd staff && pnpm lint --fix
 	@echo "✅ Formatting complete"
 
 # Run tests
 test:
 	@echo "🧪 Running tests..."
-	@npx vitest run
+	@cd staff && pnpm test
 
 # ============================================================================
 # DATABASE (Supabase)
@@ -260,9 +259,9 @@ rollback:
 clean:
 	@echo "🧹 Cleaning build artifacts..."
 	@rm -rf lambda/layer/
-	@rm -rf .nuxt/
-	@rm -rf .output/
-	@rm -rf node_modules/.cache/
+	@rm -rf staff/.nuxt/
+	@rm -rf staff/.output/
+	@rm -rf staff/node_modules/.cache/
 	@echo "✅ Clean complete"
 
 # Destroy infrastructure (dangerous!)

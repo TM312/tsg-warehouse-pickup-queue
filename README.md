@@ -19,9 +19,9 @@ A queue management system for warehouse pickups. Customers submit pickup request
    ```
    This runs PostgreSQL, Auth, Storage, and other Supabase services locally.
 
-2. **Install app dependencies:**
+2. **Install staff app dependencies:**
    ```bash
-   cd app && pnpm install
+   cd staff && pnpm install
    ```
 
 3. **Configure environment:**
@@ -29,24 +29,24 @@ A queue management system for warehouse pickups. Customers submit pickup request
    # Get the anon key
    supabase status -o json | jq -r '.ANON_KEY'
 
-   # Create app/.env
-   cat > app/.env << EOF
+   # Create staff/.env
+   cat > staff/.env << EOF
    SUPABASE_URL=http://127.0.0.1:54321
    SUPABASE_KEY=<paste anon key here>
    EOF
    ```
 
-4. **Start the app:**
+4. **Start the staff app:**
    ```bash
-   cd app && pnpm dev
+   cd staff && pnpm dev
    ```
-   App runs at http://localhost:3000
+   Staff dashboard runs at http://localhost:3000
 
 ### Local Services
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| App | http://localhost:3000 | Nuxt application |
+| Staff App | http://localhost:3000 | Staff dashboard (Nuxt) |
 | Supabase Studio | http://127.0.0.1:54323 | Database UI |
 | Supabase API | http://127.0.0.1:54321 | REST/Auth API |
 | Mailpit | http://127.0.0.1:54324 | Email testing (view sent emails) |
@@ -85,14 +85,15 @@ supabase db reset
 # View logs
 supabase logs
 
-# Start app dev server
-cd app && pnpm dev
+# Start staff app dev server
+cd staff && pnpm dev
 ```
 
 ## Project Structure
 
 ```
-├── app/                 # Nuxt 3 frontend application
+├── staff/               # Staff dashboard (Nuxt 4) - queue management UI
+├── customer/            # Customer app (future) - pickup request submission
 ├── infra/               # OpenTofu infrastructure (Lambda, API Gateway)
 ├── lambda/              # AWS Lambda functions (NetSuite integration)
 ├── supabase/            # Supabase configuration and migrations
