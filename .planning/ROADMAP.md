@@ -167,6 +167,14 @@ Plans:
 4. Staff can disable an empty gate (greyed out, no new assignments)
 5. System prevents disabling a gate that has customers in queue
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — PostgreSQL functions for reorder, priority, and cross-gate move
+- [ ] 06-02-PLAN.md — Gate management composable and CRUD dialog components
+- [ ] 06-03-PLAN.md — Drag-and-drop with useSortable, extended queue actions
+- [ ] 06-04-PLAN.md — Dashboard integration with per-gate tabs and gate management
+
 ---
 
 ### Phase 7: Customer Submission Flow
@@ -257,7 +265,7 @@ Plans:
 | 3 | Staff Authentication | INFRA-03, STAFF-01 | Complete |
 | 4 | Staff Dashboard Core | STAFF-02, STAFF-03, VAL-04 | Complete |
 | 5 | Staff Queue Management | STAFF-04, STAFF-05, STAFF-06 | Complete |
-| 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Not Started |
+| 6 | Staff Advanced Queue Operations | STAFF-07, STAFF-08, STAFF-09, STAFF-10 | Planning Complete |
 | 7 | Customer Submission Flow | CUST-01, CUST-02, CUST-03, VAL-05 | Not Started |
 | 8 | Real-time Infrastructure | INFRA-04 | Not Started |
 | 9 | Real-time Queue Updates | RT-01, RT-02, RT-03, RT-04 | Not Started |
@@ -266,4 +274,4 @@ Plans:
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 5 completion*
+*Last updated: 2026-01-29 after Phase 6 planning*
