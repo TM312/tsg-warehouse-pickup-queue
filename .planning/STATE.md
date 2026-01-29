@@ -12,9 +12,9 @@
 ## Current Position
 
 **Phase:** 7 of 10 (Customer Submission Flow)
-**Plan:** 2 of 4 in phase
+**Plan:** 3 of 4 in phase
 **Status:** In progress
-**Last activity:** 2026-01-29 - Completed 07-02-PLAN.md (Anonymous INSERT Policy)
+**Last activity:** 2026-01-29 - Completed 07-03-PLAN.md (Customer Submission Form)
 
 **Progress:**
 ```
@@ -24,19 +24,19 @@ Phase 3  [===] Staff Authentication (2/2 plans) COMPLETE
 Phase 4  [===] Staff Dashboard Core (1/1 plans) COMPLETE
 Phase 5  [===] Staff Queue Management (3/3 plans) COMPLETE
 Phase 6  [===] Staff Advanced Queue Operations (3/3 plans) COMPLETE
-Phase 7  [=  ] Customer Submission Flow (2/4 plans)
+Phase 7  [== ] Customer Submission Flow (3/4 plans)
 Phase 8  [   ] Real-time Infrastructure
 Phase 9  [   ] Real-time Queue Updates
 Phase 10 [   ] Customer Queue Experience
 ```
 
-**Overall:** 16 plans complete (Phases 1, 3, 4, 5, 6 complete; Phase 2 code complete; Phase 7 in progress)
+**Overall:** 17 plans complete (Phases 1, 3, 4, 5, 6 complete; Phase 2 code complete; Phase 7 in progress)
 
 ## Performance Metrics
 
 | Metric | Value |
 |--------|-------|
-| Plans Completed | 16 |
+| Plans Completed | 17 |
 | Requirements Delivered | 9/28 (INFRA-01, INFRA-03, STAFF-01-06, VAL-04) |
 | Phases Completed | 5/10 (+ 1 code complete) |
 
@@ -96,6 +96,9 @@ Phase 10 [   ] Customer Queue Experience
 | Separate customer/ app from staff/ | Clean separation of concerns, different auth requirements | 07-01 |
 | Supabase redirect: false for customer app | Anonymous access only, no auth flow needed | 07-01 |
 | Rate limit 5 req/60s on /api/submit | Prevent brute-force order number enumeration | 07-01 |
+| Hardcoded America/Los_Angeles timezone | Simpler than database config, can add later | 07-03 |
+| Dev mode mock for order validation | Allows testing without Lambda deployment | 07-03 |
+| Duplicate check for pending/approved/in_queue | Prevents multiple requests for same order | 07-03 |
 
 ### Technical Debt
 
@@ -141,31 +144,34 @@ Phase 10 [   ] Customer Queue Experience
 - [x] Plan Phase 7 (Customer Submission Flow)
 - [x] Execute 07-01-PLAN.md (Customer App Initialization)
 - [x] Execute 07-02-PLAN.md (Anonymous INSERT Policy)
+- [x] Execute 07-03-PLAN.md (Customer Submission Form)
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Completed Phase 7 Plan 01 (Customer App Scaffold):
-- Initialized Nuxt 4 app in customer/ directory
-- Added shadcn-vue components: button, card, input, label, form, sonner
-- Created mobile-first layout with max-w-md centered container
-- Configured Supabase for anonymous access (redirect: false)
-- Configured nuxt-api-shield rate limiting for /api/submit
+Completed Phase 7 Plan 03 (Customer Submission Form):
+- Created business hours server route with TZDate timezone handling
+- Created useBusinessHours composable for reactive open/closed state
+- Created order validation helper (dev mode mock, production Lambda)
+- Created rate-limited submission endpoint with duplicate checking
+- Created PickupRequestForm component (166 lines) with vee-validate
+- Created ClosedMessage component for off-hours display
+- Wired index page to conditionally show form or closed message
 
 ### Next Actions
 
-1. Execute 07-03-PLAN.md (Customer Submission Form)
+1. Execute 07-04-PLAN.md (if exists) or Plan Phase 8
 2. (Optional) Deploy NetSuite Lambda when credentials ready
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4) on port 3000
-- Customer app in `customer/` directory (Nuxt 4) - mobile-first layout ready
-- **Phase 7 Plans 01-02 COMPLETE: Customer app scaffold and RLS policy ready**
-- shadcn-vue components installed: button, card, input, label, form, sonner
-- vee-validate and zod ready for form validation
-- date-fns ready for business hours checking
+- Customer app in `customer/` directory (Nuxt 4) - **SUBMISSION FLOW COMPLETE**
+- **Phase 7 Plans 01-03 COMPLETE: Customer can submit pickup requests**
+- Business hours check: GET /api/business-hours
+- Submission endpoint: POST /api/submit (rate-limited 5/60s)
+- Dev mode: Order validation mocks success when NETSUITE_VALIDATION_URL not set
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Dev server: `cd staff && pnpm dev` (http://localhost:3000)
 - Customer dev server: `cd customer && pnpm dev` (uses next available port)
@@ -173,4 +179,4 @@ Completed Phase 7 Plan 01 (Customer App Scaffold):
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-29 18:10 UTC*
+*Last updated: 2026-01-29 10:22 UTC*
