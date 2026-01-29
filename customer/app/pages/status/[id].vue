@@ -5,6 +5,8 @@ import { useRealtimeStatus, type PickupRequestPayload } from '~/composables/useR
 import { useWaitTimeEstimate } from '~/composables/useWaitTimeEstimate'
 import WaitTimeEstimate from '~/components/WaitTimeEstimate.vue'
 import TurnTakeover from '~/components/TurnTakeover.vue'
+import StatusSkeleton from '~/components/StatusSkeleton.vue'
+import LiveIndicator from '~/components/LiveIndicator.vue'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface PickupRequest {
@@ -207,14 +209,7 @@ const gateNumber = computed(() => {
 
 <template>
   <!-- Loading State -->
-  <Card v-if="pending">
-    <CardHeader class="text-center">
-      <CardTitle class="text-xl md:text-2xl">Loading...</CardTitle>
-    </CardHeader>
-    <CardContent class="text-center">
-      <p class="text-muted-foreground py-4">Fetching your request status...</p>
-    </CardContent>
-  </Card>
+  <StatusSkeleton v-if="pending" />
 
   <!-- Error State (Not Found) -->
   <Card v-else-if="fetchError || !request">
@@ -231,7 +226,10 @@ const gateNumber = computed(() => {
   <!-- Status Display -->
   <Card v-else>
     <CardHeader class="text-center space-y-2">
-      <CardTitle class="text-xl md:text-2xl">{{ statusDisplay?.title }}</CardTitle>
+      <div class="flex items-center justify-center gap-2">
+        <CardTitle class="text-xl md:text-2xl">{{ statusDisplay?.title }}</CardTitle>
+        <LiveIndicator :show="realtimeStatus === 'connected'" />
+      </div>
       <p class="text-sm text-muted-foreground">
         Order: {{ request.sales_order_number }}
       </p>
