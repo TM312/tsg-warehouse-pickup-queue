@@ -38,7 +38,6 @@ const formSchema = toTypedSchema(z.object({
 const form = useForm({ validationSchema: formSchema })
 const isLoading = ref(false)
 const errorMessage = ref('')
-const successData = ref<SubmitResponse | null>(null)
 
 const onSubmit = form.handleSubmit(async (values) => {
   isLoading.value = true
@@ -58,7 +57,8 @@ const onSubmit = form.handleSubmit(async (values) => {
     }
 
     if (data.value?.success) {
-      successData.value = data.value
+      // Navigate to status page to track the request
+      await navigateTo(`/status/${data.value.requestId}`)
     }
   } catch (err) {
     errorMessage.value = 'An unexpected error occurred. Please try again.'
@@ -66,35 +66,10 @@ const onSubmit = form.handleSubmit(async (values) => {
     isLoading.value = false
   }
 })
-
-const resetForm = () => {
-  successData.value = null
-  errorMessage.value = ''
-  form.resetForm()
-}
 </script>
 
 <template>
-  <!-- Success State -->
-  <Card v-if="successData">
-    <CardHeader class="text-center space-y-2">
-      <CardTitle class="text-xl md:text-2xl text-primary">Request Submitted</CardTitle>
-    </CardHeader>
-    <CardContent class="text-center space-y-4">
-      <p class="text-muted-foreground">
-        {{ successData.message }}
-      </p>
-      <p class="text-sm text-muted-foreground">
-        You can close this page. You'll receive updates about your pickup status.
-      </p>
-      <Button variant="outline" class="h-12 w-full" @click="resetForm">
-        Submit Another Request
-      </Button>
-    </CardContent>
-  </Card>
-
-  <!-- Form State -->
-  <Card v-else>
+  <Card>
     <CardHeader class="text-center space-y-2">
       <CardTitle class="text-xl md:text-2xl">Request Pickup</CardTitle>
       <CardDescription>
