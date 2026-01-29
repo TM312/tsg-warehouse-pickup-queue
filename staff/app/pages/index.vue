@@ -298,7 +298,7 @@ const refreshing = computed(() => status.value === 'pending')
 
     <!-- Request Detail Sheet -->
     <Sheet v-model:open="sheetOpen">
-      <SheetContent class="overflow-y-auto sm:max-w-lg">
+      <SheetContent class="overflow-y-auto sm:max-w-lg p-6">
         <SheetHeader>
           <SheetTitle>Request Details</SheetTitle>
         </SheetHeader>
