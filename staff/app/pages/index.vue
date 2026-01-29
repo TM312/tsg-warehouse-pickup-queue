@@ -72,10 +72,10 @@ const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCou
 const gates = computed(() => (allGates.value ?? []).filter(g => g.is_active))
 
 // Queue actions composable
-const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, moveToGate } = useQueueActions()
+const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate } = useQueueActions()
 
 // Gate management composable
-const { createGate, renameGate, deleteGate, toggleGateActive } = useGateManagement()
+const { createGate, toggleGateActive } = useGateManagement()
 
 // Refresh all data
 async function refresh() {
@@ -129,25 +129,28 @@ async function handleReorder(gateId: string, requestIds: string[]) {
   }
 }
 
-// Priority handler
+// Priority handlers
 async function handleSetPriority(requestId: string) {
   await setPriority(requestId)
   await refresh()
 }
 
+async function handleClearPriority(requestId: string) {
+  await clearPriority(requestId)
+  await refresh()
+}
+
+// Gate queue list row click - open detail view
+function handleQueueRowClick(requestId: string) {
+  const request = requests.value?.find(r => r.id === requestId)
+  if (request) {
+    selectedRequest.value = request
+  }
+}
+
 // Gate management handlers
 async function handleCreateGate(gateNumber: number) {
   await createGate(gateNumber)
-  await refreshGates()
-}
-
-async function handleRenameGate(gateId: string, newNumber: number) {
-  await renameGate(gateId, newNumber)
-  await refreshGates()
-}
-
-async function handleDeleteGate(gateId: string) {
-  await deleteGate(gateId)
   await refreshGates()
 }
 
@@ -278,6 +281,9 @@ const refreshing = computed(() => status.value === 'pending')
           :items="gate.queue"
           @reorder="(ids) => handleReorder(gate.id, ids)"
           @set-priority="handleSetPriority"
+          @clear-priority="handleClearPriority"
+          @complete="handleComplete"
+          @row-click="handleQueueRowClick"
         />
       </TabsContent>
 
@@ -285,8 +291,6 @@ const refreshing = computed(() => status.value === 'pending')
         <GateManagement
           :gates="allGates ?? []"
           @create="handleCreateGate"
-          @rename="handleRenameGate"
-          @delete="handleDeleteGate"
           @toggle-active="handleToggleGateActive"
         />
       </TabsContent>
@@ -294,7 +298,7 @@ const refreshing = computed(() => status.value === 'pending')
 
     <!-- Request Detail Sheet -->
     <Sheet v-model:open="sheetOpen">
-      <SheetContent class="overflow-y-auto">
+      <SheetContent class="overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Request Details</SheetTitle>
         </SheetHeader>

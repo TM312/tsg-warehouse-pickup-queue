@@ -2,8 +2,9 @@
 import { shallowRef, watch, useTemplateRef, nextTick } from 'vue'
 import { useSortable, moveArrayElement } from '@vueuse/integrations/useSortable'
 import type { SortableEvent } from 'sortablejs'
-import { GripVertical } from 'lucide-vue-next'
+import { GripVertical, Check, X } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import PriorityButton from './PriorityButton.vue'
 
 interface QueueItem {
@@ -22,6 +23,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   reorder: [requestIds: string[]]
   'set-priority': [requestId: string]
+  'clear-priority': [requestId: string]
+  'complete': [requestId: string]
+  'row-click': [requestId: string]
 }>()
 
 const listRef = useTemplateRef('listRef')
@@ -54,6 +58,15 @@ useSortable(listRef, localItems, {
     emit('reorder', newOrder)
   }
 })
+
+function handleRowClick(e: MouseEvent, itemId: string) {
+  // Don't open detail if clicking on buttons or drag handle
+  const target = e.target as HTMLElement
+  if (target.closest('button') || target.closest('.drag-handle')) {
+    return
+  }
+  emit('row-click', itemId)
+}
 </script>
 
 <template>
@@ -64,7 +77,8 @@ useSortable(listRef, localItems, {
     <div
       v-for="item in localItems"
       :key="item.id"
-      class="flex items-center gap-3 p-3 border rounded-lg bg-background"
+      class="flex items-center gap-3 p-3 border rounded-lg bg-background hover:bg-muted/50 cursor-pointer transition-colors"
+      @click="(e) => handleRowClick(e, item.id)"
     >
       <div class="drag-handle cursor-grab active:cursor-grabbing">
         <GripVertical class="h-5 w-5 text-muted-foreground" />
@@ -75,13 +89,29 @@ useSortable(listRef, localItems, {
           {{ item.company_name }}
         </div>
       </div>
-      <Badge v-if="item.is_priority" variant="destructive" class="shrink-0">
+      <Badge
+        v-if="item.is_priority"
+        variant="destructive"
+        class="shrink-0 cursor-pointer hover:bg-destructive/80"
+        title="Click to remove priority"
+        @click.stop="emit('clear-priority', item.id)"
+      >
         Priority
+        <X class="h-3 w-3 ml-1" />
       </Badge>
       <PriorityButton
         v-if="!item.is_priority"
-        @click="emit('set-priority', item.id)"
+        @click.stop="emit('set-priority', item.id)"
       />
+      <Button
+        variant="outline"
+        size="sm"
+        title="Mark complete"
+        @click.stop="emit('complete', item.id)"
+      >
+        <Check class="h-4 w-4 mr-1" />
+        Complete
+      </Button>
     </div>
   </div>
 </template>

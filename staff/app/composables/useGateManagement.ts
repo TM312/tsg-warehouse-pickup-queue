@@ -34,61 +34,6 @@ export function useGateManagement() {
     }
   }
 
-  async function renameGate(gateId: string, newNumber: number): Promise<boolean> {
-    pending.value = true
-    try {
-      const { error } = await client
-        .from('gates')
-        .update({ gate_number: newNumber })
-        .eq('id', gateId)
-
-      if (error) throw error
-      toast.success(`Gate renamed to ${newNumber}`)
-      return true
-    } catch (e: unknown) {
-      const err = e as { code?: string }
-      if (err.code === '23505') {
-        toast.error(`Gate ${newNumber} already exists`)
-      } else {
-        toast.error('Failed to rename gate')
-      }
-      return false
-    } finally {
-      pending.value = false
-    }
-  }
-
-  async function deleteGate(gateId: string): Promise<boolean> {
-    pending.value = true
-    try {
-      // Check for customers in queue first
-      const { count } = await client
-        .from('pickup_requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('assigned_gate_id', gateId)
-        .eq('status', 'in_queue')
-
-      if (count && count > 0) {
-        toast.error('Cannot delete gate with customers in queue')
-        return false
-      }
-
-      const { error } = await client
-        .from('gates')
-        .delete()
-        .eq('id', gateId)
-
-      if (error) throw error
-      toast.success('Gate deleted')
-      return true
-    } catch (e) {
-      toast.error('Failed to delete gate')
-      return false
-    } finally {
-      pending.value = false
-    }
-  }
-
   async function toggleGateActive(gateId: string, isActive: boolean): Promise<boolean> {
     pending.value = true
     try {
@@ -125,8 +70,6 @@ export function useGateManagement() {
   return {
     pending: readonly(pending),
     createGate,
-    renameGate,
-    deleteGate,
     toggleGateActive,
   }
 }

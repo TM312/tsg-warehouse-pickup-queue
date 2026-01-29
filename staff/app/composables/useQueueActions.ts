@@ -102,6 +102,24 @@ export function useQueueActions() {
     }
   }
 
+  async function clearPriority(requestId: string): Promise<boolean> {
+    pending.value[requestId] = true
+    try {
+      const { error } = await client
+        .from('pickup_requests')
+        .update({ is_priority: false })
+        .eq('id', requestId)
+      if (error) throw error
+      toast.success('Priority removed')
+      return true
+    } catch (e) {
+      toast.error('Failed to remove priority')
+      return false
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
   async function moveToGate(requestId: string, newGateId: string): Promise<number | null> {
     pending.value[requestId] = true
     try {
@@ -127,6 +145,7 @@ export function useQueueActions() {
     completeRequest,
     reorderQueue,
     setPriority,
+    clearPriority,
     moveToGate
   }
 }
