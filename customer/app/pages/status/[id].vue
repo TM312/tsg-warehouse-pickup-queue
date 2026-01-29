@@ -2,6 +2,9 @@
 import { toast } from 'vue-sonner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRealtimeStatus, type PickupRequestPayload } from '~/composables/useRealtimeStatus'
+import { useWaitTimeEstimate } from '~/composables/useWaitTimeEstimate'
+import WaitTimeEstimate from '~/components/WaitTimeEstimate.vue'
+import TurnTakeover from '~/components/TurnTakeover.vue'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
 interface PickupRequest {
@@ -9,8 +12,8 @@ interface PickupRequest {
   status: string
   queue_position: number | null
   assigned_gate_id: string | null
-  order_number: string
-  customer_name: string
+  sales_order_number: string
+  company_name: string | null
 }
 
 interface Gate {
@@ -33,8 +36,8 @@ const { data: request, pending, error: fetchError, refresh } = await useAsyncDat
         status,
         queue_position,
         assigned_gate_id,
-        order_number,
-        customer_name,
+        sales_order_number,
+        company_name,
         gates:assigned_gate_id (
           id,
           gate_number
@@ -48,16 +51,30 @@ const { data: request, pending, error: fetchError, refresh } = await useAsyncDat
   }
 )
 
+// Wait time estimate
+const { calculateEstimate } = useWaitTimeEstimate()
+const waitEstimate = ref<{ min: number; max: number } | null>(null)
+
+// Turn takeover state
+const showTakeover = ref(false)
+const takeoverGateNumber = ref<number | null>(null)
+const takeoverDismissed = ref(false) // Track if user dismissed the takeover
+
 // Track previous gate ID for toast notifications
 const previousGateId = ref<string | null>(null)
 
 // Setup realtime subscription
 const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeStatus(requestId.value)
 
-onMounted(() => {
+onMounted(async () => {
   // Initialize previous gate ID
   if (request.value) {
     previousGateId.value = request.value.assigned_gate_id
+
+    // Calculate initial wait estimate if in queue
+    if (request.value.status === 'in_queue' && request.value.queue_position) {
+      waitEstimate.value = await calculateEstimate(request.value.queue_position)
+    }
   }
 
   subscribe((payload: RealtimePostgresChangesPayload<PickupRequestPayload>) => {
@@ -67,9 +84,9 @@ onMounted(() => {
       // Check for gate assignment change and show toast
       if (newData.assigned_gate_id && newData.assigned_gate_id !== previousGateId.value) {
         // Fetch gate number for toast
-        fetchGateNumber(newData.assigned_gate_id).then((gateNumber) => {
-          if (gateNumber) {
-            toast.info(`You've been assigned to Gate ${gateNumber}`, {
+        fetchGateNumber(newData.assigned_gate_id).then((fetchedGateNumber) => {
+          if (fetchedGateNumber) {
+            toast.info(`You've been assigned to Gate ${fetchedGateNumber}`, {
               duration: 5000,
             })
           }
@@ -85,6 +102,45 @@ onMounted(() => {
     }
   })
 })
+
+// Watch for position changes to update wait estimate and trigger takeover
+watch(
+  () => request.value,
+  async (newRequest, oldRequest) => {
+    if (!newRequest) return
+
+    // Recalculate wait estimate when position changes
+    if (newRequest.status === 'in_queue' && newRequest.queue_position) {
+      waitEstimate.value = await calculateEstimate(newRequest.queue_position)
+
+      // Show takeover when position is 1 with gate assigned (and not dismissed)
+      if (
+        newRequest.queue_position === 1 &&
+        newRequest.assigned_gate_id &&
+        !takeoverDismissed.value
+      ) {
+        takeoverGateNumber.value = newRequest.gates?.gate_number ?? null
+        if (takeoverGateNumber.value) {
+          showTakeover.value = true
+        }
+      }
+    } else {
+      waitEstimate.value = null
+      // Dismiss takeover if status changes away from in_queue
+      if (oldRequest?.status === 'in_queue' && newRequest.status !== 'in_queue') {
+        showTakeover.value = false
+        takeoverDismissed.value = false // Reset for next time
+      }
+    }
+  },
+  { immediate: true }
+)
+
+// Handle takeover dismiss
+function handleTakeoverDismiss() {
+  showTakeover.value = false
+  takeoverDismissed.value = true
+}
 
 onUnmounted(() => {
   unsubscribe()
@@ -177,7 +233,7 @@ const gateNumber = computed(() => {
     <CardHeader class="text-center space-y-2">
       <CardTitle class="text-xl md:text-2xl">{{ statusDisplay?.title }}</CardTitle>
       <p class="text-sm text-muted-foreground">
-        Order: {{ request.order_number }}
+        Order: {{ request.sales_order_number }}
       </p>
     </CardHeader>
     <CardContent class="text-center space-y-6">
@@ -189,6 +245,10 @@ const gateNumber = computed(() => {
       <!-- Queue Position Display -->
       <div v-if="statusDisplay?.showPosition && request.queue_position" class="py-4">
         <PositionDisplay :position="request.queue_position" />
+        <!-- Wait Time Estimate -->
+        <div class="mt-4">
+          <WaitTimeEstimate :estimate="waitEstimate" />
+        </div>
       </div>
 
       <!-- Gate Assignment -->
@@ -204,4 +264,12 @@ const gateNumber = computed(() => {
 
   <!-- Connection Status -->
   <ConnectionStatus :status="realtimeStatus" />
+
+  <!-- Turn Takeover -->
+  <TurnTakeover
+    v-if="takeoverGateNumber"
+    :show="showTakeover"
+    :gate-number="takeoverGateNumber"
+    @dismiss="handleTakeoverDismiss"
+  />
 </template>
