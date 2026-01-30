@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 ROADMAP CREATED
+**Status:** v2.0 IN PROGRESS - Phase 14 Plan 01 complete
 
 ## Project Reference
 
@@ -24,17 +24,17 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 14 of 18 (Type Foundation)
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-01-30 - Roadmap created for v2.0
+**Plan:** 01 complete
+**Status:** In progress
+**Last activity:** 2026-01-30 - Completed 14-01-PLAN.md (Shared Type Definitions)
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - 0/5 phases
+v2.0 Architecture Overhaul - Plan 14-01 complete
 
-[                    ] 0%
+[=                   ] 5%
 ```
 
 ## Deferred Items
@@ -49,11 +49,14 @@ v2.0 Architecture Overhaul - 0/5 phases
 
 See .planning/PROJECT.md for consolidated key decisions.
 
+v2.0 decisions implemented:
+- Use `as const` pattern: not TypeScript enums (better tree-shaking) - 14-01
+- Duplicate minimal types in customer app rather than cross-app shared package - 14-01
+
 v2.0 decisions pending implementation:
 - Hybrid Pinia + composables: stores for state, composables for side effects
 - No sidebar on gate routes: gate operators need simplified mobile view
 - Gate navigation alphabetical: consistent ordering for prev/next buttons
-- Use `as const` pattern: not TypeScript enums (better tree-shaking)
 
 ### Technical Debt
 
@@ -69,28 +72,26 @@ None
 
 ### Last Session Summary
 
-Created v2.0 roadmap with 5 phases covering 23 requirements:
-- Phase 14: Type Foundation (4 requirements)
-- Phase 15: Pinia Infrastructure (5 requirements)
-- Phase 16: Sidebar Layout (6 requirements)
-- Phase 17: Dashboard & Visualization (5 requirements)
-- Phase 18: Gate Operator & Bug Fixes (3 requirements)
+Completed 14-01-PLAN.md (Shared Type Definitions):
+- Created staff/shared/types/pickup-request.ts with PICKUP_STATUS, PickupStatus, PickupRequest
+- Created staff/shared/types/gate.ts with Gate, GateWithCount
+- Created customer/shared/types/pickup-request.ts with minimal types
+- Verified Nuxt 4 auto-import working via nuxi prepare
 
 ### Next Actions
 
-1. `/gsd:plan-phase 14` to plan Type Foundation phase
-2. Execute plans to establish centralized types
-3. Continue with Pinia Infrastructure (Phase 15)
+1. Execute 14-02-PLAN.md to migrate existing files to use centralized types
+2. Continue with remaining Phase 14 plans
+3. Move to Phase 15 (Pinia Infrastructure) after Phase 14 complete
 
 ### Context for Next Session
 
-- v2.0 roadmap created with 5 phases
-- Phase 14 ready to plan (Type Foundation)
+- Type definitions created in shared/types/ directories
+- PICKUP_STATUS, ACTIVE_STATUSES, TERMINAL_STATUSES, isActiveStatus auto-imported
+- Next step: migrate existing files (columns.ts, components, composables) to use new types
 - Staff app in `staff/` directory (Nuxt 4)
-- Nuxt 4 auto-imports from `shared/types/` directory
-- Use `as const` pattern for status constants
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (v2.0 roadmap created)*
+*Last updated: 2026-01-30 (14-01-PLAN.md complete)*
