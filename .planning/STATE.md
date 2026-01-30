@@ -74,6 +74,8 @@ See .planning/PROJECT.md for consolidated key decisions from v1.
 | 4xl mono font for sales order display | 12-01 | Large, scannable text for gate operator verification |
 | 200ms transition duration for pickup changes | 12-03 | Snappy but visible animation feedback |
 | Reuse useRealtimeQueue for gate page | 12-03 | Existing composable sufficient, no gate-specific subscription needed |
+| Queue positions compact after completion | 12-02 | PROC-05: Position 2 becomes 1 after completing current pickup |
+| Optional gateId in completeRequest | 12-02 | Backward compatible with dashboard callers while enabling queue compaction |
 
 ### Technical Debt
 
@@ -127,4 +129,4 @@ Gate operator view complete with realtime updates and transitions.
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (completed 12-03-PLAN.md)*
+*Last updated: 2026-01-30 (completed 12-02-PLAN.md - execution order fix)*
