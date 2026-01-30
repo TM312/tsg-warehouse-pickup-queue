@@ -68,39 +68,39 @@ Explicitly excluded from v2.0.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-06 | TBD | Pending |
-| ARCH-07 | TBD | Pending |
-| ARCH-08 | TBD | Pending |
-| ARCH-09 | TBD | Pending |
-| ARCH-01 | TBD | Pending |
-| ARCH-02 | TBD | Pending |
-| ARCH-03 | TBD | Pending |
-| ARCH-04 | TBD | Pending |
-| ARCH-05 | TBD | Pending |
-| SIDE-01 | TBD | Pending |
-| SIDE-02 | TBD | Pending |
-| SIDE-03 | TBD | Pending |
-| SIDE-04 | TBD | Pending |
-| SIDE-05 | TBD | Pending |
-| SIDE-06 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| GATE-12 | TBD | Pending |
-| GATE-13 | TBD | Pending |
-| BUG-01 | TBD | Pending |
+| ARCH-06 | 14 | Pending |
+| ARCH-07 | 14 | Pending |
+| ARCH-08 | 14 | Pending |
+| ARCH-09 | 14 | Pending |
+| ARCH-01 | 15 | Pending |
+| ARCH-02 | 15 | Pending |
+| ARCH-03 | 15 | Pending |
+| ARCH-04 | 15 | Pending |
+| ARCH-05 | 15 | Pending |
+| SIDE-01 | 16 | Pending |
+| SIDE-02 | 16 | Pending |
+| SIDE-03 | 16 | Pending |
+| SIDE-04 | 16 | Pending |
+| SIDE-05 | 16 | Pending |
+| SIDE-06 | 16 | Pending |
+| DASH-01 | 17 | Pending |
+| DASH-02 | 17 | Pending |
+| DASH-03 | 17 | Pending |
+| DASH-04 | 17 | Pending |
+| DASH-05 | 17 | Pending |
+| GATE-12 | 18 | Pending |
+| GATE-13 | 18 | Pending |
+| BUG-01 | 18 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after initial definition*
+*Last updated: 2026-01-30 (traceability updated for v2.0 roadmap)*

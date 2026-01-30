@@ -1,0 +1,114 @@
+# Roadmap: Warehouse Pickup Queue v2.0
+
+## Overview
+
+The v2.0 Architecture Overhaul transforms the staff application from an organically-grown codebase into a well-structured architecture. Starting with foundational type definitions, we build Pinia stores for centralized state management, implement sidebar navigation for improved UX, create a dashboard with visualization, and complete with gate operator enhancements and bug fixes.
+
+## Milestones
+
+- Archived: **v1.0 MVP** - Phases 1-10 (shipped 2026-01-28)
+- Archived: **v1.1 Gate Operator Experience** - Phases 11-13 (shipped 2026-01-30)
+- In Progress: **v2.0 Architecture Overhaul** - Phases 14-18
+
+## Phases
+
+- [ ] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
+- [ ] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
+- [ ] **Phase 16: Sidebar Layout** - Navigation structure for staff application
+- [ ] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
+- [ ] **Phase 18: Gate Operator & Bug Fixes** - Navigation improvements and filter fix
+
+## Phase Details
+
+### Phase 14: Type Foundation
+
+**Goal**: All status values and data types are centrally defined with TypeScript constants
+**Depends on**: Nothing (foundational phase)
+**Requirements**: ARCH-06, ARCH-07, ARCH-08, ARCH-09
+**Success Criteria** (what must be TRUE):
+  1. Status values use typed constants throughout codebase (no magic strings)
+  2. PickupRequest and Gate types are imported from shared/types/
+  3. IDE autocomplete works for all status values
+  4. Build passes with no type errors
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD
+
+### Phase 15: Pinia Infrastructure
+
+**Goal**: Shared state is managed through Pinia stores with proper composable boundaries
+**Depends on**: Phase 14 (types needed for store definitions)
+**Requirements**: ARCH-01, ARCH-02, ARCH-03, ARCH-04, ARCH-05
+**Success Criteria** (what must be TRUE):
+  1. Queue state is accessible from any component via useQueueStore()
+  2. Gate state is accessible from any component via useGatesStore()
+  3. Realtime updates flow through stores (UI updates when data changes)
+  4. Vue DevTools shows store state and reactive updates
+  5. No duplicate subscriptions after page navigation
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: TBD
+
+### Phase 16: Sidebar Layout
+
+**Goal**: Staff app has consistent navigation via collapsible sidebar
+**Depends on**: Phase 14 (can work in parallel with Phase 15)
+**Requirements**: SIDE-01, SIDE-02, SIDE-03, SIDE-04, SIDE-05, SIDE-06
+**Success Criteria** (what must be TRUE):
+  1. Dashboard, Gates, and Opening Schedule are accessible via sidebar navigation
+  2. Sidebar collapses to icons on desktop, shows as overlay on mobile
+  3. Current page is visually highlighted in sidebar
+  4. Gate operator routes (/gate/[id]) show fullscreen without sidebar
+  5. Sidebar state persists across page navigation
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD
+
+### Phase 17: Dashboard & Visualization
+
+**Goal**: Supervisors can see queue status at a glance via dashboard overview
+**Depends on**: Phase 15 (stores), Phase 16 (layout)
+**Requirements**: DASH-01, DASH-02, DASH-03, DASH-04, DASH-05
+**Success Criteria** (what must be TRUE):
+  1. Dashboard page shows overview of all gates and queues
+  2. Bar chart visualizes queue length per gate
+  3. Total pickups completed today is displayed
+  4. Average waiting time (queue to processing) is displayed
+  5. Average processing time (processing to complete) is displayed
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: TBD
+
+### Phase 18: Gate Operator & Bug Fixes
+
+**Goal**: Gate operators can navigate between gates and filter bug is resolved
+**Depends on**: Phase 16 (layout ensures gate routes remain fullscreen)
+**Requirements**: GATE-12, GATE-13, BUG-01
+**Success Criteria** (what must be TRUE):
+  1. Gate operator can navigate to previous/next gate via buttons
+  2. Gate order follows alphabetical sorting (consistent ordering)
+  3. Gate page does not scroll when content fits viewport on mobile
+  4. Show completed/cancelled toggle correctly filters the queue table
+**Plans**: TBD
+
+Plans:
+- [ ] 18-01: TBD
+
+## Progress
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 14. Type Foundation | v2.0 | 0/TBD | Not started | - |
+| 15. Pinia Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
+| 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
+| 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
+
+---
+
+*Roadmap created: 2026-01-30*
+*Previous milestones archived: .planning/milestones/*
