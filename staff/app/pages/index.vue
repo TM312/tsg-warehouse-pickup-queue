@@ -5,7 +5,7 @@ import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import DataTable from '@/components/dashboard/DataTable.vue'
-import { createColumns, type PickupRequest } from '@/components/dashboard/columns'
+import { createColumns } from '@/components/dashboard/columns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
 import NowProcessingSection from '@/components/dashboard/NowProcessingSection.vue'
@@ -16,6 +16,9 @@ import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
 import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
+import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
+import type { PickupRequest } from '#shared/types/pickup-request'
+import type { GateWithCount } from '#shared/types/gate'
 
 definePageMeta({
   middleware: 'auth'
@@ -37,14 +40,6 @@ const { data: requests, refresh: refreshRequests, status } = await useAsyncData<
   }
 )
 
-// Type for gate data
-interface GateWithCount {
-  id: string
-  gate_number: number
-  is_active: boolean
-  queue_count: number
-}
-
 // Fetch ALL gates for management tab (not just active)
 const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCount[]>('all-gates', async () => {
   const { data, error } = await client
@@ -58,7 +53,7 @@ const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCou
   const { data: counts } = await client
     .from('pickup_requests')
     .select('assigned_gate_id')
-    .eq('status', 'in_queue')
+    .eq('status', PICKUP_STATUS.IN_QUEUE)
 
   const countMap: Record<string, number> = {}
   for (const row of counts ?? []) {
@@ -106,7 +101,7 @@ async function refresh() {
 // Action handlers
 async function handleGateSelect(requestId: string, gateId: string) {
   const request = requests.value?.find(r => r.id === requestId)
-  if (request?.status === 'in_queue') {
+  if (request?.status === PICKUP_STATUS.IN_QUEUE) {
     // Already in queue - this is a move operation
     await moveToGate(requestId, gateId)
   } else {
@@ -200,7 +195,7 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
         sales_order_number: data.salesOrderNumber,
         customer_email: data.email,
         customer_phone: data.phone || null,
-        status: 'pending',
+        status: PICKUP_STATUS.PENDING,
       })
 
     if (error) throw error
@@ -214,7 +209,7 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
 // Computed for processing items (for NowProcessingSection)
 const processingItems = computed(() => {
   return (requests.value ?? [])
-    .filter(r => r.status === 'processing' && r.gate)
+    .filter(r => r.status === PICKUP_STATUS.PROCESSING && r.gate)
     .map(r => ({
       id: r.id,
       sales_order_number: r.sales_order_number,
@@ -230,7 +225,7 @@ const processingItems = computed(() => {
 const gatesWithQueues = computed(() => {
   return (gates.value ?? []).map(gate => {
     const queueItems = (requests.value ?? [])
-      .filter(r => r.assigned_gate_id === gate.id && r.status === 'in_queue')
+      .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
       .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
       .map(r => ({
         id: r.id,
@@ -242,7 +237,7 @@ const gatesWithQueues = computed(() => {
 
     // Count includes both in_queue and processing for the tab badge
     const processingCount = (requests.value ?? [])
-      .filter(r => r.assigned_gate_id === gate.id && r.status === 'processing')
+      .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.PROCESSING)
       .length
 
     return {
@@ -268,7 +263,7 @@ const filteredRequests = computed(() => {
   if (showCompleted.value) {
     return all
   }
-  return all.filter(r => !['completed', 'cancelled'].includes(r.status))
+  return all.filter(r => !(TERMINAL_STATUSES as readonly string[]).includes(r.status))
 })
 
 // Sheet state

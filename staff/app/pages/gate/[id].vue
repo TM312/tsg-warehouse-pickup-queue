@@ -7,6 +7,8 @@ import EmptyGateState from '@/components/gate/EmptyGateState.vue'
 import NextUpPreview from '@/components/gate/NextUpPreview.vue'
 import CompleteDialog from '@/components/gate/CompleteDialog.vue'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
+import type { PickupStatus } from '#shared/types/pickup-request'
 
 definePageMeta({
   middleware: 'auth'
@@ -32,7 +34,7 @@ const queue = ref<Array<{
   id: string
   sales_order_number: string
   company_name: string | null
-  status: 'in_queue' | 'processing'
+  status: PickupStatus
   queue_position: number | null
   processing_started_at: string | null
   item_count: number | null
@@ -67,7 +69,7 @@ async function fetchQueue() {
     .from('pickup_requests')
     .select('id, sales_order_number, company_name, status, queue_position, processing_started_at, item_count, po_number')
     .eq('assigned_gate_id', gateId.value)
-    .in('status', ['in_queue', 'processing'])
+    .in('status', [PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING])
     .order('queue_position', { ascending: true })
 
   if (!error && data) {
@@ -81,7 +83,7 @@ const currentPickup = computed(() => {
   if (!queue.value || queue.value.length === 0) return null
 
   // Processing takes precedence
-  const processing = queue.value.find(r => r.status === 'processing')
+  const processing = queue.value.find(r => r.status === PICKUP_STATUS.PROCESSING)
   if (processing) return processing
 
   // Otherwise, position 1
@@ -90,12 +92,12 @@ const currentPickup = computed(() => {
 
 // Next up: position 2 in queue
 const nextUp = computed(() => {
-  return queue.value?.find(p => p.queue_position === 2 && p.status === 'in_queue') ?? null
+  return queue.value?.find(p => p.queue_position === 2 && p.status === PICKUP_STATUS.IN_QUEUE) ?? null
 })
 
 // Queue count: number of in_queue items (excludes processing)
 const queueCount = computed(() => {
-  return queue.value?.filter(p => p.status === 'in_queue').length ?? 0
+  return queue.value?.filter(p => p.status === PICKUP_STATUS.IN_QUEUE).length ?? 0
 })
 
 // Loading state
@@ -204,7 +206,7 @@ onUnmounted(() => {
           <div v-if="currentPickup" :key="currentPickup.id" class="space-y-3 mt-6">
             <!-- Start Processing (only when in_queue) -->
             <Button
-              v-if="currentPickup.status === 'in_queue'"
+              v-if="currentPickup.status === PICKUP_STATUS.IN_QUEUE"
               class="h-14 w-full text-lg"
               :disabled="actionPending"
               @click="handleStartProcessing"
@@ -215,7 +217,7 @@ onUnmounted(() => {
 
             <!-- Complete (only when processing) -->
             <Button
-              v-if="currentPickup.status === 'processing'"
+              v-if="currentPickup.status === PICKUP_STATUS.PROCESSING"
               class="h-14 w-full text-lg"
               :disabled="actionPending"
               @click="showCompleteDialog = true"
@@ -226,7 +228,7 @@ onUnmounted(() => {
 
             <!-- Revert to Queue (secondary, only when processing) -->
             <Button
-              v-if="currentPickup.status === 'processing'"
+              v-if="currentPickup.status === PICKUP_STATUS.PROCESSING"
               variant="outline"
               class="h-11 w-full"
               :disabled="actionPending"
