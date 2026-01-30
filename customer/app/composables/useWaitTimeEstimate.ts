@@ -23,7 +23,7 @@ export function useWaitTimeEstimate() {
     const { data, error } = await client
       .from('pickup_requests')
       .select('created_at, completed_at')
-      .eq('status', 'completed')
+      .eq('status', PICKUP_STATUS.COMPLETED)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
       .limit(10)

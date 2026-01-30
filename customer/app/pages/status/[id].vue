@@ -11,14 +11,11 @@ import LiveIndicator from '~/components/LiveIndicator.vue'
 import CompletedStatus from '~/components/CompletedStatus.vue'
 import { XCircle } from 'lucide-vue-next'
 import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
+import type { PickupRequest, PickupStatus } from '#shared/types/pickup-request'
 
-interface PickupRequest {
-  id: string
-  status: string
-  queue_position: number | null
-  assigned_gate_id: string | null
-  sales_order_number: string
-  company_name: string | null
+// Extend PickupRequest for this page to include processing_started_at (used for wait display)
+interface StatusPageRequest extends PickupRequest {
   processing_started_at?: string | null
 }
 
@@ -54,7 +51,7 @@ const { data: request, pending, error: fetchError, refresh } = await useAsyncDat
       .single()
 
     if (error) throw error
-    return data as PickupRequest & { gates: Gate | null }
+    return data as StatusPageRequest & { gates: Gate | null }
   }
 )
 
@@ -79,7 +76,7 @@ onMounted(async () => {
     previousGateId.value = request.value.assigned_gate_id
 
     // Calculate initial wait estimate if in queue
-    if (request.value.status === 'in_queue' && request.value.queue_position) {
+    if (request.value.status === PICKUP_STATUS.IN_QUEUE && request.value.queue_position) {
       waitEstimate.value = await calculateEstimate(request.value.queue_position)
     }
   }
@@ -117,7 +114,7 @@ watch(
     if (!newRequest) return
 
     // Recalculate wait estimate when position changes
-    if (newRequest.status === 'in_queue' && newRequest.queue_position) {
+    if (newRequest.status === PICKUP_STATUS.IN_QUEUE && newRequest.queue_position) {
       waitEstimate.value = await calculateEstimate(newRequest.queue_position)
 
       // Show takeover when position is 1 with gate assigned (and not dismissed)
@@ -134,14 +131,14 @@ watch(
     } else {
       waitEstimate.value = null
       // Dismiss takeover if status changes away from in_queue
-      if (oldRequest?.status === 'in_queue' && newRequest.status !== 'in_queue') {
+      if (oldRequest?.status === PICKUP_STATUS.IN_QUEUE && newRequest.status !== PICKUP_STATUS.IN_QUEUE) {
         showTakeover.value = false
         takeoverDismissed.value = false // Reset for next time
       }
     }
 
     // Dismiss takeover when entering processing (user is being served)
-    if (newRequest.status === 'processing') {
+    if (newRequest.status === PICKUP_STATUS.PROCESSING) {
       showTakeover.value = false
       takeoverDismissed.value = true
     }
@@ -174,37 +171,37 @@ const statusDisplay = computed(() => {
   if (!request.value) return null
 
   switch (request.value.status) {
-    case 'pending':
+    case PICKUP_STATUS.PENDING:
       return {
         title: 'Request Received',
         message: 'Your request is being reviewed by our staff.',
         showPosition: false,
       }
-    case 'approved':
+    case PICKUP_STATUS.APPROVED:
       return {
         title: 'Approved',
         message: 'Your request has been approved. You\'ll be added to the queue shortly.',
         showPosition: false,
       }
-    case 'in_queue':
+    case PICKUP_STATUS.IN_QUEUE:
       return {
         title: 'In Queue',
         message: null,
         showPosition: true,
       }
-    case 'processing':
+    case PICKUP_STATUS.PROCESSING:
       return {
         title: 'Being Processed',
         message: null,
         showPosition: false,
       }
-    case 'completed':
+    case PICKUP_STATUS.COMPLETED:
       return {
         title: 'Pickup Complete',
         message: 'Thank you for your pickup!',
         showPosition: false,
       }
-    case 'cancelled':
+    case PICKUP_STATUS.CANCELLED:
       return {
         title: 'Request Cancelled',
         message: 'This request has been cancelled.',
@@ -257,13 +254,13 @@ const gateNumber = computed(() => {
     <CardContent class="text-center space-y-6">
       <!-- Completed Status -->
       <CompletedStatus
-        v-if="request.status === 'completed'"
+        v-if="request.status === PICKUP_STATUS.COMPLETED"
         :order-number="request.sales_order_number"
         :gate-number="gateNumber"
       />
 
       <!-- Cancelled Status -->
-      <div v-else-if="request.status === 'cancelled'" class="space-y-4 py-4">
+      <div v-else-if="request.status === PICKUP_STATUS.CANCELLED" class="space-y-4 py-4">
         <XCircle class="w-12 h-12 mx-auto text-muted-foreground" />
         <p class="text-lg font-medium">Request Cancelled</p>
         <p class="text-muted-foreground text-sm">This pickup request has been cancelled.</p>
@@ -280,7 +277,7 @@ const gateNumber = computed(() => {
       </div>
 
       <!-- Processing Status -->
-      <div v-else-if="request.status === 'processing'" class="py-4 space-y-4">
+      <div v-else-if="request.status === PICKUP_STATUS.PROCESSING" class="py-4 space-y-4">
         <div class="bg-amber-50 dark:bg-amber-950 rounded-lg p-6">
           <p class="text-amber-600 dark:text-amber-400 text-sm font-medium">Your Order is Being Processed</p>
           <p class="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">Gate {{ gateNumber }}</p>
@@ -295,7 +292,7 @@ const gateNumber = computed(() => {
 
       <!-- Gate Assignment (only for in_queue, processing has its own display) -->
       <div
-        v-if="gateNumber && request.status === 'in_queue'"
+        v-if="gateNumber && request.status === PICKUP_STATUS.IN_QUEUE"
         class="bg-primary/10 rounded-lg p-4 mt-4"
       >
         <p class="text-sm text-muted-foreground">Assigned Gate</p>
