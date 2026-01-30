@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 14 complete
+**Status:** v2.0 IN PROGRESS - Phase 15 plan 02 complete
 
 ## Project Reference
 
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 15 of 18 (Pinia Infrastructure)
-**Plan:** 01 of 04 complete
+**Plan:** 02 of 04 complete
 **Status:** In progress
-**Last activity:** 2026-01-30 - Completed 15-01-PLAN.md (Install Pinia Module)
+**Last activity:** 2026-01-30 - Completed 15-02-PLAN.md (Create Pinia Stores)
 
 **Progress:**
 ```
@@ -34,7 +34,7 @@ v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - Phase 14 complete, Phase 15 in progress
 
-[=====               ] 25%
+[==========          ] 50%
 ```
 
 ## Deferred Items
@@ -60,6 +60,11 @@ v2.0 decisions implemented:
 - Type assertions for .includes() on readonly arrays - 14-03
 - GateStatus type in shared types for gate operator views - 14-03
 
+v2.0 decisions implemented (continued):
+- Use Object.assign for Partial updates (avoids TypeScript spread inference issues) - 15-02
+- Use auto-imported defineStore (no manual import from pinia) - 15-02
+- Sort gates by gate_number in sortedGates getter for consistent UI ordering - 15-02
+
 v2.0 decisions pending implementation:
 - Hybrid Pinia + composables: stores for state, composables for side effects
 - No sidebar on gate routes: gate operators need simplified mobile view
@@ -81,23 +86,23 @@ None
 
 ### Last Session Summary
 
-Completed 15-01-PLAN.md (Install Pinia Module):
-- Installed @pinia/nuxt 0.11.3 and pinia dependencies
-- Added @pinia/nuxt to nuxt.config.ts modules array
-- Verified defineStore and storeToRefs are auto-imported
-- Confirmed dev server starts without Pinia-related errors
+Completed 15-02-PLAN.md (Create Pinia Stores):
+- Created useQueueStore with requests state and processingItems/inQueueItems/pendingItems getters
+- Created useGatesStore with gates state and activeGates/sortedGates/sortedActiveGates getters
+- Both stores use PICKUP_STATUS constants (no magic strings)
+- All state, getters, and actions exposed for Vue DevTools visibility
 
 ### Phase 15 In Progress
 
-Plan 1 of 4 complete:
+Plan 2 of 4 complete:
 - 15-01: Install Pinia Module (COMPLETE)
-- 15-02: Create useQueueStore (pending)
-- 15-03: Create useGatesStore (pending)
+- 15-02: Create Pinia Stores (COMPLETE)
+- 15-03: Integrate stores into composables (pending)
 - 15-04: Migrate components to stores (pending)
 
 ### Next Actions
 
-1. Execute 15-02-PLAN.md to create useQueueStore
+1. Execute 15-03-PLAN.md to integrate stores into composables
 2. Continue Phase 15 (Pinia Infrastructure)
 
 ### Context for Next Session
@@ -110,8 +115,11 @@ Plan 1 of 4 complete:
 - Customer app in `customer/` directory (Nuxt 4)
 - Pinia module installed and configured in staff app
 - defineStore and storeToRefs available via auto-import
+- useQueueStore available at staff/app/stores/queue.ts
+- useGatesStore available at staff/app/stores/gates.ts
+- Stores use setup store pattern (composition API style)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (Phase 15 plan 01 complete)*
+*Last updated: 2026-01-30 (Phase 15 plan 02 complete)*
