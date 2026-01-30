@@ -9,15 +9,15 @@ Requirements for Gate Operator Experience milestone. Each maps to roadmap phases
 
 ### Gate Operator View
 
-- [ ] **GATE-01**: Gate operator can view current pickup at their gate (/gate/[id] route)
-- [ ] **GATE-02**: Sales order number displayed prominently (large, scannable text)
-- [ ] **GATE-03**: Customer name/company shown for verification
-- [ ] **GATE-04**: Quick action to mark pickup as complete (single tap)
-- [ ] **GATE-05**: Quick action to start processing (accepts current pickup)
-- [ ] **GATE-06**: Mobile-responsive layout with 44x44px minimum touch targets
-- [ ] **GATE-07**: Real-time updates when queue changes
-- [ ] **GATE-08**: Next-up preview shows who's coming after current customer
-- [ ] **GATE-09**: Order details displayed (item count, PO# from NetSuite cache)
+- [x] **GATE-01**: Gate operator can view current pickup at their gate (/gate/[id] route)
+- [x] **GATE-02**: Sales order number displayed prominently (large, scannable text)
+- [x] **GATE-03**: Customer name/company shown for verification
+- [x] **GATE-04**: Quick action to mark pickup as complete (single tap)
+- [x] **GATE-05**: Quick action to start processing (accepts current pickup)
+- [x] **GATE-06**: Mobile-responsive layout with 44x44px minimum touch targets
+- [x] **GATE-07**: Real-time updates when queue changes
+- [x] **GATE-08**: Next-up preview shows who's coming after current customer
+- [x] **GATE-09**: Order details displayed (item count, PO# from NetSuite cache)
 
 ### Processing Status
 
@@ -25,7 +25,7 @@ Requirements for Gate Operator Experience milestone. Each maps to roadmap phases
 - [x] **PROC-02**: Visual indicator for processing status (StatusBadge update)
 - [x] **PROC-03**: Processing timestamp recorded (started_at column)
 - [x] **PROC-04**: Customer notified when their pickup enters processing (passive: status page shows "Your order is being processed at Gate X" - implemented in Phase 11-02)
-- [ ] **PROC-05**: Auto-advance to next pickup after completing current
+- [x] **PROC-05**: Auto-advance to next pickup after completing current
 
 ### Business Hours Management
 
@@ -77,16 +77,16 @@ Which phases cover which requirements.
 | PROC-02 | Phase 11 | Complete |
 | PROC-03 | Phase 11 | Complete |
 | PROC-04 | Phase 11 | Complete (passive notification via status page) |
-| PROC-05 | Phase 12 | Pending |
-| GATE-01 | Phase 12 | Pending |
-| GATE-02 | Phase 12 | Pending |
-| GATE-03 | Phase 12 | Pending |
-| GATE-04 | Phase 12 | Pending |
-| GATE-05 | Phase 12 | Pending |
-| GATE-06 | Phase 12 | Pending |
-| GATE-07 | Phase 12 | Pending |
-| GATE-08 | Phase 12 | Pending |
-| GATE-09 | Phase 12 | Pending |
+| PROC-05 | Phase 12 | Complete |
+| GATE-01 | Phase 12 | Complete |
+| GATE-02 | Phase 12 | Complete |
+| GATE-03 | Phase 12 | Complete |
+| GATE-04 | Phase 12 | Complete |
+| GATE-05 | Phase 12 | Complete |
+| GATE-06 | Phase 12 | Complete |
+| GATE-07 | Phase 12 | Complete |
+| GATE-08 | Phase 12 | Complete |
+| GATE-09 | Phase 12 | Complete |
 | HOUR-01 | Phase 13 | Pending |
 | HOUR-02 | Phase 13 | Pending |
 | HOUR-03 | Phase 13 | Pending |
@@ -100,4 +100,4 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 (Phase 11 complete)*
+*Last updated: 2026-01-30 (Phase 12 complete)*

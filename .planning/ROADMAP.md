@@ -23,7 +23,7 @@ See `.planning/archive/v1-milestone.md` for complete v1 phase history.
 **Milestone Goal:** Empower gate operators with a focused mobile view and explicit workflow states while giving supervisors business hours control.
 
 - [x] **Phase 11: Processing Status Foundation** - Schema changes and StatusBadge for new processing state
-- [ ] **Phase 12: Gate Operator View** - Mobile-first /gate/[id] with quick actions and real-time updates
+- [x] **Phase 12: Gate Operator View** - Mobile-first /gate/[id] with quick actions and real-time updates
 - [ ] **Phase 13: Business Hours Management** - Weekly schedule editor, holiday scheduling, manual override
 
 ## Phase Details
@@ -58,9 +58,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 12-01-PLAN.md - Gate operator page foundation and current pickup display (Wave 1)
-- [ ] 12-02-PLAN.md - Quick actions with Start Processing, Complete dialog, and pending state (Wave 2)
-- [ ] 12-03-PLAN.md - Next-up preview, queue count, real-time updates, and transitions (Wave 2)
+- [x] 12-01-PLAN.md - Gate operator page foundation and current pickup display (Wave 1)
+- [x] 12-02-PLAN.md - Quick actions with Start Processing, Complete dialog, and pending state (Wave 2)
+- [x] 12-03-PLAN.md - Next-up preview, queue count, real-time updates, and transitions (Wave 2)
 
 ### Phase 13: Business Hours Management
 **Goal**: Supervisors can configure when the warehouse is open for pickups
@@ -84,9 +84,9 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-10 | v1.0 | 24/24 | Complete | 2026-01-30 |
 | 11. Processing Status | v1.1 | 2/2 | Complete | 2026-01-30 |
-| 12. Gate Operator View | v1.1 | 0/3 | Not started | - |
+| 12. Gate Operator View | v1.1 | 3/3 | Complete | 2026-01-30 |
 | 13. Business Hours | v1.1 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-01-30 (Phase 11 complete)*
+*Last updated: 2026-01-30 (Phase 12 complete)*
