@@ -11,11 +11,12 @@ export interface PickupRequest {
   sales_order_number: string
   company_name: string | null
   customer_email: string
-  status: 'pending' | 'approved' | 'in_queue' | 'completed' | 'cancelled'
+  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
   email_flagged: boolean
   assigned_gate_id: string | null
   queue_position: number | null
   is_priority?: boolean
+  processing_started_at?: string | null
   created_at: string
   gate?: { id: string; gate_number: number } | null
 }
@@ -49,7 +50,8 @@ export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupReque
       header: 'Status',
       cell: ({ row }) => {
         const status = row.getValue('status') as PickupRequest['status']
-        return h(StatusBadge, { status })
+        const processingStartedAt = row.original.processing_started_at
+        return h(StatusBadge, { status, processingStartedAt })
       },
     },
     {
@@ -67,7 +69,7 @@ export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupReque
       header: 'Gate',
       cell: ({ row }) => {
         const status = row.original.status
-        const isActive = ['pending', 'approved', 'in_queue'].includes(status)
+        const isActive = ['pending', 'approved', 'in_queue', 'processing'].includes(status)
 
         if (isActive) {
           return h(GateSelect, {
@@ -146,7 +148,8 @@ export const columns: ColumnDef<PickupRequest>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as PickupRequest['status']
-      return h(StatusBadge, { status })
+      const processingStartedAt = row.original.processing_started_at
+      return h(StatusBadge, { status, processingStartedAt })
     },
   },
   {
