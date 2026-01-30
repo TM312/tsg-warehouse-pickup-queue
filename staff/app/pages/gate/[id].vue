@@ -12,6 +12,7 @@ import { PICKUP_STATUS } from '#shared/types/pickup-request'
 import type { GateStatus } from '#shared/types/pickup-request'
 
 definePageMeta({
+  layout: 'fullscreen',
   middleware: 'auth'
 })
 
