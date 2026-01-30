@@ -8,6 +8,7 @@ import DataTable from '@/components/dashboard/DataTable.vue'
 import { createColumns, type PickupRequest } from '@/components/dashboard/columns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
+import NowProcessingSection from '@/components/dashboard/NowProcessingSection.vue'
 import GateManagement from '@/components/gates/GateManagement.vue'
 import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
 import ShowCompletedToggle from '@/components/dashboard/ShowCompletedToggle.vue'
@@ -28,7 +29,7 @@ const { data: requests, refresh: refreshRequests, status } = await useAsyncData<
   async () => {
     const { data, error } = await client
       .from('pickup_requests')
-      .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, is_priority, created_at, gate:gates(id, gate_number)')
+      .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, is_priority, processing_started_at, created_at, gate:gates(id, gate_number)')
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -77,7 +78,7 @@ const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCou
 const gates = computed(() => (allGates.value ?? []).filter(g => g.is_active))
 
 // Queue actions composable
-const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate } = useQueueActions()
+const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue } = useQueueActions()
 
 // Gate management composable
 const { createGate, toggleGateActive } = useGateManagement()
@@ -168,6 +169,17 @@ function handleQueueRowClick(requestId: string) {
   }
 }
 
+// Processing section handlers
+async function handleProcessingComplete(requestId: string) {
+  await completeRequest(requestId)
+  await refresh()
+}
+
+async function handleProcessingRevert(requestId: string) {
+  await revertToQueue(requestId)
+  await refresh()
+}
+
 // Gate management handlers
 async function handleCreateGate(gateNumber: number) {
   await createGate(gateNumber)
@@ -199,11 +211,25 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
   }
 }
 
-// Computed for per-gate queue items
+// Computed for processing items (for NowProcessingSection)
+const processingItems = computed(() => {
+  return (requests.value ?? [])
+    .filter(r => r.status === 'processing' && r.gate)
+    .map(r => ({
+      id: r.id,
+      sales_order_number: r.sales_order_number,
+      company_name: r.company_name,
+      gate_number: r.gate!.gate_number,
+      gate_id: r.assigned_gate_id!,
+      processing_started_at: r.processing_started_at!
+    }))
+    .sort((a, b) => a.gate_number - b.gate_number)
+})
+
+// Computed for per-gate queue items (includes both in_queue and processing for count)
 const gatesWithQueues = computed(() => {
-  return (gates.value ?? []).map(gate => ({
-    ...gate,
-    queue: (requests.value ?? [])
+  return (gates.value ?? []).map(gate => {
+    const queueItems = (requests.value ?? [])
       .filter(r => r.assigned_gate_id === gate.id && r.status === 'in_queue')
       .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
       .map(r => ({
@@ -213,7 +239,18 @@ const gatesWithQueues = computed(() => {
         queue_position: r.queue_position ?? 0,
         is_priority: r.is_priority ?? false
       }))
-  }))
+
+    // Count includes both in_queue and processing for the tab badge
+    const processingCount = (requests.value ?? [])
+      .filter(r => r.assigned_gate_id === gate.id && r.status === 'processing')
+      .length
+
+    return {
+      ...gate,
+      queue: queueItems,
+      totalActive: queueItems.length + processingCount
+    }
+  })
 })
 
 // Create columns with callbacks
@@ -282,6 +319,17 @@ const refreshing = computed(() => status.value === 'pending')
       </div>
     </div>
 
+    <!-- Now Processing Section -->
+    <NowProcessingSection
+      v-if="processingItems.length > 0"
+      :items="processingItems"
+      :loading="pending"
+      class="mb-6"
+      @complete="handleProcessingComplete"
+      @revert="handleProcessingRevert"
+      @row-click="handleQueueRowClick"
+    />
+
     <Tabs default-value="all" class="w-full">
       <TabsList class="flex-wrap">
         <TabsTrigger value="all">
@@ -294,7 +342,7 @@ const refreshing = computed(() => status.value === 'pending')
           :value="`gate-${gate.id}`"
         >
           Gate {{ gate.gate_number }}
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.queue.length }}</span>
+          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.totalActive }}</span>
         </TabsTrigger>
         <TabsTrigger value="manage">
           Manage Gates
