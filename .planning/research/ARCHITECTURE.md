@@ -1,403 +1,566 @@
-# Architecture Patterns: v1.1 Gate Operator Experience
+# Architecture Research: v2.0 Architecture Overhaul
 
-**Domain:** Warehouse pickup queue management system
+**Domain:** Nuxt 4 Pinia + composables hybrid pattern, sidebar layouts, centralized types
 **Researched:** 2026-01-30
-**Confidence:** HIGH (based on existing codebase analysis)
+**Confidence:** HIGH (verified with official Nuxt 4 and Pinia documentation)
 
 ## Executive Summary
 
-The v1.1 features (gate operator view, processing status, business hours management) integrate cleanly with the existing architecture. The key insight is that these features are **additive extensions** rather than architectural changes:
+The v2.0 architecture overhaul introduces three key changes that integrate cleanly with the existing codebase:
 
-1. **Gate operator view** = new route + focused UI reusing existing composables
-2. **Processing status** = new status value in existing CHECK constraint + UI updates
-3. **Business hours management** = CRUD UI for existing `business_hours` table
+1. **Pinia + composables hybrid pattern:** Stores manage shared state, composables handle realtime/RPC side effects
+2. **Sidebar layout with route exclusion:** New `sidebar.vue` layout for dashboard pages, gate routes use `layout: false`
+3. **Centralized types:** Use Nuxt 4's `shared/types/` directory for auto-imported type definitions
 
-No new technologies needed. All three features follow established patterns from v1.
+These changes are **evolutionary refinements** rather than rewrites. Existing composables remain functional; Pinia stores add centralized state on top.
 
-## Current Architecture Overview
+## Current Architecture Analysis
 
-```
-+------------------+       +------------------+
-|   Customer App   |       |    Staff App     |
-|   (customer/)    |       |    (staff/)      |
-|   - Submit form  |       |   - Dashboard    |
-|   - Status page  |       |   - Gate mgmt    |
-+--------+---------+       +--------+---------+
-         |                          |
-         |  Supabase Realtime       |
-         |  (postgres_changes)      |
-         +------------+-------------+
-                      |
-              +-------v--------+
-              |   Supabase     |
-              |   PostgreSQL   |
-              |   - pickup_requests
-              |   - gates
-              |   - business_hours
-              +----------------+
-```
-
-### Existing Component Inventory
-
-**Staff App Routes:**
-- `/` - Dashboard (index.vue)
-- `/login` - Auth
-- `/settings` - Placeholder
-- `/password/update` - Password management
-- `/forgot-password` - Password reset
-- `/confirm` - Auth confirmation
-
-**Staff Composables:**
-- `useQueueActions` - RPC calls for queue operations
-- `useRealtimeQueue` - Realtime subscription management
-- `useGateManagement` - Gate CRUD operations
-
-**Customer App Routes:**
-- `/` - Submission form
-- `/status/[id]` - Real-time status tracking
-
-**Database Functions (SECURITY DEFINER):**
-- `assign_to_queue(request_id, gate_id)` - Atomic queue assignment
-- `reorder_queue(gate_id, request_ids)` - Bulk position update
-- `set_priority(request_id)` - Priority insertion at position 2
-- `move_to_gate(request_id, new_gate_id)` - Cross-gate transfer
-
-## Integration Architecture by Feature
-
-### 1. Gate Operator View
-
-**Component:** New route at `/gate/[id]` within staff app
-
-**Integration Points:**
-
-| Existing | New Component | Relationship |
-|----------|---------------|--------------|
-| `useSupabaseClient()` | GateOperatorPage | Reuse for data fetching |
-| `useRealtimeQueue` | GateOperatorPage | Reuse for live updates |
-| `useQueueActions.completeRequest()` | CompleteButton | Reuse existing RPC |
-| `gates` table | Route param validation | Query by gate ID |
-| `pickup_requests` table | Queue filtering | Filter by gate_id + status |
-
-**New Components Needed:**
+### Existing Composables
 
 ```
-staff/app/pages/gate/[id].vue     # Main operator page
-staff/app/components/operator/
-  CurrentPickup.vue               # Display current customer (position 1)
-  QuickActions.vue                # Complete/Skip buttons
-  UpNextList.vue                  # Next 2-3 in queue (preview)
+staff/app/composables/
+├── useRealtimeQueue.ts      # Realtime subscription management
+├── useQueueActions.ts       # RPC calls (assignGate, completeRequest, etc.)
+├── useGateManagement.ts     # Gate CRUD operations
+└── useBusinessHoursSettings.ts  # Business hours CRUD
 ```
 
-**Data Flow:**
-```
-GateOperatorPage
-  |
-  +-- useAsyncData('gate-queue', ...) ---- SELECT from pickup_requests
-  |                                        WHERE gate_id = :id
-  |                                        AND status IN ('in_queue', 'processing')
-  |
-  +-- useRealtimeQueue.subscribe() ------- postgres_changes on pickup_requests
-  |
-  +-- useQueueActions.completeRequest() -- UPDATE status = 'completed'
-```
+**Current Pattern:**
+- Each composable manages its own local state (`pending`, `status`)
+- Data fetching via `useAsyncData` in page components
+- Realtime subscriptions trigger callback-based refreshes
+- No shared state between pages (each page fetches independently)
 
-**Mobile-First Considerations:**
-- Large touch targets (min 44x44px)
-- Single-column layout for position 1 customer
-- Minimal scrolling - key info above fold
-- No drag-drop (desktop dashboard handles reordering)
+**Pain Points Solved by v2.0:**
+1. Dashboard index.vue has 300+ lines mixing state, UI, and logic
+2. Types duplicated across files (PickupRequest defined in columns.ts)
+3. Magic strings for statuses ('pending', 'in_queue', etc.)
+4. No centralized state for cross-component communication
 
-### 2. Processing Status
-
-**Component:** Database schema change + UI updates across both apps
-
-**Integration Points:**
-
-| Existing | Modification | Impact |
-|----------|--------------|--------|
-| `pickup_requests.status` CHECK constraint | Add 'processing' value | Migration required |
-| `assign_to_queue()` function | No change | Still assigns to 'in_queue' |
-| `completeRequest()` in useQueueActions | Modify to allow from 'processing' | Minor update |
-| Customer status page | Add 'processing' case | New UI state |
-| Staff DataTable | Add 'processing' badge | StatusBadge update |
-
-**Database Migration:**
-
-```sql
--- Add 'processing' to status CHECK constraint
-ALTER TABLE pickup_requests
-DROP CONSTRAINT pickup_requests_status_check;
-
-ALTER TABLE pickup_requests
-ADD CONSTRAINT pickup_requests_status_check
-CHECK (status IN ('pending', 'approved', 'in_queue', 'processing', 'completed', 'cancelled'));
-```
-
-**New Function Needed:**
-
-```sql
--- start_processing: Moves position 1 to 'processing' status
-CREATE OR REPLACE FUNCTION start_processing(p_request_id uuid)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  UPDATE pickup_requests
-  SET status = 'processing'
-  WHERE id = p_request_id
-    AND status = 'in_queue'
-    AND queue_position = 1;
-
-  -- Note: queue_position retained during processing
-  -- for potential "put back in queue" feature
-END;
-$$;
-```
-
-**Status Flow Change:**
-```
-Current v1:
-pending -> approved -> in_queue -----------------> completed
-                                                -> cancelled
-
-New v1.1:
-pending -> approved -> in_queue -> processing --> completed
-                                              --> cancelled
-```
-
-**UI Updates Required:**
-
-1. **StatusBadge.vue** (staff) - Add 'processing' variant (yellow/amber)
-2. **Customer status/[id].vue** - Add 'processing' case in statusDisplay computed
-3. **GateQueueList.vue** - Distinguish position 1 if processing
-4. **New GateOperatorPage** - "Start Processing" action button
-
-### 3. Business Hours Management
-
-**Component:** New settings sub-page or section for staff
-
-**Integration Points:**
-
-| Existing | New Component | Relationship |
-|----------|---------------|--------------|
-| `business_hours` table | BusinessHoursForm | Direct CRUD |
-| Seed data (7 rows) | Initial state | One row per day exists |
-| `/api/business-hours.get.ts` | No change | Reads same table |
-| RLS policies | Already permit staff UPDATE | No migration needed |
-
-**Architecture Decision: Settings Page vs Modal**
-
-Recommendation: **Dedicated settings section** at `/settings/business-hours`
-
-Rationale:
-- Complex enough to warrant its own page (7 days + holidays)
-- Separates from operational dashboard
-- Room for future holiday/override features
-- Pattern: `/settings` already exists as placeholder
-
-**New Components Needed:**
+### Current Layout Structure
 
 ```
-staff/app/pages/settings/business-hours.vue  # Main page
-staff/app/components/settings/
-  WeeklyScheduleEditor.vue                   # Grid of 7 days
-  DayHoursRow.vue                            # Single day editor
-  HolidayManager.vue                         # Future: closures
+staff/app/layouts/
+├── default.vue   # Header with nav links + slot
+└── auth.vue      # Minimal layout for login pages
 ```
 
-**Data Model Considerations:**
+**Current default.vue behavior:**
+- Header with "Warehouse Pickup Queue" title
+- Settings link + Logout button
+- Main content via `<slot />`
+- Used on all authenticated pages
 
-Current `business_hours` table handles weekly schedule. For future holiday support:
+**Problem:** Gate operator view (`/gate/[id]`) currently uses default layout but needs simpler, full-screen mobile experience.
 
-```sql
--- Future: scheduled closures (not in v1.1 scope)
-CREATE TABLE scheduled_closures (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  closure_date date NOT NULL,
-  reason text,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
+## v2.0 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Vue App                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │                      Layouts                              │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │    │
+│  │  │   sidebar    │  │    gate      │  │    auth      │   │    │
+│  │  │  (dashboard) │  │ (fullscreen) │  │   (login)    │   │    │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────┤
+│                        Pages                                     │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐            │
+│  │ index   │  │ gates   │  │settings │  │gate/[id]│            │
+│  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘            │
+├───────┴────────────┴────────────┴────────────┴──────────────────┤
+│                     Pinia Stores (state)                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  useQueue    │  │  useGates    │  │ useSettings  │          │
+│  │   Store      │  │    Store     │  │    Store     │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+├─────────────────────────────────────────────────────────────────┤
+│                   Composables (side effects)                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │useRealtime   │  │useQueueRpc   │  │useGateRpc    │          │
+│  │  Queue       │  │              │  │              │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+├─────────────────────────────────────────────────────────────────┤
+│                     Supabase Client                              │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │              useSupabaseClient()                         │    │
+│  └─────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**For v1.1, weekly schedule editing is sufficient.**
+### Component Responsibilities
 
-**CRUD Operations:**
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| **Pinia Stores** | Shared reactive state, derived computations | `app/stores/*.ts` with `defineStore` |
+| **Composables** | Realtime subscriptions, RPC calls, side effects | `app/composables/*.ts` with `useSupabaseClient` |
+| **Layouts** | Page structure, navigation chrome | `app/layouts/*.vue` |
+| **Pages** | Route handling, composition root | `app/pages/**/*.vue` |
+| **Components** | UI presentation, local interactions | `app/components/**/*.vue` |
+
+## Recommended Project Structure
+
+```
+staff/
+├── app/
+│   ├── stores/                    # NEW: Pinia stores
+│   │   ├── queue.ts               # Pickup requests state
+│   │   ├── gates.ts               # Gates state
+│   │   └── settings.ts            # Business hours state
+│   │
+│   ├── composables/               # EXISTING: Side effects
+│   │   ├── useRealtimeQueue.ts    # Realtime subscriptions
+│   │   ├── useQueueRpc.ts         # Queue RPC operations
+│   │   ├── useGateRpc.ts          # Gate RPC operations
+│   │   └── useBusinessHoursRpc.ts # Business hours RPC
+│   │
+│   ├── layouts/
+│   │   ├── sidebar.vue            # NEW: Sidebar layout for dashboard
+│   │   ├── auth.vue               # EXISTING: Login pages
+│   │   └── default.vue            # KEEP: Fallback (or remove)
+│   │
+│   ├── pages/
+│   │   ├── index.vue              # Dashboard (uses sidebar layout)
+│   │   ├── gates.vue              # NEW: Gate management page
+│   │   ├── settings/
+│   │   │   └── business-hours.vue # Business hours (uses sidebar)
+│   │   └── gate/
+│   │       └── [id].vue           # Gate operator (layout: false)
+│   │
+│   └── components/
+│       ├── layout/                # NEW: Layout components
+│       │   ├── AppSidebar.vue     # Sidebar navigation
+│       │   └── SidebarNav.vue     # Nav items
+│       └── ...                    # Existing components
+│
+└── shared/                        # NEW: Shared types (Nuxt 4)
+    └── types/
+        ├── index.ts               # Re-exports
+        ├── pickup-request.ts      # PickupRequest interface + Status enum
+        ├── gate.ts                # Gate interface
+        └── business-hours.ts      # BusinessHours interfaces
+```
+
+### Structure Rationale
+
+- **`app/stores/`:** Pinia auto-discovers stores in this directory (Nuxt 4 convention)
+- **`app/composables/`:** Keep composables for non-state logic (realtime, RPC)
+- **`shared/types/`:** Auto-imported types available in both app and server code
+- **`app/components/layout/`:** Isolate layout-specific components from feature components
+
+## Architectural Patterns
+
+### Pattern 1: Hybrid Pinia + Composables
+
+**What:** Pinia stores hold shared state; composables handle side effects and update stores
+
+**When to use:** When multiple components need the same data, or when state needs to survive navigation
+
+**Trade-offs:**
+- (+) Clear separation: state vs side effects
+- (+) DevTools integration for debugging state
+- (+) Computed getters for derived data
+- (-) Slight learning curve for team
+
+**Example:**
 
 ```typescript
-// No new composable needed - direct client operations
-const client = useSupabaseClient()
+// stores/queue.ts
+export const useQueueStore = defineStore('queue', () => {
+  // State
+  const requests = ref<PickupRequest[]>([])
+  const loading = ref(false)
+  const error = ref<Error | null>(null)
 
-// Update a day's hours
-await client
-  .from('business_hours')
-  .update({ open_time: '08:00:00', close_time: '17:00:00', is_closed: false })
-  .eq('day_of_week', dayIndex)
+  // Getters (computed)
+  const pendingRequests = computed(() =>
+    requests.value.filter(r => r.status === Status.PENDING)
+  )
+  const requestsByGate = computed(() => {
+    const map = new Map<string, PickupRequest[]>()
+    for (const r of requests.value) {
+      if (r.assigned_gate_id) {
+        const list = map.get(r.assigned_gate_id) || []
+        list.push(r)
+        map.set(r.assigned_gate_id, list)
+      }
+    }
+    return map
+  })
 
-// Mark day as closed
-await client
-  .from('business_hours')
-  .update({ is_closed: true })
-  .eq('day_of_week', dayIndex)
+  // Actions (called by composables)
+  function setRequests(data: PickupRequest[]) {
+    requests.value = data
+  }
+  function updateRequest(updated: PickupRequest) {
+    const idx = requests.value.findIndex(r => r.id === updated.id)
+    if (idx >= 0) requests.value[idx] = updated
+  }
+
+  return {
+    requests: readonly(requests),
+    loading: readonly(loading),
+    error: readonly(error),
+    pendingRequests,
+    requestsByGate,
+    setRequests,
+    updateRequest,
+  }
+})
 ```
 
-## Component Boundaries
-
-### New Components by Feature
-
-| Feature | New Route | New Components | Modified Components |
-|---------|-----------|----------------|---------------------|
-| Gate Operator | `/gate/[id]` | GateOperatorPage, CurrentPickup, QuickActions | - |
-| Processing Status | - | - | StatusBadge, customer status page, useQueueActions |
-| Business Hours | `/settings/business-hours` | WeeklyScheduleEditor, DayHoursRow | settings/index.vue (add navigation) |
-
-### Component Communication
-
-```
-GateOperatorPage
-  |-- CurrentPickup (receives current customer prop)
-  |     |-- QuickActions (emits complete/skip events)
-  |-- UpNextList (receives queue preview array prop)
-
-WeeklyScheduleEditor
-  |-- DayHoursRow x7 (receives day config, emits update)
-```
-
-## Data Flow Changes
-
-### Realtime Channel Strategy
-
-**Current:** Single channel `pickup-requests-staff` watches all changes
-
-**Recommendation:** Keep single channel for v1.1
-
-The gate operator view filters client-side by gate_id. This is acceptable because:
-1. Volume is low (50-100 requests/day)
-2. Gate operators benefit from seeing other gates' activity (awareness)
-3. Adding per-gate channels adds complexity without meaningful benefit
-
-For high-volume scenarios (1000+ requests/day), consider filtered subscriptions:
 ```typescript
-// Future optimization if needed
-.on('postgres_changes', {
-  event: '*',
-  schema: 'public',
-  table: 'pickup_requests',
-  filter: `assigned_gate_id=eq.${gateId}`
-}, callback)
+// composables/useQueueRpc.ts
+export function useQueueRpc() {
+  const client = useSupabaseClient()
+  const store = useQueueStore()
+  const pending = ref<Record<string, boolean>>({})
+
+  async function fetchRequests() {
+    store.loading = true
+    try {
+      const { data, error } = await client
+        .from('pickup_requests')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      store.setRequests(data)
+    } finally {
+      store.loading = false
+    }
+  }
+
+  async function completeRequest(requestId: string, gateId?: string) {
+    pending.value[requestId] = true
+    try {
+      const { error } = await client
+        .from('pickup_requests')
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .eq('id', requestId)
+      if (error) throw error
+      // Optimistic update via store
+      store.updateRequest({ ...store.requests.find(r => r.id === requestId)!, status: Status.COMPLETED })
+      toast.success('Pickup marked complete')
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
+  return { pending: readonly(pending), fetchRequests, completeRequest }
+}
 ```
 
-### State Synchronization
+### Pattern 2: Layout Exclusion for Gate Routes
 
-Gate operator view shares data with main dashboard. Two approaches:
+**What:** Use `definePageMeta({ layout: false })` for gate operator pages to opt out of sidebar
 
-**Option A: Independent Data Fetching (Recommended)**
-- Each page fetches its own data
-- Realtime events trigger refresh()
-- Simple, isolated, works if operator opens directly
+**When to use:** Mobile-first pages that need full-screen experience
 
-**Option B: Shared Store**
-- Pinia store holding requests
-- Both pages read from store
-- More complex, unnecessary for v1.1
+**Trade-offs:**
+- (+) Clean separation of operator vs admin experience
+- (+) Nuxt-native, no workarounds
+- (-) Must manage layout manually in excluded pages
+
+**Example:**
+
+```vue
+<!-- app/layouts/sidebar.vue -->
+<script setup lang="ts">
+const supabase = useSupabaseClient()
+async function logout() {
+  await supabase.auth.signOut()
+  await navigateTo('/login')
+}
+</script>
+
+<template>
+  <div class="flex min-h-screen">
+    <AppSidebar />
+    <div class="flex-1 flex flex-col">
+      <header class="border-b px-6 py-4 flex justify-between items-center">
+        <h1 class="text-lg font-semibold">Warehouse Pickup Queue</h1>
+        <Button variant="ghost" size="sm" @click="logout">Logout</Button>
+      </header>
+      <main class="flex-1 p-6">
+        <slot />
+      </main>
+    </div>
+  </div>
+</template>
+```
+
+```vue
+<!-- app/pages/index.vue (Dashboard) -->
+<script setup lang="ts">
+definePageMeta({
+  layout: 'sidebar',
+  middleware: 'auth'
+})
+</script>
+```
+
+```vue
+<!-- app/pages/gate/[id].vue (Operator View) -->
+<script setup lang="ts">
+definePageMeta({
+  layout: false,  // No sidebar, fullscreen mobile experience
+  middleware: 'auth'
+})
+</script>
+
+<template>
+  <div class="min-h-screen flex flex-col bg-background">
+    <!-- Gate-specific header -->
+    <header class="bg-primary text-primary-foreground p-4">
+      <h1 class="text-2xl font-bold text-center">Gate {{ gate?.gate_number }}</h1>
+    </header>
+    <!-- Full-screen content -->
+    <main class="flex-1 p-4">
+      <!-- ... -->
+    </main>
+  </div>
+</template>
+```
+
+### Pattern 3: Centralized Types with shared/types/
+
+**What:** Define interfaces and enums in `shared/types/` for auto-import across app and server
+
+**When to use:** Any type used in multiple files or across app/server boundary
+
+**Trade-offs:**
+- (+) Single source of truth
+- (+) Auto-imported (no manual imports needed)
+- (+) Works with Nuxt 4's separate TypeScript projects
+- (-) Only `shared/types/` and `shared/utils/` are auto-imported
+
+**Example:**
+
+```typescript
+// shared/types/pickup-request.ts
+export enum PickupStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  IN_QUEUE = 'in_queue',
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export interface PickupRequest {
+  id: string
+  sales_order_number: string
+  company_name: string | null
+  customer_email: string
+  status: PickupStatus
+  email_flagged: boolean
+  assigned_gate_id: string | null
+  queue_position: number | null
+  is_priority: boolean
+  processing_started_at: string | null
+  created_at: string
+  completed_at: string | null
+  gate?: Gate | null
+}
+```
+
+```typescript
+// shared/types/gate.ts
+export interface Gate {
+  id: string
+  gate_number: number
+  is_active: boolean
+}
+
+export interface GateWithQueueCount extends Gate {
+  queue_count: number
+}
+```
+
+```typescript
+// shared/types/index.ts
+export * from './pickup-request'
+export * from './gate'
+export * from './business-hours'
+```
+
+**Usage (no import needed):**
+
+```typescript
+// In any .vue or .ts file
+const request: PickupRequest = { ... }
+if (request.status === PickupStatus.PROCESSING) { ... }
+```
+
+## Data Flow
+
+### Request Flow with Pinia
+
+```
+[User Action]
+    |
+    v
+[Component] -----> [Composable RPC] -----> [Supabase]
+    |                    |                      |
+    |                    v                      |
+    |              [Pinia Store] <-------------+
+    |                    |       (on success)
+    v                    v
+[Reactive UI] <---- [Store State]
+```
+
+### Realtime Integration
+
+```
+[Supabase Realtime]
+    |
+    | postgres_changes event
+    v
+[useRealtimeQueue composable]
+    |
+    | calls store.refresh() or store.patch()
+    v
+[Pinia Store]
+    |
+    | reactive state update
+    v
+[All subscribed components]
+```
+
+### Key Data Flows
+
+1. **Initial load:** Page calls `composable.fetchData()` -> updates store -> components react
+2. **User action:** Component calls `composable.action()` -> RPC call -> updates store on success
+3. **Realtime event:** Subscription callback -> calls `composable.fetchData()` or patches store directly
+4. **Navigation:** Store persists across routes, no refetch needed (unless explicitly cleared)
+
+## Scaling Considerations
+
+| Scale | Architecture Adjustments |
+|-------|--------------------------|
+| 0-100 pickups/day | Current architecture is fine. Single Pinia store, client-side filtering. |
+| 100-500 pickups/day | Consider per-gate realtime filters to reduce event volume. |
+| 500+ pickups/day | Split stores by domain (queueStore, historyStore). Consider server-side pagination. |
+
+### Scaling Priorities
+
+1. **First bottleneck:** Realtime event volume. Fix: Add `filter` to postgres_changes subscription.
+2. **Second bottleneck:** Client memory with large request history. Fix: Paginate historical data, keep only active in store.
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Store Logic in Components
+
+**What people do:** Put data transformation and business logic in page components
+**Why it's wrong:** Logic gets duplicated, components become untestable
+**Do this instead:** Keep transformations in store getters, actions in composables
+
+### Anti-Pattern 2: Direct Supabase Calls from Components
+
+**What people do:** Call `useSupabaseClient()` directly in components
+**Why it's wrong:** Bypasses store, leads to inconsistent state
+**Do this instead:** All data mutations go through composables that update stores
+
+### Anti-Pattern 3: Multiple Realtime Subscriptions for Same Table
+
+**What people do:** Create new subscription in each component that needs data
+**Why it's wrong:** Wasteful, can cause duplicate updates and race conditions
+**Do this instead:** Single subscription per table in composable, updates central store
+
+### Anti-Pattern 4: Mixing Layout Concerns
+
+**What people do:** Conditionally render sidebar inside layout based on route
+**Why it's wrong:** Complex, error-prone, violates single responsibility
+**Do this instead:** Use separate layouts, set via `definePageMeta({ layout: 'name' })`
+
+## Integration Points
+
+### Existing to New
+
+| Existing | New | Migration Strategy |
+|----------|-----|-------------------|
+| `useQueueActions` composable | `useQueueRpc` + `useQueueStore` | Keep composable, add store integration |
+| `useGateManagement` composable | `useGateRpc` + `useGatesStore` | Keep composable, add store integration |
+| `useRealtimeQueue` composable | Keep as-is | Update callback to refresh store |
+| Types in `columns.ts` | Move to `shared/types/` | Delete old, use auto-imports |
+| Magic strings | Enums in `shared/types/` | Find-replace with enum values |
+
+### Migration Approach
+
+**Phase 1 (Non-breaking):**
+1. Add `shared/types/` with enums and interfaces
+2. Update existing code to use new types (no functionality change)
+3. Add Pinia module to nuxt.config.ts
+4. Create empty stores
+
+**Phase 2 (Incremental):**
+1. Add store state, connect composables to stores
+2. Update components to read from stores
+3. Test with realtime updates
+
+**Phase 3 (Layout):**
+1. Create sidebar.vue layout with AppSidebar component
+2. Update dashboard pages to use sidebar layout
+3. Add `layout: false` to gate/[id].vue
+4. Remove old default.vue header
 
 ## Suggested Build Order
 
 Based on dependencies and integration complexity:
 
-### Phase 1: Processing Status (Foundation)
-1. Database migration (add 'processing' to CHECK constraint)
-2. Create `start_processing()` database function
-3. Update `useQueueActions` with startProcessing method
-4. Update StatusBadge component
-5. Update customer status page
+### Phase 1: Type Foundation
 
-**Rationale:** Processing status is required by gate operator view. Build foundation first.
+1. Create `shared/types/` directory
+2. Move/create PickupRequest, Gate, BusinessHours interfaces
+3. Create Status enum with typed values
+4. Update existing files to use centralized types
+5. Verify TypeScript compilation
 
-### Phase 2: Gate Operator View
-1. Create `/gate/[id]` route with basic layout
-2. Implement CurrentPickup component
-3. Implement QuickActions with start processing + complete
-4. Add realtime subscription
-5. Mobile optimization pass
+**Rationale:** Types are foundational. Must exist before Pinia stores reference them.
 
-**Rationale:** Depends on processing status. Core v1.1 feature.
+### Phase 2: Pinia Infrastructure
 
-### Phase 3: Business Hours Management
-1. Create `/settings/business-hours` route
-2. Implement WeeklyScheduleEditor component
-3. Implement DayHoursRow with time pickers
-4. Add navigation from settings page
-5. Test with customer app business hours check
+1. Add `@pinia/nuxt` module
+2. Create `useQueueStore` with state, getters
+3. Create `useGatesStore` with state, getters
+4. Update `useQueueActions` to update stores
+5. Update `useRealtimeQueue` to refresh stores
+6. Update dashboard to read from stores
 
-**Rationale:** Independent feature, can be built in parallel or after. Lower urgency than operator view.
+**Rationale:** Pinia stores depend on types. Dashboard is primary consumer.
 
-## Anti-Patterns to Avoid
+### Phase 3: Sidebar Layout
 
-### 1. Over-Engineering Realtime
+1. Create `AppSidebar.vue` component using shadcn-vue Sidebar
+2. Create `sidebar.vue` layout
+3. Update dashboard pages to use `layout: 'sidebar'`
+4. Add `layout: false` to gate/[id].vue
+5. Test navigation between layouts
 
-**Don't:** Create per-gate channels or per-operator channels
-**Do:** Reuse existing channel with client-side filtering
+**Rationale:** Layout is independent of store implementation. Can be done in parallel.
 
-### 2. Duplicating Queue Logic
+### Phase 4: Dashboard Restructure
 
-**Don't:** Add new database functions that replicate existing logic
-**Do:** Extend existing functions (e.g., completeRequest already works)
+1. Extract inline data fetching to composables/stores
+2. Create dedicated gate management page (`/gates`)
+3. Simplify dashboard to use store data
+4. Add gate queue visualization (bar chart)
 
-### 3. Breaking Status Flow
-
-**Don't:** Allow arbitrary status transitions
-**Do:** Enforce valid transitions in database functions
-
-Valid transitions for 'processing':
-```
-in_queue (position 1) -> processing  (start_processing function)
-processing -> completed              (completeRequest update)
-processing -> cancelled              (cancelRequest update)
-processing -> in_queue               (future: "put back" feature)
-```
-
-### 4. Mixing Concerns in Operator View
-
-**Don't:** Add queue reordering to operator view
-**Do:** Keep operator view focused on single-customer flow
-
-Operator view is for:
-- Seeing who's up
-- Starting processing
-- Completing pickup
-
-Supervisor dashboard is for:
-- Queue reordering
-- Priority management
-- Multi-gate overview
-
-## Technology Decisions
-
-### No New Dependencies Required
-
-All v1.1 features can be built with existing stack:
-- Nuxt 4 / Vue 3 (routing, components)
-- shadcn-vue (form components, buttons, cards)
-- Supabase client (data operations, realtime)
-- date-fns (time formatting in business hours)
-
-### shadcn-vue Components for New Features
-
-| Component | Used For |
-|-----------|----------|
-| Card | Operator current pickup display |
-| Button | Quick actions |
-| Input | Time inputs for business hours |
-| Switch | Open/closed toggle per day |
-| Label | Form labels |
-| Select | Potentially for time dropdowns |
-
-All already installed in staff app.
+**Rationale:** Depends on both stores and layout being in place.
 
 ## Sources
 
-- Codebase analysis: `/Users/thomas/Projects/tsg/warehouse-pickup-queue/`
-- Existing migrations in `supabase/migrations/`
-- Existing composables in `staff/app/composables/`
-- shadcn-vue documentation (via existing component implementations)
+- [Nuxt 4 State Management](https://nuxt.com/docs/4.x/getting-started/state-management) - Official Nuxt state management guide
+- [Pinia Nuxt Integration](https://pinia.vuejs.org/ssr/nuxt.html) - Official Pinia SSR/Nuxt documentation
+- [Pinia + Composables Cookbook](https://pinia.vuejs.org/cookbook/composables.html) - Using composables with Pinia stores
+- [Nuxt 4 Layouts](https://nuxt.com/docs/4.x/directory-structure/app/layouts) - Official layouts documentation
+- [Nuxt 4 Shared Directory](https://nuxt.com/docs/4.x/directory-structure/shared) - Auto-imported types/utils
+- [definePageMeta](https://nuxt.com/docs/4.x/api/utils/define-page-meta) - Layout assignment per page
+- Codebase analysis: existing composables, layouts, and component patterns
+
+---
+*Architecture research for: v2.0 Architecture Overhaul*
+*Researched: 2026-01-30*

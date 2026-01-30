@@ -1,8 +1,8 @@
-# Domain Pitfalls: v1.1 Gate Operator Experience
+# Domain Pitfalls: v2.0 Architecture Overhaul
 
-**Domain:** Warehouse pickup queue system - adding gate operator views, processing workflow, business hours management
+**Domain:** Nuxt 4 Architecture Refactoring (Pinia + Sidebar Layout + Type Centralization)
 **Researched:** 2026-01-30
-**Confidence:** HIGH (based on existing codebase analysis + verified research)
+**Confidence:** HIGH (verified with official docs and codebase analysis)
 
 ---
 
@@ -10,110 +10,215 @@
 
 Mistakes that cause rewrites or major issues.
 
-### Pitfall 1: Status Transition Race Conditions with "Processing" State
+### Pitfall 1: Realtime Subscription Leak During Composable-to-Pinia Migration
 
-**What goes wrong:** Adding `processing` status between `in_queue` and `completed` creates a new intermediate state. Two gate operators (or supervisor + gate operator) can attempt transitions on the same request simultaneously. Without atomic guards, request can end up in inconsistent state or skip states entirely.
+**What goes wrong:**
+When migrating `useRealtimeQueue` composable to work with Pinia stores, the subscription cleanup in `onUnmounted` may not fire if the composable is called from within a Pinia store or after an `await` statement. This causes:
+- Multiple subscriptions to same channel
+- Memory leaks
+- Duplicate event handling (queue updates fire multiple times)
+- Connection exhaustion with Supabase Realtime
 
-**Why it happens:** The current system uses direct `.update()` calls for `completeRequest()` (see `useQueueActions.ts` lines 52-72) without status guards. Adding `processing` means: `in_queue -> processing -> completed`. If operator A clicks "Start Processing" while supervisor B clicks "Complete", both updates can succeed, potentially completing a request that was never marked as processing.
+**Why it happens:**
+Vue composables must be called synchronously in `<script setup>` or `setup()` for lifecycle hooks like `onUnmounted` to register correctly. If you use `await` before registering `onUnmounted`, or call the composable from a Pinia store's setup function after async operations, the lifecycle hook is never registered.
 
-**Consequences:**
-- Customer sees status jump from "Queued" to "Completed" without "Processing" intermediate
-- Audit trail missing processing timestamp
-- If processing has business logic (e.g., time tracking), it gets skipped
-- Real-time subscriptions may fire in wrong order
+Current code (`useRealtimeQueue.ts` lines 58-62) correctly handles cleanup:
+```typescript
+onUnmounted(() => {
+  unsubscribe()
+})
+```
 
-**Prevention:**
-1. Add `processing_started_at` timestamp column (not just status change)
-2. Use database function with `WHERE status = 'in_queue'` guard for `start_processing`
-3. Use database function with `WHERE status = 'processing'` guard for `complete_request`
-4. Return old status from function to detect race (if NULL returned, transition failed)
+But moving this to a Pinia store or calling after async would break it.
 
-**Detection (warning signs):**
-- Test: Two browser tabs completing same request simultaneously
-- Monitor: Requests with `completed_at` but no `processing_started_at`
-- Logs: "Failed to start processing" errors in production
+**How to avoid:**
+1. Keep realtime subscriptions in composables, NOT in Pinia stores
+2. Use the hybrid pattern: Pinia for state, composables for side effects
+3. Call `subscribe()` from component's `onMounted`, not from store initialization
+4. If composable must be async, register all lifecycle hooks BEFORE any `await`
 
-**Phase:** Address in database migration phase (before UI)
+**Warning signs:**
+- Console shows "SUBSCRIBED" multiple times for same channel
+- Queue updates appear duplicated in UI
+- Memory usage grows on page navigation
+- Supabase dashboard shows many concurrent connections
 
----
-
-### Pitfall 2: Queue Position Gaps on Processing Status
-
-**What goes wrong:** Current system clears `queue_position` on completion (see `completeRequest()` line 60). If `processing` status means "being loaded at gate", does the customer still occupy position 1? If not, when do other customers shift up? Inconsistent handling creates queue position gaps or duplicate positions.
-
-**Why it happens:** The existing `assign_to_queue`, `reorder_queue`, and `move_to_gate` functions all assume `status = 'in_queue'` for queue position logic. Adding `processing` breaks this assumption unless explicitly handled.
-
-**Consequences:**
-- Customer in position 2 never advances to position 1 (stuck behind "processing" customer)
-- Or: Two customers both show position 1 (one processing, one "next")
-- Wait time estimates become incorrect
-- Drag-drop reordering breaks for processing customers
-
-**Prevention:**
-1. Define clear semantic: `processing` means "position 1 is being served, don't show in queue UI"
-2. Keep `queue_position = 1` during processing OR create separate "serving" semantic
-3. Update all queue functions to handle: `WHERE status IN ('in_queue', 'processing')`
-4. On processing completion, run gap compaction (shift all positions down)
-
-**Detection:**
-- Test: Start processing position 1, verify position 2 customer now shows as "next up"
-- Query: `SELECT * FROM pickup_requests WHERE queue_position = 1 GROUP BY assigned_gate_id HAVING COUNT(*) > 1`
-
-**Phase:** Database migration + queue function updates
+**Phase to address:**
+Phase 1 (Pinia Integration) - Define clear boundary: stores own state, composables own subscriptions
 
 ---
 
-### Pitfall 3: Business Hours Timezone Storage Mismatch
+### Pitfall 2: Store Reactivity Loss on Destructuring
 
-**What goes wrong:** Current `business_hours` table stores `open_time` and `close_time` as `time` type without timezone. The customer app will compare "now" against these times, but "now" and "stored time" may be in different timezones, causing warehouse to appear open/closed at wrong times.
+**What goes wrong:**
+Destructuring state directly from a Pinia store loses reactivity. The UI stops updating when store state changes, appearing "frozen" on initial values.
 
-**Why it happens:** PostgreSQL `time` type has no timezone context. If server is in UTC, staff enters "8:00 AM" local time, it stores as "8:00 AM" with no timezone. Customer's browser sends "8:15 AM" local time for comparison. If customer and warehouse are in same timezone, it works. If server does timezone conversion, it breaks.
+```typescript
+// BROKEN - loses reactivity
+const { requests, gates } = useQueueStore()
 
-**Consequences:**
-- Warehouse shows "closed" during business hours (frustrated customers)
-- Warehouse shows "open" outside business hours (customers arrive to closed warehouse)
-- Daylight Saving Time transitions cause 1-hour windows of wrong behavior twice yearly
+// requests will always show initial value, never updates
+```
 
-**Prevention:**
-1. Store timezone explicitly in config table (e.g., `America/Los_Angeles`)
-2. All time comparisons happen server-side using warehouse timezone
-3. Never compare raw `time` values from different sources
-4. Add DST-specific test cases (2 AM on spring-forward day)
+**Why it happens:**
+Pinia wraps stores in `reactive()`, which unwraps all refs. When you destructure, you get plain values at that moment, not reactive references. This is a fundamental Vue reactivity limitation.
 
-**Detection:**
-- Test: Set local machine to different timezone, verify business hours check still correct
-- Test: Manually adjust system clock around DST boundary
+**How to avoid:**
+Use `storeToRefs()` for state and getters, destructure actions directly:
 
-**Phase:** Business hours schema design (before UI)
+```typescript
+import { storeToRefs } from 'pinia'
 
-**Source:** [DEV Community - How to Handle Date and Time Correctly](https://dev.to/kcsujeet/how-to-handle-date-and-time-correctly-to-avoid-timezone-bugs-4o03)
+const store = useQueueStore()
+const { requests, gates } = storeToRefs(store)  // Reactive refs
+const { refreshRequests, assignGate } = store   // Actions - no storeToRefs needed
+```
+
+**Warning signs:**
+- UI shows stale data despite store updates visible in DevTools
+- Computed properties don't recalculate
+- Template bindings work, but destructured vars in script don't
+
+**Phase to address:**
+Phase 1 (Pinia Integration) - Establish destructuring pattern in first store, apply consistently
 
 ---
 
-### Pitfall 4: Holiday Table Design - Recurring vs One-Time
+### Pitfall 3: Type Definition Migration Breaking Components
 
-**What goes wrong:** Adding holidays table without clear recurring vs. one-time model. Team stores "Christmas 2026" as one-time, then next year it's missing. Or team stores "Christmas" as recurring without year, then can't add "Christmas Eve closure 2026 only".
+**What goes wrong:**
+When centralizing types (e.g., moving `PickupRequest` from `columns.ts` to `types/`), imports break across multiple files simultaneously. TypeScript compilation fails, making it hard to iterate.
 
-**Why it happens:** Holiday patterns are complex: some fixed date (Jan 1), some floating (Thanksgiving = 4th Thursday November), some one-time (special closure), some recurring annual. Single table design rarely handles all cases.
+**Current duplicate type definitions:**
+- `staff/app/components/dashboard/columns.ts` (lines 9-22): `PickupRequest` interface
+- `staff/app/components/dashboard/StatusBadge.vue` (line 8): inline status union type
+- `staff/app/components/dashboard/ActionButtons.vue` (line 18): same inline status union
+- `staff/app/pages/gate/[id].vue` (lines 31-40): inline queue item type
 
-**Consequences:**
-- Holidays must be re-entered annually (operational burden)
-- Can't schedule one-time closures alongside recurring holidays
-- Floating holidays (Easter, Thanksgiving) require manual date calculation each year
+**Why it happens:**
+Types are currently defined inline where used. Moving to centralized location requires updating every import simultaneously, which is error-prone.
 
-**Prevention:**
-1. Separate tables: `recurring_holidays` (rules) + `holiday_overrides` (specific dates)
-2. Or: Single `closures` table with `date DATE` for specific closures + manual annual entry
-3. For v1.1 MVP: Use simple `closures` table with explicit dates. Recurring can be v2.
-4. Always store full `DATE` not just month/day
+**How to avoid:**
+1. Create central types file (`types/index.ts` or `types/queue.ts`)
+2. Re-export from old location initially: `export { PickupRequest } from '~/types'`
+3. Update imports incrementally (one file per commit if needed)
+4. Remove re-exports only after all imports updated
+5. Use TypeScript strict mode to catch missing imports early
 
-**Detection:**
-- Review: Can admin schedule "closed Dec 24-26, 2026" AND "closed for inventory Jan 15, 2027"?
-- Review: What happens on Jan 1, 2027 - are 2026 holidays still working?
+**Warning signs:**
+- Multiple "Cannot find name" errors after type move
+- Components that were working suddenly have type errors
+- IDE shows different types than runtime
 
-**Phase:** Business hours schema design
+**Phase to address:**
+Phase 3 (Type Centralization) - Create types first, use re-export migration pattern
 
-**Source:** [Medium - The Complex World of Calendars: Database Design](https://medium.com/tomorrowapp/the-complex-world-of-calendars-database-design-fccb3a71a74b)
+---
+
+### Pitfall 4: Sidebar Layout Breaking Gate Operator Mobile View
+
+**What goes wrong:**
+Adding sidebar layout affects the `/gate/[id]` route, which must remain a full-screen mobile-first view for gate operators. The sidebar interferes with:
+- Touch targets (44px requirement from v1.1)
+- Full-width sales order number display
+- Mobile viewport height
+- Current scroll fix (`min-h-screen flex flex-col`)
+
+**Why it happens:**
+Default layouts in Nuxt apply to all pages unless explicitly overridden. Easy to forget gate pages need different treatment.
+
+**How to avoid:**
+1. Create new `sidebar.vue` layout for dashboard pages
+2. Keep `default.vue` or create `gate.vue` layout for gate pages
+3. Explicitly set layout in `/gate/[id].vue`:
+   ```typescript
+   definePageMeta({
+     layout: 'gate'  // or layout: false for no layout
+   })
+   ```
+4. Test gate view on mobile after ANY layout changes
+
+**Warning signs:**
+- Gate page shows sidebar on mobile
+- Sales order number truncated
+- Touch targets smaller than 44px
+- Scrolling issues on gate page
+
+**Phase to address:**
+Phase 2 (Sidebar Layout) - Create sidebar layout ONLY for dashboard routes, test gate view
+
+---
+
+### Pitfall 5: Pinia Store Hydration Mismatch in SSR
+
+**What goes wrong:**
+Nuxt 4 uses SSR. If Pinia state differs between server and client render, Vue throws "Hydration node mismatch" warnings and UI may flicker or show wrong data initially.
+
+**Why it happens:**
+- Using `Date.now()`, `Math.random()`, or `localStorage` in store state initialization
+- Store state computed from browser-only APIs
+- Different data fetched on server vs client
+
+Current code is safe (composables fetch on mount), but Pinia migration could introduce issues.
+
+**How to avoid:**
+1. Initialize store state with static defaults, not computed values
+2. Fetch data in `onMounted` or use `useAsyncData` with proper SSR handling
+3. For browser-only state (like preferences), use `onMounted` to set:
+   ```typescript
+   // In component, not store
+   onMounted(() => {
+     store.loadFromLocalStorage()
+   })
+   ```
+4. Use `@pinia/nuxt` which handles SSR serialization automatically
+
+**Warning signs:**
+- Console shows "[Vue warn]: Hydration node mismatch"
+- UI flickers on page load
+- State briefly shows wrong value then corrects
+
+**Phase to address:**
+Phase 1 (Pinia Integration) - Use `@pinia/nuxt` module, avoid browser APIs in store definition
+
+---
+
+### Pitfall 6: Calling Pinia Store Outside Setup Context
+
+**What goes wrong:**
+Error: "getActivePinia() was called but there was no active Pinia."
+
+This happens when trying to use stores in:
+- Navigation guards
+- Nuxt middleware
+- Other stores (during definition)
+- Utility functions called outside components
+
+**Why it happens:**
+`defineStore()` returns a function that needs the Pinia instance. Vue provides this through injection context, which only exists within `setup()` or composables called from setup.
+
+**How to avoid:**
+1. For middleware/guards, Nuxt + Pinia handles this - stores work in middleware:
+   ```typescript
+   // nuxt middleware - this works
+   export default defineNuxtRouteMiddleware((to, from) => {
+     const store = useQueueStore()  // OK in Nuxt middleware
+   })
+   ```
+2. For store-to-store access, call inside actions:
+   ```typescript
+   // Inside store action (works)
+   const otherStore = useOtherStore()
+   ```
+3. For utility functions, pass store as parameter or call store inside function
+
+**Warning signs:**
+- Error mentions "getActivePinia" or "no active Pinia"
+- Error occurs on page navigation
+- Error occurs in non-component code
+
+**Phase to address:**
+Phase 1 (Pinia Integration) - Follow Nuxt + Pinia patterns, use auto-imports
 
 ---
 
@@ -121,238 +226,273 @@ Mistakes that cause rewrites or major issues.
 
 Mistakes that cause delays or technical debt.
 
-### Pitfall 5: Gate Operator View - Mobile Realtime Reconnection
-
-**What goes wrong:** Gate operator uses mobile phone at warehouse. Phone screen turns off, or operator walks to dead zone, WebSocket disconnects. When reconnecting, Supabase Realtime resumes but misses events that occurred during disconnection. Operator sees stale queue state.
-
-**Why it happens:** Existing `useRealtimeQueue.ts` has visibility change handler (lines 46-56) that calls `eventCallback()` on tab visible. But this only refreshes if `status.value !== 'connected'`. If connection "looks" connected but missed events, stale data persists.
-
-**Consequences:**
-- Gate operator marks wrong customer as processing
-- Gate shows "empty" when customer is actually waiting
-- Supervisor dashboard and gate view show different states
-
-**Prevention:**
-1. Always refetch on visibility change regardless of connection status (already partially implemented)
-2. Add `lastEventTimestamp` tracking - if gap > threshold, force refetch
-3. Add "pull to refresh" or manual refresh button on gate view
-4. Consider optimistic reconnection: refetch immediately, then resume subscription
-
-**Detection:**
-- Test: Lock phone for 30 seconds, unlock, verify data matches supervisor dashboard
-- Test: Airplane mode toggle, verify recovery
-
-**Phase:** Gate operator view implementation
-
-**Source:** [GitHub Discussion - How to obtain reliable realtime updates](https://github.com/orgs/supabase/discussions/5641)
-
----
-
-### Pitfall 6: Mobile Touch Targets Too Small
-
-**What goes wrong:** Gate operator view designed on desktop with small buttons. On mobile, gate operators wearing gloves or in hurry can't accurately tap "Start Processing" or "Complete" buttons. Mis-taps cause wrong actions.
-
-**Why it happens:** Desktop-first development, shadcn-vue default button sizes, not testing on actual mobile devices at warehouse scale.
-
-**Consequences:**
-- Wrong customer marked complete
-- Frustrated operators
-- Slower processing time
-- Accessibility compliance issues (WCAG 2.5.8 requires 24x24px minimum, recommends 44x44px for touch)
-
-**Prevention:**
-1. Gate view buttons minimum 44x44 CSS pixels (WCAG AAA recommendation)
-2. Add spacing between destructive actions (don't put "Complete" next to "Cancel")
-3. Test on actual phone with gloves or stylus
-4. Consider confirmation dialogs for critical actions (Complete, Cancel)
-
-**Detection:**
-- Audit: Measure button sizes in mobile inspector
-- Test: Use phone in one hand, try to tap buttons quickly
-
-**Phase:** Gate operator view UI design
-
-**Source:** [W3C WCAG 2.5.8 - Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)
-
----
-
-### Pitfall 7: Manual Override vs Automated Rules Conflict
-
-**What goes wrong:** Business hours has weekly schedule (automated) plus holiday closures (automated) plus manual "open/close" override. When multiple rules apply, which wins? Manual override set to "open", but it's Christmas - is warehouse open or closed?
-
-**Why it happens:** Three-way priority not explicitly defined. Each feature implemented independently without integration testing.
-
-**Consequences:**
-- Warehouse marked open on Christmas (customers arrive, nobody there)
-- Warehouse marked closed during manual override "open" (lost business)
-- Staff confused about which setting "wins"
-
-**Prevention:**
-1. Define explicit priority order: Manual Override > Holiday > Weekly Schedule
-2. Store `manual_override_until` timestamp - override expires automatically
-3. UI shows "currently: CLOSED (holiday override)" with clear explanation
-4. Admin can see all three layers and which one is "winning"
-
-**Detection:**
-- Test matrix: All combinations of override + holiday + weekly schedule
-- UI shows "effective status" with reason
-
-**Phase:** Business hours logic implementation
-
----
-
-### Pitfall 8: Processing State Without Timeout
-
-**What goes wrong:** Gate operator taps "Start Processing", then walks away, forgets, or app crashes. Customer stuck in `processing` status forever. No one else can serve them. Customer waits indefinitely.
-
-**Why it happens:** Intermediate states without timeout recovery. Processing state is "owned" by the operator who started it, but no mechanism to release it.
-
-**Consequences:**
-- Customer stuck in limbo
-- Queue backs up
-- Manual database intervention required to fix
-
-**Prevention:**
-1. Add `processing_started_at` timestamp
-2. Background job or periodic check: if `processing` > 30 minutes, alert supervisor
-3. UI shows "processing for X minutes" with warning after threshold
-4. Supervisor can "reset to queued" for stuck requests
-5. Consider auto-timeout: processing > 1 hour reverts to `in_queue`
-
-**Detection:**
-- Query: `SELECT * FROM pickup_requests WHERE status = 'processing' AND processing_started_at < now() - interval '30 minutes'`
-
-**Phase:** Processing status implementation + monitoring
-
-**Source:** [Red Hat - How to design state machines for microservices](https://developers.redhat.com/articles/2021/11/23/how-design-state-machines-microservices)
-
----
-
-## Minor Pitfalls
-
-Mistakes that cause annoyance but are fixable.
-
-### Pitfall 9: Gate Route Not Protected
-
-**What goes wrong:** `/gate/[id]` route accessible without authentication. Random person finds URL, can view queue state or worse, perform actions.
-
-**Why it happens:** New route added without checking auth middleware coverage. Gate view might be in different app section than dashboard.
-
-**Prevention:**
-1. Verify auth middleware applies to `/gate/*` routes
-2. Consider additional gate-specific auth (operator assigned to gate?)
-3. Audit all routes before deployment
-
-**Detection:**
-- Test: Access `/gate/1` in incognito browser without login
-
-**Phase:** Gate view routing setup
-
----
-
-### Pitfall 10: Real-time Subscription per Gate Creates Too Many Channels
-
-**What goes wrong:** Each `/gate/[id]` page creates its own Supabase channel subscription filtered to that gate. With 10 gates open, 10 channels. Not terrible, but wasteful and can hit connection limits.
-
-**Why it happens:** Copy-paste from dashboard subscription without considering gate-specific filtering at subscription vs. client level.
-
-**Prevention:**
-1. Option A: Single channel for all pickup_requests, filter client-side by gate
-2. Option B: Gate-specific channel with RLS filter (may need schema adjustment)
-3. For v1.1 with few gates, Option A is simpler
-
-**Detection:**
-- Monitor: Check Supabase Realtime connection count with multiple gates open
-
-**Phase:** Gate view realtime implementation
-
----
-
-### Pitfall 11: Business Hours UI Doesn't Show Current State
-
-**What goes wrong:** Admin configures business hours but can't tell at a glance if warehouse is currently open or closed. Must mentally combine weekly schedule + holidays + override.
-
-**Why it happens:** Configuration UI separate from status display.
-
-**Prevention:**
-1. Business hours page shows "CURRENT STATUS: OPEN" banner at top
-2. Shows why: "Open until 5:00 PM (Monday schedule)"
-3. Shows next change: "Will close in 3 hours"
-
-**Detection:**
-- Usability: Can admin answer "is warehouse open right now?" without calculation?
-
-**Phase:** Business hours management UI
-
----
-
-### Pitfall 12: Processing Status Not Visible on Customer Status Page
-
-**What goes wrong:** Customer sees "Queued at Gate 3, Position 1" then suddenly "Complete". Never saw "Processing" state. Confusing - when did they get served?
-
-**Why it happens:** Customer status page wasn't updated to show new `processing` status. Only checks for old statuses.
-
-**Prevention:**
-1. Update customer status page to recognize `processing` status
-2. Show: "Your order is being processed at Gate 3"
-3. Consider: Different color/animation for "processing" vs "queued"
-
-**Detection:**
-- E2E test: Full flow from submission through processing to complete on customer view
-
-**Phase:** Customer status page update (after processing status exists)
-
----
-
-## Phase-Specific Warnings
-
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Processing status migration | Race conditions, queue position gaps | Atomic database functions with status guards |
-| Gate operator view | Touch targets, reconnection | Mobile-first design, aggressive refresh |
-| Business hours schema | Timezone bugs, holiday complexity | Store timezone explicitly, simple closure table for MVP |
-| Business hours UI | Override priority confusion | Clear visual hierarchy showing "effective" status |
-| Customer status update | Missing processing state display | Add processing state to status page |
-
----
-
-## Integration with Existing System
-
-### Safe Migration Path for Adding "processing" Status
-
-The existing `pickup_requests.status` uses CHECK constraint (not ENUM), which allows adding values without table lock:
-
-```sql
--- Step 1: Add new status value (non-breaking)
-ALTER TABLE pickup_requests
-DROP CONSTRAINT IF EXISTS pickup_requests_status_check;
-
-ALTER TABLE pickup_requests
-ADD CONSTRAINT pickup_requests_status_check
-CHECK (status IN ('pending', 'approved', 'in_queue', 'processing', 'completed', 'cancelled'));
-
--- Step 2: Add tracking timestamp
-ALTER TABLE pickup_requests
-ADD COLUMN processing_started_at timestamptz;
+### Pitfall 7: ShowCompleted Toggle Filter Bug Persists After Migration
+
+**What goes wrong:**
+The existing bug (BUG-01) where the showCompleted toggle doesn't filter correctly may persist or worsen after Pinia migration if the computed filter logic moves to the store incorrectly.
+
+**Current implementation** (`index.vue` lines 265-272):
+```typescript
+const filteredRequests = computed(() => {
+  const all = requests.value ?? []
+  if (showCompleted.value) {
+    return all
+  }
+  return all.filter(r => !['completed', 'cancelled'].includes(r.status))
+})
 ```
 
-**Warning:** The existing queue functions (`assign_to_queue`, `reorder_queue`, `move_to_gate`, `set_priority`) all filter by `status = 'in_queue'`. They need updating to handle `processing` appropriately before the status can be used.
+**Why it happens:**
+If `showCompleted` state moves to Pinia but the computed filter doesn't properly react to store changes, or if the filter gets duplicated between store and component.
 
-### Existing Code Assumptions to Update
+**How to avoid:**
+1. Keep UI state like `showCompleted` local to component OR in dedicated UI store
+2. If moving to store, test toggle immediately after migration
+3. Use `storeToRefs` if accessing store state in computed
+4. Fix the existing bug first, then migrate
 
-1. `useQueueActions.ts` - `completeRequest()` assumes direct `in_queue -> completed` transition
-2. `useRealtimeQueue.ts` - No explicit handling of `processing` status
-3. Dashboard filtering - May need to show `processing` requests distinctly
-4. Queue position queries - Partial index `WHERE status = 'in_queue'` excludes processing
+**Warning signs:**
+- Toggle doesn't visually update filtered list
+- DevTools shows correct filter value but UI doesn't reflect
+- Filter works on initial load but not on toggle
+
+**Phase to address:**
+Phase 4 (Bug Fixes) - Fix bug first, verify after any state management changes
+
+---
+
+### Pitfall 8: Losing Existing Realtime Reconnection Logic
+
+**What goes wrong:**
+The existing `useRealtimeQueue.ts` has visibility change handling (lines 46-56) that refreshes data when tab becomes visible. During Pinia migration, this logic could be accidentally removed or broken.
+
+**Why it happens:**
+Refactoring composables without preserving all edge case handlers. Focus on "moving state" misses the side effect logic.
+
+**How to avoid:**
+1. Document existing composable behavior before migration
+2. Keep composable for side effects, only move state to store
+3. Test: Lock screen, unlock, verify data refreshes
+4. Write test case for visibility change before refactoring
+
+**Warning signs:**
+- Data becomes stale after tab was backgrounded
+- No refresh occurs when returning to app
+- WebSocket shows connected but data is old
+
+**Phase to address:**
+Phase 1 (Pinia Integration) - Preserve composable, only migrate state to store
+
+---
+
+### Pitfall 9: Sidebar Mobile Toggle Not Persistent
+
+**What goes wrong:**
+User collapses sidebar on mobile, navigates to another page, sidebar is expanded again. Or worse, sidebar state fights between routes.
+
+**Why it happens:**
+shadcn-vue Sidebar uses SidebarProvider for state, but state isn't persisted across navigations by default.
+
+**How to avoid:**
+1. Use SidebarProvider's `storage` and `storage-key` props:
+   ```vue
+   <SidebarProvider storage="localStorage" storage-key="sidebar-state">
+   ```
+2. Or manage sidebar state in Pinia store (centralized)
+3. Test: Collapse sidebar, navigate, verify it stays collapsed
+
+**Warning signs:**
+- Sidebar "jumps" on navigation
+- User must repeatedly collapse sidebar
+- Different sidebar state on different pages
+
+**Phase to address:**
+Phase 2 (Sidebar Layout) - Configure persistence in SidebarProvider
+
+---
+
+### Pitfall 10: Enum Migration Breaks Runtime Checks
+
+**What goes wrong:**
+Current status checks use string literals: `status === 'processing'`. Migrating to TypeScript enums works at compile time, but if database returns strings that don't match enum values, runtime checks fail silently.
+
+**Why it happens:**
+TypeScript enums compile to objects with string values, but comparison with raw database strings may not work as expected, especially with const enums.
+
+**Example:**
+```typescript
+// Enum approach
+enum Status {
+  Processing = 'processing'
+}
+
+// Database returns string
+const dbStatus = 'processing'
+
+// This works
+if (dbStatus === Status.Processing) {} // true
+
+// But const enum gets inlined
+const enum Status {
+  Processing = 'processing'
+}
+// Compiles to: if (dbStatus === 'processing') {}
+// Which works, but loses type safety benefits
+```
+
+**How to avoid:**
+1. Use `as const` objects instead of enums (recommended for 2026):
+   ```typescript
+   export const PickupStatus = {
+     pending: 'pending',
+     approved: 'approved',
+     in_queue: 'in_queue',
+     processing: 'processing',
+     completed: 'completed',
+     cancelled: 'cancelled',
+   } as const
+
+   export type PickupStatus = typeof PickupStatus[keyof typeof PickupStatus]
+   ```
+2. This provides type safety AND works with database strings
+3. Avoid TypeScript `enum` keyword entirely
+
+**Warning signs:**
+- Status comparisons always false
+- Switch statements with status never match cases
+- TypeScript happy but runtime broken
+
+**Phase to address:**
+Phase 3 (Type Centralization) - Use `as const` pattern, not enums
+
+---
+
+## Technical Debt Patterns
+
+Shortcuts that seem reasonable but create long-term problems.
+
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Keeping status strings as magic values | No refactoring needed | Type errors, invalid status bugs | Never - centralize in Phase 3 |
+| Mixing composables and stores randomly | Quick feature add | Unclear data flow, debugging nightmare | Never - establish pattern in Phase 1 |
+| Inline type definitions per component | Faster initial development | Drift, inconsistency, duplicate types | Only during transition |
+| Skipping mobile test after layout change | Faster development | Broken gate operator view in production | Never for layout changes |
+| Putting realtime subscriptions in Pinia | Seems cleaner | Memory leaks, lifecycle issues | Never - keep in composables |
+
+## Integration Gotchas
+
+Common mistakes when connecting components during refactoring.
+
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| Pinia + Supabase Realtime | Put subscription in store | Keep subscription in composable, update store from callback |
+| Pinia + `useAsyncData` | Duplicate data (store + asyncData) | Use store as single source, asyncData populates store |
+| Sidebar + Route | Apply sidebar to all routes | Use `definePageMeta({ layout: 'sidebar' })` selectively |
+| Type changes + Components | Change type, update all files at once | Re-export pattern for gradual migration |
+| Pinia + existing composables | Replace composable entirely | Wrap composable, delegate side effects |
+
+## Performance Traps
+
+Patterns that work at small scale but fail as usage grows.
+
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|----------------|
+| Store fetches on every component mount | Slow navigation, redundant API calls | Fetch once, use stale-while-revalidate | Multiple dashboard users |
+| Re-rendering entire queue list on any change | Sluggish drag-drop | Use `:key` properly, memoize computeds | 20+ items in queue |
+| Watching entire store state | Excessive re-renders | Watch specific properties with `storeToRefs` | Complex dashboard view |
+| Sidebar re-renders on state change | Janky animations | Isolate sidebar state from queue state | Any navigation |
+
+## Security Mistakes
+
+Domain-specific security issues for this refactoring.
+
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| Store exposes all data to all components | Over-fetching, privacy leak | Use getters to filter by context (gate ID) |
+| Client-side status validation only | Invalid status injection | Keep database constraints (CHECK constraint exists) |
+| Type centralization weakens validation | Looser types accepted | Use strict TypeScript, runtime validation for API responses |
+
+## UX Pitfalls
+
+Common user experience mistakes during architecture refactoring.
+
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| Sidebar pushes content on mobile | Gate operators struggle with small screen | Sidebar overlay on mobile, or exclude from gate routes |
+| Layout transition flickers | Unprofessional feel | Use `layout: false` for gate, smooth transitions elsewhere |
+| Lost scroll position after navigation | User loses context | Preserve scroll in store or use Vue router scroll behavior |
+| Loading states inconsistent after Pinia | Confusing feedback | Centralize loading state in store, consistent UI |
+
+## "Looks Done But Isn't" Checklist
+
+Things that appear complete but are missing critical pieces.
+
+- [ ] **Pinia store created:** Often missing `storeToRefs` in consuming components - verify ALL destructuring uses it
+- [ ] **Sidebar layout added:** Often missing mobile responsiveness - verify on 320px viewport
+- [ ] **Types centralized:** Often missing import updates - verify no TypeScript errors in `pnpm build`
+- [ ] **Composable migrated:** Often missing cleanup - verify subscriptions unsubscribe on unmount (check DevTools)
+- [ ] **Layout applied:** Often missing route exclusions - verify gate pages still work unaffected
+- [ ] **Filter bug fixed:** BUG-01 exists - verify showCompleted toggle filters both completed AND cancelled
+- [ ] **Sidebar persists:** Often forgotten - verify collapse state survives navigation
+
+## Recovery Strategies
+
+When pitfalls occur despite prevention, how to recover.
+
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| Reactivity loss | LOW | Add `storeToRefs()`, immediate fix |
+| Subscription leak | MEDIUM | Add explicit cleanup, may need page refresh to clear old subscriptions |
+| Type migration breaks | LOW | Revert to re-export pattern, migrate incrementally |
+| Gate view broken | MEDIUM | Add `layout: 'gate'` or `layout: false` to gate page, test mobile |
+| SSR hydration mismatch | MEDIUM | Move browser-only code to `onMounted`, may need cache clear |
+| Store outside context | LOW | Move store call inside setup or action |
+| Sidebar not persisting | LOW | Add storage props to SidebarProvider |
+
+## Pitfall-to-Phase Mapping
+
+How roadmap phases should address these pitfalls.
+
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| Realtime subscription leak | Phase 1 | Subscriptions still work after navigation, DevTools shows single subscription |
+| Store reactivity loss | Phase 1 | UI updates when store changes, use Vue DevTools to verify reactivity |
+| Type migration breaks | Phase 3 | `pnpm build` passes with no type errors |
+| Gate view broken | Phase 2 | Gate page renders correctly on 320px mobile viewport |
+| SSR hydration mismatch | Phase 1 | No Vue hydration warnings in console on page load |
+| Store outside context | Phase 1 | No Pinia errors on navigation or in middleware |
+| ShowCompleted bug | Phase 4 | Toggle filters correctly, DevTools confirms state change |
+| Sidebar persistence | Phase 2 | Collapse sidebar, navigate away, return - still collapsed |
+| Enum runtime mismatch | Phase 3 | Status comparisons work with database strings |
+
+---
+
+## Preserved from v1.1 (Still Relevant)
+
+The following pitfalls from v1.1 remain relevant during v2.0:
+
+### Mobile Touch Targets
+Gate operator buttons must remain 44x44px minimum. Sidebar layout must not reduce these.
+
+### Realtime Reconnection
+The visibility change handler in `useRealtimeQueue.ts` must be preserved during any composable refactoring.
+
+### Status Transition Guards
+Database functions (`start_processing`, `complete_request`) have status guards. Don't bypass these when migrating to Pinia.
 
 ---
 
 ## Sources
 
-- [DEV Community - How to Handle Date and Time Correctly](https://dev.to/kcsujeet/how-to-handle-date-and-time-correctly-to-avoid-timezone-bugs-4o03)
-- [GitHub Discussion - How to obtain reliable realtime updates](https://github.com/orgs/supabase/discussions/5641)
-- [W3C WCAG 2.5.8 - Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)
-- [Red Hat - How to design state machines for microservices](https://developers.redhat.com/articles/2021/11/23/how-design-state-machines-microservices)
-- [Medium - The Complex World of Calendars: Database Design](https://medium.com/tomorrowapp/the-complex-world-of-calendars-database-design-fccb3a71a74b)
-- [Medium - 7 UX Design Best Practices for Warehouse Mobile Apps](https://medium.com/@stefan.karabin/7-ux-design-best-practices-for-warehouse-mobile-apps-b6e2a0a6940f)
-- [Smashing Magazine - Accessible Target Sizes Cheatsheet](https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks/)
+- [Pinia + Nuxt SSR documentation](https://pinia.vuejs.org/ssr/nuxt.html)
+- [Top 5 Pinia mistakes](https://masteringpinia.com/blog/top-5-mistakes-to-avoid-when-using-pinia)
+- [Composables vs Pinia patterns](https://iamjeremie.me/post/2025-01/composables-vs-pinia-vs-provide-inject/)
+- [Vue composable lifecycle cleanup](https://vuejs.org/guide/reusability/composables)
+- [shadcn-vue sidebar documentation](https://www.shadcn-vue.com/docs/components/sidebar)
+- [Pinia storeToRefs discussion](https://github.com/vuejs/pinia/discussions/1448)
+- [TypeScript enums vs const objects](https://www.angularspace.com/breaking-the-enum-habit-why-typescript-developers-need-a-new-approach/)
+- Codebase analysis: `/Users/thomas/Projects/tsg/warehouse-pickup-queue/staff/app/`
+
+---
+*Pitfalls research for: Warehouse Pickup Queue v2.0 Architecture Overhaul*
+*Researched: 2026-01-30*

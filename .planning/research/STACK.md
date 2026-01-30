@@ -1,306 +1,378 @@
-# Technology Stack: v1.1 Gate Operator Experience
+# Technology Stack: v2.0 Architecture Overhaul
 
 **Project:** Warehouse Pickup Queue System
 **Researched:** 2026-01-30
-**Confidence:** HIGH (verified against existing codebase and official documentation)
+**Scope:** NEW additions only (Pinia, Sidebar, Dashboard visualization, TypeScript types)
 
 ## Executive Summary
 
-**No new dependencies required.** The existing stack (Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase, date-fns) fully supports all v1.1 features. The gate operator view, processing status workflow, and business hours UI can all be built with current technologies.
+The v2.0 architecture overhaul requires **three new dependencies** and one shadcn CLI addition. The existing stack (Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase) remains unchanged. Pinia provides state management, vue-chartjs handles dashboard visualization, and the shadcn-vue Sidebar component provides navigation layout.
 
-The only consideration was time picker components for business hours. After research, the recommendation is to use native HTML5 `<input type="time">` styled with existing Input component patterns, avoiding additional dependencies.
-
-## Current Stack (Verified from package.json)
-
-### Staff App (`staff/package.json`)
-
-| Package | Version | Purpose | v1.1 Usage |
-|---------|---------|---------|------------|
-| nuxt | ^4.3.0 | Framework | Routing for /gate/[id], /settings/business-hours |
-| vue | ^3.5.27 | UI framework | All new components |
-| @nuxtjs/supabase | ^2.0.3 | Supabase integration | Data fetching, realtime |
-| @supabase/supabase-js | ^2.93.2 | Supabase client | RPC calls, CRUD |
-| shadcn-nuxt | ^2.4.3 | Component library | UI components |
-| reka-ui | ^2.7.0 | Headless components | Base for shadcn-vue |
-| @vueuse/core | ^14.1.0 | Composables | useSwipe (if needed), existing patterns |
-| @vueuse/integrations | ^14.1.0 | Extended composables | useSortable (existing) |
-| tailwindcss | ^4.1.18 | Styling | Mobile-first responsive |
-| lucide-vue-next | ^0.563.0 | Icons | Action icons |
-| vue-sonner | ^2.0.9 | Toasts | Success/error feedback |
-| vee-validate | ^4.15.1 | Form validation | Business hours form |
-| zod | ^3.25.76 | Schema validation | Form schemas |
-
-### Customer App (`customer/package.json`)
-
-| Package | Version | Purpose | v1.1 Usage |
-|---------|---------|---------|------------|
-| date-fns | ^4.1.0 | Date/time formatting | Business hours display |
-| @date-fns/tz | ^1.4.1 | Timezone handling | Warehouse timezone logic |
-
-**Note:** date-fns is in customer app but not staff app. Recommend installing in staff app for business hours editor.
+**Key decisions:**
+- **Pinia:** Official Vue state management, Nuxt 4 compatible as of @pinia/nuxt v0.11.3
+- **vue-chartjs:** Lightweight Chart.js wrapper for simple bar chart (gate queue visualization)
+- **shadcn-vue Sidebar:** No npm install needed - add via CLI since reka-ui already installed
+- **TypeScript types:** Use `as const` objects in `shared/types/` directory (Nuxt 4 convention)
 
 ## Recommended Stack Additions
 
-### Staff App Only
+### State Management
 
-| Package | Version | Purpose | Rationale |
-|---------|---------|---------|-----------|
-| date-fns | ^4.1.0 | Time formatting | Format time values for display, already proven in customer app |
-| @date-fns/tz | ^1.4.1 | Timezone handling | Warehouse timezone for business hours preview |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| pinia | ^3.0.4 | Global state management | Official Vue state management, composition API native, devtools support |
+| @pinia/nuxt | ^0.11.3 | Nuxt integration | Auto-imports stores from `app/stores/`, SSR hydration handled automatically |
 
-**Installation:**
-```bash
-cd staff
-pnpm add date-fns @date-fns/tz
-```
+**Verified compatibility:** @pinia/nuxt v0.11.3 explicitly supports `^3.15.0 || ^4.0.0` (confirmed via [Nuxt Modules](https://nuxt.com/modules/pinia)). The project runs Nuxt 4.3.0.
 
-**Why:** Business hours editor needs to format time values (`08:00:00` -> `8:00 AM`) and show "current warehouse time" preview. date-fns is already validated in customer app.
+**Integration pattern:** Hybrid with existing composables.
+- **Pinia stores:** Global UI state (sidebar collapsed), cross-component state (dashboard metrics)
+- **Composables (keep as-is):** Realtime subscriptions (`useRealtimeQueue`), Supabase RPC calls (`useQueueActions`, `useGateManagement`)
 
-## What NOT to Add (and Why)
+Do NOT migrate working realtime composables to Pinia - they handle Supabase channel lifecycle correctly as-is. Pinia stores can call composables internally when needed.
 
-### Time Picker Libraries
+### UI Components (Sidebar)
 
-| Library | Why NOT |
-|---------|---------|
-| @vuepic/vue-datepicker | Overkill for simple time input; adds 50KB+ |
-| vue-timepicker | Vue 2 focused, requires adaptation |
-| v-calendar | Full calendar system, unnecessary |
-| @internationalized/date | Already have date-fns which is sufficient |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| shadcn-vue Sidebar | (via CLI) | Sidebar navigation layout | Already using shadcn-vue, Sidebar is a pre-built component |
 
-**Instead:** Use native HTML5 `<input type="time">` with existing Input component styling. Benefits:
-- Zero additional dependencies
-- Native mobile time picker UI (excellent on iOS/Android)
-- Consistent with existing form patterns
-- Ships time as `HH:mm` string (matches database `time` type)
+**No new npm dependencies required.** The project already has:
+- `shadcn-nuxt: ^2.4.3`
+- `reka-ui: ^2.7.0` (shadcn-vue's underlying component library since v1.0)
+- `lucide-vue-next: ^0.563.0` (icons)
 
-Example implementation:
-```vue
-<template>
-  <Input
-    type="time"
-    v-model="openTime"
-    class="w-32"
-  />
-</template>
-```
+**Installation:** Run `pnpm dlx shadcn-vue@latest add sidebar`
 
-### Swipe Gesture Libraries
+**Sidebar sub-components added by CLI:**
+- `SidebarProvider` - Wraps app, manages collapse state
+- `Sidebar`, `SidebarContent`, `SidebarHeader`, `SidebarFooter`
+- `SidebarGroup`, `SidebarGroupLabel`, `SidebarGroupContent`
+- `SidebarMenu`, `SidebarMenuItem`, `SidebarMenuButton`
+- `SidebarTrigger`, `SidebarRail`, `SidebarInset`
 
-| Library | Why NOT |
-|---------|---------|
-| vue-swipe-actions | Adds complexity for minimal benefit |
-| @vueuse/gesture | Gate operator doesn't need swipe actions |
-| hammer.js | Overkill, large bundle |
+**Layout strategy:**
+- Create new `sidebar.vue` layout for dashboard/settings pages
+- Gate operator routes (`/gate/[id]`) continue using existing `default.vue` layout (no sidebar - full screen focus)
 
-**Instead:** Use `@vueuse/core`'s `useSwipe` (already installed) IF swipe gestures become a requirement. For v1.1, large tap buttons are more appropriate for gate operators (faster, clearer).
+### Dashboard Visualization
 
-### Business Hours Scheduling Libraries
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| vue-chartjs | ^5.3.3 | Vue wrapper for Chart.js | Simple API, well-maintained, Vue 3 compatible |
+| chart.js | ^4.4.x | Charting engine | Peer dependency of vue-chartjs, lightweight for simple bar charts |
 
-| Library | Why NOT |
-|---------|---------|
-| vue-business-hours | Vue 2 package, not maintained |
-| date-holidays | Premature - holidays are v2 scope |
-| @fullcalendar/vue | Calendar view not needed for weekly schedule |
+**Rationale:** For a simple bar chart showing queue length per gate, vue-chartjs is ideal:
+- Mature, actively maintained (379 projects depend on it)
+- Minimal learning curve - import `Bar` component, pass data/options
+- Lightweight - no need for D3-based solutions
+- TypeScript support included
 
-**Instead:** Build a simple 7-row editor using existing form components. The `business_hours` table schema already exists with exactly what's needed.
+**Alternatives rejected:**
+- **Vue3-Charts** (SVG-based) - More customizable but overkill
+- **ApexCharts** - Beautiful but heavier than needed
+- **ECharts** - Enterprise-grade, way too heavy for one chart
 
-### Additional UI Component Libraries
+### TypeScript Organization
 
-| Library | Why NOT |
-|---------|---------|
-| nuxt-ui | Would conflict with shadcn-vue patterns |
-| vuetify | Different design system, heavy |
-| primevue | Unnecessary given shadcn-vue coverage |
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| (native TypeScript) | ^5.9.3 | Type definitions | Already installed |
 
-**Instead:** Continue using shadcn-vue. All needed components exist:
-- Card, Button, Input, Label, Switch (gate operator view)
-- Dialog, Form, Table (business hours editor)
-- Alert-dialog (confirmations)
+**No new packages.** TypeScript organization is a pattern choice, not a dependency.
 
-## Feature-Specific Stack Usage
+**Recommended pattern:** `as const` objects over enums.
 
-### 1. Gate Operator View (`/gate/[id]`)
-
-**Uses existing:**
-- Nuxt routing (dynamic route)
-- `useSupabaseClient()` for data
-- `useRealtimeQueue` composable
-- `useQueueActions` composable (extend for startProcessing)
-- Card, Button components from shadcn-vue
-- Tailwind responsive utilities
-
-**Mobile-first implementation:**
 ```typescript
-// Large touch targets via Tailwind
-<Button class="min-h-[56px] text-lg w-full">
-  Complete Pickup
-</Button>
+// shared/types/status.ts
+export const PickupStatus = {
+  PENDING: 'pending',
+  IN_QUEUE: 'in_queue',
+  PROCESSING: 'processing',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+} as const
 
-// Responsive layout
-<div class="flex flex-col gap-6 p-4 md:p-8">
+export type PickupStatus = typeof PickupStatus[keyof typeof PickupStatus]
 ```
 
-### 2. Processing Status Workflow
+**Why `as const` over TypeScript enums:**
+- No extra JavaScript generated (enums create runtime objects)
+- Better tree-shaking
+- More flexible with string literals from API responses
+- TypeScript handbook now recommends this approach
+- Avoids numeric enum reverse-mapping gotchas
 
-**Uses existing:**
-- Supabase migrations (add status value)
-- `useQueueActions` composable (new method)
-- StatusBadge component (new variant)
-
-**Database migration:**
-```sql
--- Uses existing pattern from ARCHITECTURE.md
-ALTER TABLE pickup_requests
-DROP CONSTRAINT pickup_requests_status_check;
-
-ALTER TABLE pickup_requests
-ADD CONSTRAINT pickup_requests_status_check
-CHECK (status IN ('pending', 'approved', 'in_queue', 'processing', 'completed', 'cancelled'));
+**File organization (Nuxt 4 convention):**
+```
+shared/
+  types/           # Auto-imported by Nuxt 4
+    status.ts      # PickupStatus, GateStatus
+    models.ts      # Gate, PickupRequest interfaces
+    index.ts       # Re-exports
+  utils/           # Manual import via #shared alias
 ```
 
-### 3. Business Hours Management
+Types in `shared/types/` are auto-imported by Nuxt 4 ([documented here](https://nuxt.com/docs/4.x/directory-structure/shared)).
 
-**Uses existing:**
-- Nuxt routing (`/settings/business-hours`)
-- Form components (FormField, FormItem, etc.)
-- Input component (for native time input)
-- Switch component (open/closed toggle)
-- Label component
-- `useSupabaseClient()` for CRUD
-
-**Add to staff app:**
-- date-fns for time formatting
-- @date-fns/tz for timezone preview
-
-**Time input pattern:**
-```vue
-<FormField name="openTime">
-  <FormItem>
-    <FormLabel>Open Time</FormLabel>
-    <FormControl>
-      <!-- Native time input with shadcn styling -->
-      <Input
-        type="time"
-        :model-value="formatTimeForInput(openTime)"
-        @update:model-value="openTime = parseTimeFromInput($event)"
-      />
-    </FormControl>
-  </FormItem>
-</FormField>
-```
-
-**Time formatting utilities:**
-```typescript
-// staff/app/utils/time.ts
-import { parse, format } from 'date-fns'
-
-// Database format: '08:00:00' -> Input format: '08:00'
-export function formatTimeForInput(dbTime: string): string {
-  return dbTime.slice(0, 5)
-}
-
-// Input format: '08:00' -> Database format: '08:00:00'
-export function parseTimeFromInput(inputTime: string): string {
-  return `${inputTime}:00`
-}
-
-// Display format: '08:00:00' -> '8:00 AM'
-export function formatTimeForDisplay(dbTime: string): string {
-  const date = parse(dbTime, 'HH:mm:ss', new Date())
-  return format(date, 'h:mm a')
-}
-```
-
-## shadcn-vue Components to Add
-
-These components may need to be added via CLI if not already present:
+## Complete Installation
 
 ```bash
 cd staff
-npx shadcn-vue@latest add calendar  # For future holiday picker
+
+# State management
+pnpm add pinia @pinia/nuxt
+
+# Dashboard visualization
+pnpm add vue-chartjs chart.js
+
+# Sidebar (no npm install - uses shadcn CLI)
+pnpm dlx shadcn-vue@latest add sidebar
 ```
 
-**Currently installed (verified):**
-- alert-dialog, badge, button, card, dialog, form, input, label, select, separator, sheet, sonner, switch, table, tabs
+**nuxt.config.ts update:**
+```typescript
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  devtools: { enabled: true },
+  modules: [
+    '@nuxtjs/supabase',
+    'shadcn-nuxt',
+    '@pinia/nuxt',  // ADD THIS
+  ],
+  // ... rest unchanged
+})
+```
 
-**May need for v1.1:**
-- None required for core features
-- Calendar component (optional, for future holiday management)
+## What NOT to Add
 
-## Database Stack (No Changes)
-
-Current Supabase PostgreSQL configuration supports all v1.1 features:
-
-| Feature | Table | Existing Support |
-|---------|-------|------------------|
-| Processing status | pickup_requests | CHECK constraint update only |
-| Gate operator data | pickup_requests, gates | Full support |
-| Business hours | business_hours | Full CRUD support |
-
-**No schema changes needed except:**
-1. Migration to add 'processing' to status CHECK constraint
-2. New `start_processing()` SECURITY DEFINER function
+| Avoided | Reason |
+|---------|--------|
+| VueX | Deprecated in favor of Pinia |
+| pinia-plugin-persistedstate | No state needs browser persistence (sidebar state is minor) |
+| Full dashboard framework | Overkill for one bar chart |
+| D3.js | Too complex for simple bar chart |
+| Additional icon library | lucide-vue-next already installed |
+| @types packages | vue-chartjs and chart.js include TypeScript types |
+| ApexCharts | Heavier than needed, beautiful but unnecessary |
 
 ## Alternatives Considered
 
-### Time Picker Alternatives
+| Category | Recommended | Alternative | Why Not Alternative |
+|----------|-------------|-------------|---------------------|
+| State | Pinia | VueX | VueX is legacy, Pinia is official successor |
+| State | Pinia | useState (Nuxt) | useState is for simple SSR state, not UI state with actions |
+| Charts | vue-chartjs | ApexCharts | Heavier, more features than needed |
+| Charts | vue-chartjs | Vue3-Charts | Less ecosystem support, SVG approach not needed |
+| Charts | vue-chartjs | ECharts | Much heavier, enterprise-focused |
+| Types | `as const` | TypeScript enums | Enums generate runtime code, less flexible |
+| Sidebar | shadcn-vue | Custom build | Already using shadcn-vue, Sidebar is mature |
 
-| Option | Pros | Cons | Decision |
-|--------|------|------|----------|
-| Native `<input type="time">` | Zero deps, native mobile UX, simple | Limited styling control | **Selected** |
-| @vuepic/vue-datepicker | Full-featured, time-only mode | 50KB+, overkill for simple use | Rejected |
-| Custom Select dropdowns | Full control, consistent styling | More code, worse mobile UX | Rejected |
+## Integration Patterns
 
-### Mobile Swipe Alternatives
+### Pinia + Existing Composables
 
-| Option | Pros | Cons | Decision |
-|--------|------|------|----------|
-| Large tap buttons | Clear, fast, error-proof | Less "modern" feel | **Selected** |
-| Swipe actions | iOS-style UX | Discoverability issues, accidental actions | Rejected for v1.1 |
-| Hold-to-confirm | Prevents accidents | Slow, unfamiliar | Rejected |
+```typescript
+// app/stores/dashboard.ts
+export const useDashboardStore = defineStore('dashboard', () => {
+  // Import existing composable
+  const { status, subscribe, unsubscribe } = useRealtimeQueue()
 
-### State Management Alternatives
+  // Pinia manages dashboard-specific state
+  const gateMetrics = ref<GateMetric[]>([])
+  const isLoading = ref(false)
 
-| Option | Pros | Cons | Decision |
-|--------|------|------|----------|
-| Per-page data fetching | Simple, isolated | Some redundant fetches | **Selected** |
-| Pinia store | Shared state, single fetch | Complexity, overkill for 2 pages | Rejected |
-| Nuxt useState | Built-in, simple | Less structured than Pinia | Could work, not needed |
+  async function fetchMetrics() {
+    isLoading.value = true
+    const client = useSupabaseClient()
+    // ... fetch logic
+    isLoading.value = false
+  }
 
-## Installation Summary
+  // Composable handles realtime events
+  function initRealtime() {
+    subscribe(() => fetchMetrics())
+  }
 
-**Staff app only:**
-```bash
-cd staff
-pnpm add date-fns @date-fns/tz
+  return {
+    gateMetrics,
+    isLoading,
+    status, // expose realtime status
+    fetchMetrics,
+    initRealtime,
+    unsubscribe
+  }
+})
 ```
 
-**Verification:**
-```bash
-pnpm ls date-fns @date-fns/tz
+### Sidebar Layout Pattern
+
+```
+app/layouts/
+  default.vue      # Existing - header only (for /gate/[id] pages)
+  sidebar.vue      # NEW - sidebar navigation for dashboard/settings
 ```
 
-Expected output:
-```
-date-fns@4.1.0
-@date-fns/tz@1.4.1
+Route-to-layout via `definePageMeta`:
+```vue
+<!-- app/pages/dashboard.vue -->
+<script setup>
+definePageMeta({ layout: 'sidebar' })
+</script>
 ```
 
-## Migration Checklist
+```vue
+<!-- app/pages/gate/[id].vue -->
+<script setup>
+definePageMeta({ layout: 'default' })  // No sidebar for gate operators
+</script>
+```
 
-Before development:
-- [ ] Run `pnpm add date-fns @date-fns/tz` in staff directory
-- [ ] Verify shadcn components installed (all should be present)
-- [ ] No nuxt.config.ts changes needed
-- [ ] No tailwind.config changes needed
+### Chart.js + Vue Pattern
+
+```vue
+<script setup lang="ts">
+import { Bar } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip
+} from 'chart.js'
+
+// Register only needed components (tree-shaking)
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip)
+
+const store = useDashboardStore()
+
+const chartData = computed(() => ({
+  labels: store.gateMetrics.map(g => `Gate ${g.gate_number}`),
+  datasets: [{
+    label: 'Queue Length',
+    data: store.gateMetrics.map(g => g.queue_count),
+    backgroundColor: '#3b82f6',
+  }]
+}))
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: { stepSize: 1 }
+    }
+  }
+}
+</script>
+
+<template>
+  <div class="h-64">
+    <Bar :data="chartData" :options="chartOptions" />
+  </div>
+</template>
+```
+
+### TypeScript Type Pattern
+
+```typescript
+// shared/types/status.ts
+export const PickupStatus = {
+  PENDING: 'pending',
+  IN_QUEUE: 'in_queue',
+  PROCESSING: 'processing',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+} as const
+
+export type PickupStatus = typeof PickupStatus[keyof typeof PickupStatus]
+
+// Usage - type-safe with autocomplete
+function updateStatus(id: string, status: PickupStatus) {
+  // status must be one of the const values
+}
+
+updateStatus('123', PickupStatus.PROCESSING)  // OK
+updateStatus('123', 'processing')              // OK (string literal)
+updateStatus('123', 'invalid')                 // Type error
+```
+
+```typescript
+// shared/types/models.ts
+import type { PickupStatus } from './status'
+
+export interface PickupRequest {
+  id: string
+  customer_name: string
+  status: PickupStatus
+  position: number | null
+  assigned_gate_id: string | null
+  created_at: string
+}
+
+export interface Gate {
+  id: string
+  gate_number: number
+  is_active: boolean
+}
+
+export interface GateMetric {
+  gate_id: string
+  gate_number: number
+  queue_count: number
+}
+```
+
+## Directory Structure After v2.0
+
+```
+staff/
+  app/
+    components/
+      ui/
+        sidebar/           # Added via shadcn CLI
+    composables/
+      useRealtimeQueue.ts  # Keep as-is
+      useQueueActions.ts   # Keep as-is
+      useGateManagement.ts # Keep as-is
+    layouts/
+      default.vue          # Existing (gate operator)
+      sidebar.vue          # NEW (dashboard, settings)
+    pages/
+      dashboard.vue        # NEW - with bar chart
+      gate/[id].vue        # Existing
+    stores/                # NEW directory
+      dashboard.ts         # Dashboard state + metrics
+      ui.ts                # Optional: sidebar collapsed state
+  shared/
+    types/                 # NEW directory
+      status.ts            # PickupStatus, GateStatus
+      models.ts            # Gate, PickupRequest interfaces
+      index.ts             # Re-exports
+  nuxt.config.ts           # Add @pinia/nuxt to modules
+```
+
+## Confidence Assessment
+
+| Decision | Confidence | Basis |
+|----------|------------|-------|
+| Pinia + @pinia/nuxt | HIGH | Official docs confirm Nuxt 4 support, version verified |
+| shadcn-vue Sidebar | HIGH | Already using shadcn-vue, official component |
+| vue-chartjs + chart.js | HIGH | Mature library, npm activity, straightforward use |
+| `as const` over enums | HIGH | TypeScript handbook recommendation, industry adoption |
+| shared/types/ convention | HIGH | Nuxt 4 official documentation |
+| Hybrid Pinia + composables | MEDIUM | Pattern is sound but may need implementation tuning |
 
 ## Sources
 
-| Source | Type | Confidence |
-|--------|------|------------|
-| `staff/package.json`, `customer/package.json` | Codebase | HIGH |
-| [shadcn-vue Date Picker](https://www.shadcn-vue.com/docs/components/date-picker) | Official docs | HIGH |
-| [VueUse useSwipe](https://vueuse.org/core/useswipe/) | Official docs | HIGH |
-| [@vuepic/vue-datepicker](https://www.npmjs.com/package/@vuepic/vue-datepicker) | npm | MEDIUM |
-| [date-fns documentation](https://date-fns.org/) | Official docs | HIGH |
-| Existing codebase patterns | Codebase | HIGH |
+- [@pinia/nuxt Nuxt Module](https://nuxt.com/modules/pinia) - v0.11.3, Nuxt 4 support confirmed
+- [Pinia Nuxt Documentation](https://pinia.vuejs.org/ssr/nuxt.html)
+- [Pinia Composables Cookbook](https://pinia.vuejs.org/cookbook/composables.html)
+- [shadcn-vue Sidebar Component](https://www.shadcn-vue.com/docs/components/sidebar)
+- [shadcn-vue Changelog](https://www.shadcn-vue.com/docs/changelog) - Reka UI migration
+- [vue-chartjs npm](https://www.npmjs.com/package/vue-chartjs) - v5.3.3
+- [vue-chartjs Guide](https://vue-chartjs.org/guide/)
+- [Nuxt 4 shared/ Directory](https://nuxt.com/docs/4.x/directory-structure/shared)
+- [TypeScript Enums Handbook](https://www.typescriptlang.org/docs/handbook/enums.html)
+- [TypeScript `as const` Best Practices](https://www.angularspace.com/breaking-the-enum-habit-why-typescript-developers-need-a-new-approach/)

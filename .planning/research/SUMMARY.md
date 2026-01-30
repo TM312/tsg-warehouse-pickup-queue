@@ -1,280 +1,282 @@
 # Project Research Summary
 
-**Project:** Warehouse Pickup Queue System - v1.1 Gate Operator Experience
-**Domain:** Warehouse management - pickup queue workflow
+**Project:** Warehouse Pickup Queue v2.0 Architecture Overhaul
+**Domain:** Nuxt 4 Admin Dashboard with Pinia state management, sidebar navigation, and centralized types
 **Researched:** 2026-01-30
 **Confidence:** HIGH
 
 ## Executive Summary
 
-The v1.1 milestone adds gate operator tooling, processing status workflow, and business hours management to an existing warehouse pickup queue system. Research confirms this is an **additive expansion** requiring zero new dependencies - the existing Nuxt 4/Vue 3/Supabase/shadcn-vue stack fully supports all features.
+The v2.0 architecture overhaul introduces three evolutionary refinements to the existing Nuxt 4 codebase: (1) Pinia stores for shared state management while keeping existing composables for realtime subscriptions and RPC operations, (2) shadcn-vue Sidebar navigation for dashboard pages while preserving the fullscreen gate operator experience, and (3) centralized TypeScript types using Nuxt 4's `shared/types/` auto-import convention.
 
-The recommended approach builds on proven patterns from the v1 codebase: (1) extend the existing status workflow with a new "processing" state using database functions with atomic guards, (2) create a mobile-first gate operator view at `/gate/[id]` reusing existing composables, and (3) build business hours UI as CRUD over the existing `business_hours` table. The only additions needed are `date-fns` and `@date-fns/tz` in the staff app for time formatting, plus shadcn-vue's date picker component for future holiday scheduling.
+The recommended approach is a **hybrid Pinia + composables pattern** where Pinia stores manage global reactive state (queue data, gate status) and computed derivations, while existing composables retain responsibility for side effects (realtime subscriptions, RPC calls). This separation prevents lifecycle cleanup issues and maintains the working realtime infrastructure. The sidebar layout applies only to dashboard/admin pages via explicit `layout: 'sidebar'` metadata, while gate operator routes use `layout: false` to preserve their mobile-first, fullscreen experience. For visualization, use shadcn-vue's Chart component (based on unovis) instead of vue-chartjs for bar chart rendering.
 
-The primary risk is **status transition race conditions** when adding the intermediate "processing" state. Prevention requires atomic database functions with explicit status guards (WHERE status = 'in_queue'), queue position handling logic for processing customers, and timestamp tracking for timeout detection. Secondary risks include mobile reconnection handling, timezone bugs in business hours, and touch target accessibility on gate operator mobile interfaces.
+**Key risks:** (1) Realtime subscription leaks if subscriptions move from composables into Pinia stores, (2) reactivity loss if store state is destructured without `storeToRefs()`, (3) gate operator mobile view broken if sidebar layout inadvertently applies to `/gate/[id]` routes. Mitigation: Establish clear composable-vs-store boundaries in Phase 1, mandate `storeToRefs()` in all store consumers, and test gate view on mobile after every layout change.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The existing stack requires no architectural changes. All v1.1 features work with current technologies: Nuxt 4 for routing (`/gate/[id]`, `/settings/business-hours`), shadcn-vue for UI components (Card, Button, Input, Switch), Supabase for data and realtime updates, and Tailwind for mobile-responsive design.
+v2.0 adds three new dependencies plus one shadcn CLI component to the existing stack (Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase). Pinia provides official Vue state management with Composition API support and devtools integration. The shadcn-vue Sidebar component requires no new npm dependencies since the project already has reka-ui (shadcn's underlying library) and lucide-vue-next icons. For dashboard visualization, use **shadcn-vue Chart** (based on unovis) instead of vue-chartjs.
 
-**Core technologies (already installed):**
-- Nuxt 4 / Vue 3: Dynamic routing, component framework — powers both staff and customer apps
-- Supabase: PostgreSQL + Realtime — handles queue state with existing SECURITY DEFINER functions
-- shadcn-vue / reka-ui: Component library — all needed components already present (Card, Button, Input, Switch, Dialog)
-- TailwindCSS: Mobile-first styling — existing responsive patterns extend to gate view
-- @vueuse/core: Composables library — already used for gestures, can support useSwipe if needed
+**Core technologies:**
+- **Pinia + @pinia/nuxt**: Global state management — official Vue successor to Vuex, Nuxt 4 compatible as of v0.11.3, auto-imports stores from `app/stores/`
+- **shadcn-vue Sidebar**: Sidebar navigation layout — pre-built component from existing shadcn-vue library, add via `pnpm dlx shadcn-vue@latest add sidebar`
+- **shadcn-vue Chart**: Dashboard visualization — add via `pnpm dlx shadcn-vue@latest add chart-bar`, provides recharts-style API using unovis for rendering
+- **TypeScript `as const` pattern**: Type organization — use `as const` objects instead of enums for status values (no runtime overhead, better tree-shaking)
 
-**Staff app additions (install only):**
-- date-fns: Time formatting (`08:00:00` -> `8:00 AM`) — already proven in customer app
-- @date-fns/tz: Timezone handling for warehouse local time — needed for business hours preview
+**Critical version note:** @pinia/nuxt v0.11.3 explicitly supports Nuxt `^3.15.0 || ^4.0.0`. The project runs Nuxt 4.3.0, so compatibility is verified.
 
-**Recommended NOT to add:**
-- Time picker libraries (@vuepic/vue-datepicker, v-calendar): Native `<input type="time">` is sufficient and provides excellent mobile UX
-- Swipe gesture libraries (hammer.js, vue-swipe-actions): Large tap buttons are clearer for gate operators
-- Business hours libraries (vue-business-hours): Simple form with existing components is adequate
-- State management (Pinia): Per-page data fetching is simpler for two-page addition
-
-**User preference noted:** Use shadcn-vue date picker component for holiday scheduling (future phase).
+**What NOT to add:** VueX (deprecated), pinia-plugin-persistedstate (not needed), vue-chartjs (replaced by shadcn-vue Chart), ApexCharts (heavier than needed), TypeScript enums (use `as const`).
 
 ### Expected Features
 
-Research identified clear table stakes vs differentiators across three feature areas.
+The v2.0 architecture overhaul targets four key areas: sidebar navigation, dashboard visualization, state management, and type safety. Users expect standard admin UI patterns: collapsible sidebar with mobile overlay, active route highlighting, keyboard shortcuts, and layout that doesn't interfere with content. The dashboard should provide at-a-glance queue status through simple bar chart visualization.
 
 **Must have (table stakes):**
-- Current pickup display with sales order number prominently shown (primary warehouse identifier)
-- "Start Processing" and "Complete" quick actions for gate operators
-- Processing status state to distinguish "next up" from "actively being served"
-- Weekly schedule editor for business hours (Mon-Fri 8am-5pm pattern)
-- Holiday/closure date scheduling (Christmas, inventory day, etc.)
-- Mobile-responsive layout with real-time updates on gate operator view
+- Collapsible sidebar navigation — every modern admin has one, users know the pattern
+- Mobile sidebar as overlay — mobile users expect hamburger menu behavior (shadcn handles via `useSidebar().isMobile`)
+- Active route highlighting — users need visual confirmation of current location
+- No sidebar on gate operator routes — `/gate/[id]` must remain fullscreen mobile experience
+- Centralized TypeScript types — replace magic strings with type constants
+- Dashboard overview page — supervisors need at-a-glance queue status
 
-**Should have (competitive differentiators):**
-- Next-up preview on gate view (see who's coming after current customer)
-- Manual override toggle for business hours ("Closed today" emergency control)
-- Schedule preview showing next 7 days including holidays
-- Elapsed time indicator on gate view (processing duration tracking)
-- Auto-advance to next customer after completion
+**Should have (competitive):**
+- Bar chart visualization — shows queue length per gate (use shadcn-vue Chart with bar chart)
+- Pinia store for shared state — eliminates prop drilling, single source of truth
+- SidebarRail for collapsed state — compact icon-only sidebar
+- Sidebar state persistence — remembers collapsed/expanded via `storage-key` prop
+- Computed derivations in store — efficient `requestsByGate`, `activeRequests` getters
 
 **Defer (v2+):**
-- Recurring holidays ("every July 4th" logic)
-- Processing timeout alerts (needs usage metrics first)
-- Estimated completion times (requires historical data)
-- Skip/defer actions (edge case, uncommon need)
-- Customer contact info on gate view (only needed for problem scenarios)
+- Nested/multi-level sidebar menus — YAGNI for 3-4 navigation items
+- Sidebar search/command palette — overkill for 3-page app
+- Real-time chart updates — polling/subscriptions for charts adds complexity, manual refresh is fine
+- Server-side Pinia state — app requires auth, no SEO benefit to SSR hydration
+- Type generation from database schema — manual types sufficient for this app size
 
 ### Architecture Approach
 
-All v1.1 features integrate as extensions of existing architecture patterns. Processing status is a database migration adding a value to the existing CHECK constraint. Gate operator view is a new route reusing existing composables (`useRealtimeQueue`, `useQueueActions`). Business hours management is straightforward CRUD on an existing table.
+The v2.0 architecture uses a **hybrid Pinia + composables pattern** where state and side effects have clear separation. Pinia stores own shared reactive state (pickup requests, gates) and computed derivations (filtered lists, counts by gate). Existing composables retain responsibility for realtime subscriptions and RPC calls, updating stores via actions. This preserves working lifecycle cleanup in `useRealtimeQueue.ts` while centralizing state access.
 
 **Major components:**
-1. **Gate Operator Page** (`/gate/[id]`) — Mobile-first view showing current pickup (position 1), quick actions (Start Processing, Complete), and next-up preview. Reuses `useRealtimeQueue` for live updates and `useQueueActions` for RPC calls. Independent data fetching per page, no shared store needed.
+1. **Pinia Stores** (`app/stores/`) — Shared reactive state, computed getters. `useQueueStore` holds pickup requests array, `useGatesStore` holds gates. Actions like `setRequests()` called by composables. Return `readonly()` refs to prevent external mutation.
+2. **Composables** (`app/composables/`) — Side effects only. `useRealtimeQueue` manages Supabase channel subscriptions with proper `onUnmounted` cleanup. `useQueueRpc` and `useGateRpc` make RPC calls and update stores on success. Hybrid pattern: composables can call stores internally.
+3. **Sidebar Layout** (`app/layouts/sidebar.vue`) — Uses shadcn-vue SidebarProvider, Sidebar components. Wraps dashboard/settings pages. Gate operator routes use `layout: false` to opt out. Mobile sidebar renders as Sheet overlay.
+4. **Centralized Types** (`shared/types/`) — Auto-imported by Nuxt 4. Use `as const` objects for status enums. Interfaces for PickupRequest, Gate, etc. Single source of truth prevents drift.
 
-2. **Processing Status Workflow** — New "processing" status value between "in_queue" and "completed". Requires database migration updating CHECK constraint, new `start_processing()` SECURITY DEFINER function with atomic guards, StatusBadge component update for new variant, and customer status page recognition of processing state.
-
-3. **Business Hours Management** (`/settings/business-hours`) — Weekly schedule editor (7-row grid) plus holiday/closure table for date-based overrides. Uses existing form components (Input with type="time", Switch for open/closed toggle, Label). CRUD operations directly against `business_hours` table. Future holiday table uses shadcn-vue date picker per user preference.
-
-**Key architectural decisions:**
-- Single realtime channel for all gates (client-side filtering) — volume too low to warrant per-gate channels
-- Native HTML5 `<input type="time">` for time picking — zero dependencies, excellent mobile native pickers
-- Processing status retains queue_position during service — enables "put back in queue" recovery
-- Independent data fetching per page — simpler than shared Pinia store for two-page addition
+**Key patterns:**
+- Store consumers MUST use `storeToRefs()` for state/getters, destructure actions directly
+- Realtime subscriptions stay in composables, never in stores (lifecycle cleanup)
+- Route-specific layouts via `definePageMeta({ layout: 'sidebar' })` or `layout: false`
+- Status values as `as const` objects, not TypeScript enums (no runtime overhead)
 
 ### Critical Pitfalls
 
-1. **Status transition race conditions** — Adding "processing" state creates new intermediate step. Without atomic guards, two operators can transition same request simultaneously (e.g., one starts processing while another completes it). Prevention: database functions with `WHERE status = 'in_queue'` guard for start_processing, `WHERE status = 'processing'` guard for complete. Return old status to detect failed transitions.
+Research identified six critical pitfalls that would cause rewrites or major issues if not addressed:
 
-2. **Queue position gaps during processing** — Current system clears queue_position on completion. If customer is "processing" at position 1, does position 2 advance to position 1? Inconsistent handling creates gaps or duplicates. Prevention: Define clear semantic (processing = position 1 being served, hide from queue UI), keep queue_position = 1 during processing, update all queue functions to handle `WHERE status IN ('in_queue', 'processing')`.
+1. **Realtime subscription leak during composable-to-Pinia migration** — If `useRealtimeQueue` subscription moves into Pinia store or is called after `await`, the `onUnmounted` cleanup never registers. Causes memory leaks, duplicate events, connection exhaustion. **Prevention:** Keep subscriptions in composables, call from component `onMounted`, never from store initialization.
 
-3. **Business hours timezone storage mismatch** — PostgreSQL `time` type has no timezone context. Staff enters "8:00 AM" local, but comparison with customer's "now" can be in different timezone. Prevention: Store warehouse timezone explicitly in config, all comparisons happen server-side using warehouse timezone, add DST-specific test cases.
+2. **Store reactivity loss on destructuring** — Destructuring state directly from Pinia store (`const { requests } = useQueueStore()`) loses reactivity. UI freezes on initial values. **Prevention:** Always use `storeToRefs()` for state/getters: `const { requests } = storeToRefs(store)`. Actions can be destructured directly.
 
-4. **Holiday table design complexity** — Mixing recurring holidays (every Christmas) with one-time closures (inventory day) in single table creates maintenance burden. Prevention: For v1.1, use simple `closures` table with explicit DATE values. Manual annual entry is acceptable for 50-100 pickups/day volume. Recurring logic deferred to v2.
+3. **Type definition migration breaking components** — Moving types from inline definitions (e.g., `columns.ts`) to `shared/types/` breaks imports across multiple files simultaneously. Hard to iterate. **Prevention:** Create central types first, re-export from old location initially, migrate incrementally, remove re-exports last.
 
-5. **Mobile realtime reconnection** — Gate operator's phone screen locks or hits dead zone, WebSocket disconnects. On reconnection, may miss events during disconnection window. Prevention: Always refetch on visibility change regardless of connection status, add "pull to refresh" on gate view, track last event timestamp with gap detection.
+4. **Sidebar layout breaking gate operator mobile view** — Default layouts apply to all pages unless overridden. Sidebar would interfere with fullscreen gate operator experience. **Prevention:** Create `sidebar.vue` layout only for dashboard, use `layout: false` on `/gate/[id]`, test mobile after every layout change.
 
-6. **Touch targets too small** — Desktop-designed buttons don't work for gate operators wearing gloves or in hurry. Prevention: Minimum 44x44px touch targets (WCAG AAA), spacing between destructive actions, test on actual mobile devices at warehouse.
+5. **Pinia store hydration mismatch in SSR** — If store state differs between server and client render (e.g., using `Date.now()`, `localStorage` in initialization), Vue throws hydration warnings and UI flickers. **Prevention:** Initialize stores with static defaults, fetch data in `onMounted`, use `@pinia/nuxt` for SSR serialization.
+
+6. **Calling Pinia store outside setup context** — Error "getActivePinia() was called but there was no active Pinia" when using stores in utility functions or during store definition. **Prevention:** Call stores only inside component setup, Nuxt middleware (works), or inside other store actions. Pass stores as parameters to utilities.
 
 ## Implications for Roadmap
 
-Based on research, the natural dependency order and risk mitigation strategy suggests this phase structure:
+Based on research, suggested phase structure follows dependency order: types first (foundational), then Pinia infrastructure (depends on types), then sidebar layout (independent), then dashboard restructure (depends on both).
 
-### Phase 1: Processing Status Foundation
-**Rationale:** Processing status is foundational for gate operator workflow. Must exist before gate view can use "Start Processing" action. Database schema changes should be isolated to reduce risk.
+### Phase 1: Type Foundation
+
+**Rationale:** TypeScript types are foundational and have no dependencies. Must exist before Pinia stores reference them. Creates single source of truth, eliminates magic strings, enables autocomplete.
 
 **Delivers:**
-- Database migration adding 'processing' to status CHECK constraint
-- New `processing_started_at` timestamp column for timeout tracking
-- `start_processing()` SECURITY DEFINER function with atomic guards
-- Updated `completeRequest()` to allow transitions from 'processing'
-- StatusBadge component update with processing variant (yellow/amber)
+- `shared/types/` directory with auto-imported types
+- PickupRequest, Gate, BusinessHours interfaces
+- Status constants using `as const` pattern (not enums)
+- Re-export pattern for gradual migration from inline types
 
 **Addresses:**
-- Processing status workflow (table stakes from FEATURES.md)
-- Avoids status transition race conditions (critical pitfall #1)
-- Sets foundation for queue position handling (critical pitfall #2)
+- Table stakes: Centralized TypeScript types, replace magic strings
+- Pitfall 3: Use re-export migration pattern to avoid breaking all imports simultaneously
 
-**Research flag:** Standard pattern (database migrations, status state machines). No additional research needed beyond PITFALLS.md guidance on atomic guards.
+**Key tasks:**
+- Create `shared/types/pickup-request.ts` with PickupStatus as `as const` object
+- Create `shared/types/gate.ts` with Gate interface
+- Add re-exports from old locations (`columns.ts`) temporarily
+- Update imports incrementally (one file at a time is safe)
+- Verify `pnpm build` passes with no type errors
 
-### Phase 2: Gate Operator View
-**Rationale:** Core v1.1 value delivery. Depends on processing status from Phase 1. Mobile-first implementation addresses operator workflow needs. Highest operational impact.
+**Research flag:** Standard patterns, skip deep research
 
-**Delivers:**
-- `/gate/[id]` dynamic route with gate validation
-- CurrentPickup component showing position 1 customer (large sales order number, company name)
-- QuickActions component with Start Processing and Complete buttons (44x44px minimum)
-- UpNextList showing next 2-3 in queue as preview
-- Real-time subscription reusing `useRealtimeQueue` composable
-- Reconnection handling and pull-to-refresh
+### Phase 2: Pinia Infrastructure
 
-**Uses:**
-- Existing Nuxt routing, shadcn-vue Card/Button components
-- Existing `useQueueActions` extended with startProcessing method
-- Existing `useRealtimeQueue` with visibility change refetch
-- TailwindCSS responsive utilities for mobile-first design
-
-**Implements:**
-- Gate operator view architecture component
-- All gate operator table stakes from FEATURES.md
-- Next-up preview differentiator
-
-**Avoids:**
-- Mobile reconnection issues (moderate pitfall #5)
-- Touch target accessibility issues (moderate pitfall #6)
-
-**Research flag:** Standard pattern (mobile-responsive CRUD, realtime subscriptions). Existing codebase provides all patterns. No additional research needed.
-
-### Phase 3: Business Hours Weekly Schedule
-**Rationale:** Independent of gate operator workflow. Can be built in parallel or after Phase 2. Addresses core business hours table stakes without holiday complexity.
+**Rationale:** Pinia stores depend on types from Phase 1. State management is core to reducing prop drilling and establishing single source of truth. Must define composable-vs-store boundaries early to prevent pitfalls.
 
 **Delivers:**
-- `/settings/business-hours` route in staff app
-- WeeklyScheduleEditor component (7-day grid)
-- DayHoursRow component with native time inputs, open/closed toggle
-- Current status banner ("OPEN until 5:00 PM")
-- Install date-fns and @date-fns/tz in staff app
-- Time formatting utilities (DB format <-> input format <-> display format)
+- `@pinia/nuxt` module added to `nuxt.config.ts`
+- `useQueueStore` with state, getters (pendingRequests, requestsByGate)
+- `useGatesStore` with state, getters
+- Hybrid pattern: composables call store actions, stores never call composables
+- Dashboard reads from stores via `storeToRefs()`
 
 **Addresses:**
-- Weekly schedule editor (table stakes from FEATURES.md)
-- Time zone handling differentiator
-- Schedule preview differentiator
+- Table stakes: Pinia store for shared state
+- Pitfall 1: Keep realtime subscriptions in composables, not stores
+- Pitfall 2: Mandate `storeToRefs()` for all store consumers
+- Pitfall 5: Use static defaults, no browser APIs in store definition
+- Pitfall 6: Only call stores inside setup context
 
-**Avoids:**
-- Timezone storage bugs (critical pitfall #3)
-- Manual override conflicts (deferred to Phase 4)
+**Uses stack:**
+- pinia ^3.0.4
+- @pinia/nuxt ^0.11.3 (Nuxt 4 verified compatible)
 
-**Research flag:** Standard pattern (form CRUD, time input handling). date-fns usage proven in customer app. Native time inputs well-documented. No additional research needed.
+**Key tasks:**
+- Install Pinia dependencies
+- Create setup stores using `defineStore('name', () => { ... })`
+- Update `useQueueActions` and `useGateManagement` to call store actions
+- Update `useRealtimeQueue` callback to refresh store
+- Update dashboard index.vue to use `storeToRefs()`
+- Test with Vue DevTools that reactivity works
 
-### Phase 4: Holiday Scheduling & Manual Override
-**Rationale:** Completes business hours feature. Builds on Phase 3 foundation. Moderate complexity requires careful priority handling.
+**Research flag:** Standard patterns (official Pinia docs), but needs validation of hybrid pattern with existing composables
 
-**Delivers:**
-- `scheduled_closures` table for date-based closures
-- HolidayManager component with shadcn-vue date picker (per user preference)
-- Manual override toggle with expiration timestamp
-- Override priority logic (Manual Override > Holiday > Weekly Schedule)
-- "Effective status" display showing which rule is active
-- Schedule preview showing next 7 days with closures highlighted
+### Phase 3: Sidebar Layout
 
-**Addresses:**
-- Holiday/closure scheduling (table stakes from FEATURES.md)
-- Manual override toggle (differentiator)
-- Closure message customization (nice-to-have)
-
-**Avoids:**
-- Holiday table design complexity (critical pitfall #4) — uses simple date-based closures, defers recurring logic
-- Manual override conflicts (moderate pitfall #7) — explicit priority hierarchy
-
-**Research flag:** Moderate complexity. Priority resolution logic and date picker integration patterns are well-documented. Calendar/holiday patterns covered in PITFALLS.md. No additional research needed if following simple closures approach.
-
-### Phase 5: Customer Status Update
-**Rationale:** Final integration pass ensuring customer app reflects new processing status. Low complexity, completes end-to-end workflow.
+**Rationale:** Sidebar layout is independent of Pinia implementation and can be developed in parallel. Primary architectural change for v2.0. Must explicitly exclude gate operator routes to preserve mobile UX.
 
 **Delivers:**
-- Customer status page recognition of 'processing' status
-- Updated status display: "Your order is being processed at Gate 3"
-- Processing state styling/animation distinct from queued state
-- E2E test coverage for full submission -> processing -> completion flow
+- shadcn-vue Sidebar component added via CLI
+- `AppSidebar.vue` navigation component
+- `sidebar.vue` layout wrapping dashboard/settings pages
+- Gate routes explicitly use `layout: false` for fullscreen experience
+- Mobile sidebar as overlay via `useSidebar().isMobile`
+- Sidebar state persistence via `storage-key` prop
 
 **Addresses:**
-- Customer notification of processing (table stakes from FEATURES.md)
+- Table stakes: Collapsible sidebar, mobile overlay, active route highlighting, no sidebar on gate routes
+- Should have: SidebarRail, sidebar state persistence
+- Pitfall 4: Create sidebar.vue layout ONLY for dashboard, test gate view on mobile
 
-**Avoids:**
-- Processing status not visible to customers (minor pitfall #12)
+**Uses stack:**
+- shadcn-vue Sidebar (via CLI: `pnpm dlx shadcn-vue@latest add sidebar`)
+- Existing reka-ui and lucide-vue-next dependencies
 
-**Research flag:** Trivial. Simple component update. No research needed.
+**Implements architecture:**
+- Sidebar Layout component from ARCHITECTURE.md
+- Route-specific layout pattern via `definePageMeta`
+
+**Key tasks:**
+- Run `pnpm dlx shadcn-vue@latest add sidebar`
+- Create `app/components/layout/AppSidebar.vue` with navigation items
+- Create `app/layouts/sidebar.vue` with SidebarProvider
+- Update dashboard/settings pages: `definePageMeta({ layout: 'sidebar' })`
+- Update gate pages: `definePageMeta({ layout: false })`
+- Test on 320px mobile viewport, verify no sidebar on gate routes
+
+**Research flag:** Standard component (shadcn docs), skip deep research
+
+### Phase 4: Dashboard Restructure & Visualization
+
+**Rationale:** Depends on both Pinia stores (Phase 2) and sidebar layout (Phase 3) being in place. Adds primary new feature (dashboard overview with chart) and simplifies existing dashboard by removing inline data fetching.
+
+**Delivers:**
+- Simplified dashboard index.vue using store data
+- Gate management page (`/gates`) with queue counts
+- Bar chart showing queue length per gate using shadcn-vue Chart
+- Dashboard metrics refresh on mount
+- Existing showCompleted toggle bug (BUG-01) verification
+
+**Addresses:**
+- Table stakes: Dashboard overview page
+- Should have: Bar chart visualization
+- Pitfall 7: Fix/verify showCompleted toggle after store migration
+
+**Uses stack:**
+- shadcn-vue Chart (via CLI: `pnpm dlx shadcn-vue@latest add chart-bar`)
+- Based on unovis, provides recharts-style API
+
+**Key tasks:**
+- Run `pnpm dlx shadcn-vue@latest add chart-bar`
+- Create `GateQueueChart.vue` component using Bar chart from shadcn-vue
+- Extract dashboard data fetching to store actions
+- Create `/gates` page with queue counts table
+- Simplify dashboard to focus on overview metrics
+- Test showCompleted toggle with store state
+
+**Research flag:** May need shadcn-vue Chart documentation review (less common than other components)
 
 ### Phase Ordering Rationale
 
-- **Dependency-driven:** Processing status must exist before gate operator view can use it. Weekly schedule must work before layering holiday complexity.
-- **Risk isolation:** Database migrations in dedicated phase reduce risk of UI/DB coupling issues.
-- **Value delivery:** Gate operator view (Phase 2) delivers core v1.1 value immediately after foundation (Phase 1).
-- **Parallel potential:** Phase 3 (business hours) can be built in parallel with Phase 2 (gate view) — no shared dependencies.
-- **Incremental complexity:** Start with simple weekly schedule, then add holiday/override complexity in Phase 4 when foundation is proven.
+- **Types first:** Zero dependencies, enables everything else. Safe incremental migration via re-exports.
+- **Pinia before dashboard:** Dashboard restructure depends on stores existing. Better to establish state patterns early.
+- **Sidebar parallel to Pinia:** Sidebar layout is independent. Can be developed alongside Pinia work.
+- **Dashboard last:** Requires both stores and layout. Primary deliverable, benefits from all other work.
+
+**Dependency chain:**
+```
+Types (Phase 1)
+    |
+    └─> Pinia (Phase 2) ──┐
+                           ├─> Dashboard (Phase 4)
+    ┌─> Sidebar (Phase 3) ─┘
+```
 
 ### Research Flags
 
-**Phases with standard patterns (no additional research needed):**
-- **Phase 1:** Database migrations and status state machines are well-documented. PITFALLS.md provides atomic guard patterns.
-- **Phase 2:** Mobile-responsive Vue components and Supabase realtime patterns proven in existing v1 codebase.
-- **Phase 3:** Form CRUD and native time inputs well-documented. date-fns usage patterns proven in customer app.
-- **Phase 5:** Trivial component update.
+Phases likely needing deeper research during planning:
+- **Phase 4:** May need shadcn-vue Chart API research — recharts-style API but using unovis, less documented than other shadcn components
 
-**Phase needing moderate planning attention:**
-- **Phase 4:** Holiday scheduling and override priority logic requires careful design. Not complex enough for `/gsd:research-phase`, but merits extra planning review. FEATURES.md and PITFALLS.md provide sufficient guidance — recommend simple closures table over complex recurring logic.
+Phases with standard patterns (skip research-phase):
+- **Phase 1:** TypeScript patterns well-documented, `as const` is standard approach
+- **Phase 2:** Pinia official docs comprehensive, setup store pattern clear
+- **Phase 3:** shadcn-vue Sidebar is mature component with extensive docs
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Verified against existing codebase package.json files and official documentation. No unknowns. |
-| Features | HIGH | Table stakes identified from WMS UI/UX research, order workflow patterns, and business hours management best practices. Clear consensus on expectations. |
-| Architecture | HIGH | Based on existing v1 codebase patterns. All integration points identified in code. Extensions are straightforward. |
-| Pitfalls | HIGH | Critical pitfalls backed by authoritative sources (W3C, Supabase discussions, database design articles). Race conditions and timezone bugs are well-documented domains. |
+| Stack | HIGH | All dependencies verified compatible with Nuxt 4.3.0. @pinia/nuxt v0.11.3 explicitly supports Nuxt 4. shadcn-vue Sidebar and Chart are official components. |
+| Features | HIGH | Feature expectations drawn from official shadcn-vue component docs and standard admin dashboard patterns. Dashboard visualization using shadcn-vue Chart instead of vue-chartjs. |
+| Architecture | HIGH | Hybrid Pinia + composables pattern verified with Pinia cookbook. Layout exclusion via `definePageMeta` is Nuxt-native. `shared/types/` auto-import is Nuxt 4 official convention. |
+| Pitfalls | HIGH | Pitfalls based on official documentation (storeToRefs, lifecycle hooks), codebase analysis (existing realtime subscription pattern), and established Vue 3 patterns. |
 
 **Overall confidence:** HIGH
 
-All research backed by authoritative sources (official docs, W3C standards, established pattern articles) or verified existing codebase analysis. No speculation or single-source findings in critical areas.
-
 ### Gaps to Address
 
-**Resolved during research:**
-- Time picker approach (native HTML5 inputs selected over libraries)
-- State management approach (per-page fetching selected over Pinia)
-- Realtime channel strategy (single channel with client filtering selected)
-- Holiday complexity (simple closures table selected for v1.1, recurring deferred to v2)
+Minor gaps that need validation during implementation:
 
-**Minor validations during implementation:**
-- Confirm shadcn-vue date picker component installed, add if missing
-- Verify auth middleware coverage extends to `/gate/*` routes
-- Test actual mobile device with gloves at warehouse for touch target sizing
-- Validate timezone handling on DST boundary dates
-
-No major gaps requiring additional research. Implementation can proceed with current findings.
+- **shadcn-vue Chart documentation:** Less comprehensive than other shadcn components. May need to reference unovis docs directly for advanced customization. Handle by: Start with simple bar chart example from shadcn-vue docs, escalate to unovis docs only if needed.
+- **Hybrid Pinia + composables pattern:** Standard pattern but specific integration with existing `useRealtimeQueue` needs validation. Handle by: Test subscription cleanup thoroughly in Phase 2, verify DevTools shows single subscription after navigation.
+- **showCompleted toggle bug (BUG-01):** Existing bug may interact with Pinia migration. Handle by: Verify bug still exists before Phase 2, test immediately after store migration, create test case for future regression prevention.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- **Existing codebase** (`/Users/thomas/Projects/tsg/warehouse-pickup-queue/`) — Architecture patterns, component inventory, database schema, composables
-- **package.json files** (staff/, customer/) — Technology versions, installed dependencies
-- **shadcn-vue documentation** (https://www.shadcn-vue.com/) — Component library usage, date picker patterns
-- **Supabase documentation** — Realtime subscriptions, SECURITY DEFINER functions, RLS patterns
-- **date-fns documentation** (https://date-fns.org/) — Time formatting patterns
-- **W3C WCAG 2.5.8** (https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum) — Touch target size requirements
+- [Nuxt 4 State Management](https://nuxt.com/docs/4.x/getting-started/state-management) — Official state management guide
+- [Pinia Nuxt Integration](https://pinia.vuejs.org/ssr/nuxt.html) — SSR/Nuxt documentation
+- [Pinia + Composables Cookbook](https://pinia.vuejs.org/cookbook/composables.html) — Using composables with stores
+- [@pinia/nuxt Module](https://nuxt.com/modules/pinia) — v0.11.3 Nuxt 4 compatibility verified
+- [shadcn-vue Sidebar Component](https://www.shadcn-vue.com/docs/components/sidebar) — Component API, variants, mobile behavior
+- [shadcn-vue Chart Component](https://www.shadcn-vue.com/docs/components/chart) — Chart component using unovis
+- [Nuxt 4 Layouts](https://nuxt.com/docs/4.x/directory-structure/app/layouts) — Route-specific layouts, definePageMeta
+- [Nuxt 4 Shared Directory](https://nuxt.com/docs/4.x/directory-structure/shared) — Auto-imported types/utils
+- [Vue Router Active Links](https://router.vuejs.org/guide/essentials/active-links) — router-link-active classes
+- [TypeScript Handbook Enums](https://www.typescriptlang.org/docs/handbook/enums.html) — Enum patterns
 
 ### Secondary (MEDIUM confidence)
-- **LoadProof - WMS UI/UX Best Practices** — Training reduction, simplified warehouse UI design
-- **Adobe Commerce - Order Processing** — Pending -> Processing -> Complete state patterns
-- **Zendesk - Business Hours & Holidays** — Weekly schedule, holiday exception patterns
-- **ShipStation - Customer Pickup Processing** — Order identification for pickup workflows
-- **Medium - Complex World of Calendars: Database Design** — Holiday table design patterns
-- **GitHub Discussion - Supabase Realtime reliability** — Reconnection handling best practices
-- **Red Hat - State Machines for Microservices** — Status transition patterns, timeout handling
-- **DEV Community - Date and Time Timezone Bugs** — Timezone storage and comparison patterns
-
-### Tertiary (LOW confidence)
-- None — all findings backed by primary or secondary sources with community consensus
+- [Mastering Pinia: Top 5 Mistakes](https://masteringpinia.com/blog/top-5-mistakes-to-avoid-when-using-pinia) — storeToRefs, common pitfalls
+- [Composables vs Pinia patterns](https://iamjeremie.me/post/2025-01/composables-vs-pinia-vs-provide-inject/) — When to use each
+- [TypeScript as const Best Practices](https://www.angularspace.com/breaking-the-enum-habit-why-typescript-developers-need-a-new-approach/) — Enum alternatives
+- [Pinia storeToRefs discussion](https://github.com/vuejs/pinia/discussions/1448) — Reactivity loss prevention
+- [shadcn-vue Sidebar Blocks](https://www.shadcn-vue.com/blocks/sidebar) — 16 pre-built sidebar patterns
+- Codebase analysis: Existing composables, layouts, realtime subscription patterns
 
 ---
 *Research completed: 2026-01-30*
