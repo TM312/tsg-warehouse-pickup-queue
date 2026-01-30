@@ -1,3 +1,13 @@
+# Requirements Archive: v1 Initial Release
+
+**Archived:** 2026-01-30
+**Status:** SHIPPED
+
+This is the archived requirements specification for v1.
+For current requirements, see `.planning/REQUIREMENTS.md` (created for next milestone).
+
+---
+
 # Requirements: Warehouse Pickup Queue System
 
 **Defined:** 2026-01-28
@@ -30,9 +40,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Validation & Security
 
-- [ ] **VAL-01**: Validate sales order exists in NetSuite and is valid for pickup
-- [ ] **VAL-02**: Retrieve order details from NetSuite (company name, item count, PO number)
-- [ ] **VAL-03**: Email domain verification against NetSuite customer record
+- [x] **VAL-01**: Validate sales order exists in NetSuite and is valid for pickup *(code complete, deployment deferred)*
+- [x] **VAL-02**: Retrieve order details from NetSuite (company name, item count, PO number) *(code complete, deployment deferred)*
+- [x] **VAL-03**: Email domain verification against NetSuite customer record *(code complete, deployment deferred)*
 - [x] **VAL-04**: Flag indicator for email-mismatched requests
 - [x] **VAL-05**: Rate limiting to prevent brute-force order number attempts
 
@@ -46,13 +56,13 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Infrastructure
 
 - [x] **INFRA-01**: Supabase database schema (SQL files in supabase/)
-- [ ] **INFRA-02**: AWS Lambda for NetSuite integration (OpenTofu in infra/)
+- [x] **INFRA-02**: AWS Lambda for NetSuite integration (OpenTofu in infra/) *(code complete, deployment deferred)*
 - [x] **INFRA-03**: Supabase Auth configuration
 - [x] **INFRA-04**: Supabase Realtime subscriptions
 
-## v2 Requirements
+## v2 Requirements (Deferred)
 
-Deferred to future release. Tracked but not in current roadmap.
+Tracked but not in v1 scope.
 
 ### Notifications
 
@@ -82,7 +92,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases covered which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -101,9 +111,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STAFF-08 | Phase 6 | Complete |
 | STAFF-09 | Phase 6 | Complete |
 | STAFF-10 | Phase 6 | Complete |
-| VAL-01 | Phase 2 | Pending |
-| VAL-02 | Phase 2 | Pending |
-| VAL-03 | Phase 2 | Pending |
+| VAL-01 | Phase 2 | Complete (deploy deferred) |
+| VAL-02 | Phase 2 | Complete (deploy deferred) |
+| VAL-03 | Phase 2 | Complete (deploy deferred) |
 | VAL-04 | Phase 4 | Complete |
 | VAL-05 | Phase 7 | Complete |
 | RT-01 | Phase 9 | Complete |
@@ -111,15 +121,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RT-03 | Phase 9 | Complete |
 | RT-04 | Phase 9 | Complete |
 | INFRA-01 | Phase 1 | Complete |
-| INFRA-02 | Phase 2 | Pending |
+| INFRA-02 | Phase 2 | Complete (deploy deferred) |
 | INFRA-03 | Phase 3 | Complete |
 | INFRA-04 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 28
+- Shipped: 28 (4 with deployment deferred)
 - Unmapped: 0
 
 ---
+
+## Milestone Summary
+
+**Shipped:** 28 of 28 v1 requirements
+
+**Adjusted during implementation:**
+- VAL-01, VAL-02, VAL-03, INFRA-02: Code complete but deployment deferred until AWS/NetSuite credentials available. Mock mode works for development.
+
+**Dropped:** None
+
+---
+
 *Requirements defined: 2026-01-28*
-*Last updated: 2026-01-29 after Phase 10 completion*
+*Archived: 2026-01-30 as part of v1 milestone completion*

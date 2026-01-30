@@ -2,62 +2,65 @@
 
 ## What This Is
 
-A two-part web application that streamlines warehouse pickup operations. Customers scan a QR code, enter their sales order number, and get real-time queue updates. Warehouse staff manage the queue, assign gates, and process pickups through an internal dashboard. The system integrates with NetSuite ERP for order validation and Twilio for SMS notifications.
+A two-part web application that streamlines warehouse pickup operations. Customers scan a QR code, enter their sales order number, and get real-time queue updates. Warehouse staff manage the queue, assign gates, and process pickups through an internal dashboard. The system integrates with NetSuite ERP for order validation.
 
 ## Core Value
 
 Customers always know their queue position and which gate to go to — no confusion, no manual coordination overhead.
 
+## Current State
+
+**Version:** v1 shipped 2026-01-30
+**Codebase:** ~6,700 LOC (Vue, TypeScript, SQL, Python, Terraform)
+**Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
+
+**What's working:**
+- Customer app: submission form, business hours check, real-time status tracking
+- Staff app: dashboard, queue management, gate management, drag-drop reordering
+- Real-time updates across both apps via Supabase Realtime
+- Rate limiting on customer submissions
+
+**What's pending:**
+- NetSuite Lambda deployment (code complete, awaiting credentials)
+- SMS notifications (v2 scope)
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+**v1 — shipped 2026-01-30:**
+- CUST-01: Mobile-responsive web app accessible via static QR code/URL
+- CUST-02: Business hours check with message when warehouse is closed
+- CUST-03: Submission form with sales order number, email, optional phone
+- CUST-04: Real-time queue status display (position, gate, estimated wait)
+- CUST-05: Visual confirmation when pickup is complete
+- STAFF-01: Email/password authentication via Supabase
+- STAFF-02: Dashboard with table view of all pickup requests
+- STAFF-03: Visual highlighting of requests requiring attention
+- STAFF-04: Gate assignment functionality
+- STAFF-05: Add to queue / Cancel request actions
+- STAFF-06: Mark pickup as complete
+- STAFF-07: Reorder queue positions within a gate
+- STAFF-08: Move customer between gates
+- STAFF-09: Priority override capability
+- STAFF-10: Gate enable/disable (gates must be empty to disable)
+- VAL-01: Validate sales order exists in NetSuite *(code complete, deployment deferred)*
+- VAL-02: Retrieve order details from NetSuite *(code complete, deployment deferred)*
+- VAL-03: Email domain verification against NetSuite *(code complete, deployment deferred)*
+- VAL-04: Flag indicator for email-mismatched requests
+- VAL-05: Rate limiting to prevent brute-force attempts
+- RT-01: Queue position updates via Supabase Realtime
+- RT-02: Wait time estimate recalculation
+- RT-03: Gate assignment change notifications
+- RT-04: Status change notifications
+- INFRA-01: Supabase database schema
+- INFRA-02: AWS Lambda for NetSuite integration *(code complete, deployment deferred)*
+- INFRA-03: Supabase Auth configuration
+- INFRA-04: Supabase Realtime subscriptions
 
 ### Active
 
-**Customer App:**
-- [ ] Mobile-responsive web app accessible via static QR code/URL
-- [ ] Business hours check with informational message when closed
-- [ ] Submission form: sales order number, email, optional phone number
-- [ ] Real-time validation of sales order against NetSuite
-- [ ] Email domain verification against NetSuite customer record
-- [ ] Rate limiting to prevent brute-force order number attempts
-- [ ] Clear messaging for email mismatch (direct to front desk)
-- [ ] Real-time queue status display (position, gate, estimated wait time)
-- [ ] SMS notification when turn is approaching (only if phone provided)
-- [ ] Visual confirmation when pickup is complete
-
-**Warehouse Staff App:**
-- [ ] Email/password authentication via Supabase
-- [ ] Dashboard with table view of all pickup requests
-- [ ] Visual highlighting of requests requiring attention
-- [ ] Request details view (shipping address, subtotal, line items)
-- [ ] Flag indicator for email-mismatched requests
-- [ ] Gate assignment functionality
-- [ ] Add to queue / Cancel request actions
-- [ ] Mark pickup as complete
-- [ ] Reorder queue positions within a gate
-- [ ] Move customer between gates
-- [ ] Priority override capability
-- [ ] Gate enable/disable (gates must be empty to disable)
-- [ ] Configure business hours and vacation days
-
-**Real-time Updates (all via Supabase Realtime):**
-- [ ] Queue position updates
-- [ ] Wait time estimate recalculation
-- [ ] Gate assignment changes
-- [ ] Status changes (pending → approved → in_queue → completed)
-
-**NetSuite Integration:**
-- [ ] Validate sales order exists and is valid for pickup
-- [ ] Retrieve order details (company, items, PO, address, subtotal)
-- [ ] Retrieve customer email domain for verification
-- [ ] Cache order data per session
-
-**SMS Integration:**
-- [ ] Twilio integration for notifications
-- [ ] Send SMS when customer's turn is approaching
+*(None yet — define for next milestone)*
 
 ### Out of Scope
 
@@ -69,51 +72,42 @@ Customers always know their queue position and which gate to go to — no confus
 - Automated gate assignment — all assignments manual
 - Multi-language support — English only
 - Offline functionality — online required
-- Dynamic gate management — gates fixed at setup
 
 ## Context
 
 **Business Environment:**
 - Expected daily volume: 50-100 pickups
 - Customers arrive with sales order number from purchase confirmation
-- Current process lacks visibility into queue position and gate assignment
-- Staff currently coordinates manually, creating overhead
+- v1 deployed, ready for production testing
 
 **Technical Environment:**
-- NetSuite ERP is source of truth for orders and customer data
-- NetSuite sandbox available for development
-- Token-based authentication credentials available
-- Python `python-netsuite` library for integration
-
-**User Research:**
-- Customers need clear guidance on where to go and how long to wait
-- Staff need efficient tools to validate orders and manage queue
-- Email domain mismatch happens — flagged customers go to front desk, staff adds them manually
+- Staff app: `staff/` directory (Nuxt 4, port 3000)
+- Customer app: `customer/` directory (Nuxt 4)
+- Local Supabase: `supabase start` (test user: staff@example.com / password123)
+- NetSuite Lambda: `infra/` directory (OpenTofu), deployment pending
 
 ## Constraints
 
-- **Tech Stack**: Nuxt 3 + Vue 3 + TailwindCSS + shadcn-vue for both frontends — non-negotiable
+- **Tech Stack**: Nuxt 4 + Vue 3 + TailwindCSS + shadcn-vue — non-negotiable
 - **Database/Auth**: Supabase Cloud (PostgreSQL, Auth, Realtime) — non-negotiable
-- **NetSuite Integration**: AWS Lambda + python-netsuite — required for Python library support
-- **SMS Provider**: Twilio — decided
-- **Infrastructure as Code**: OpenTofu in `infra/` directory for AWS resources
-- **Database Schema**: SQL files in `supabase/` directory for Supabase tables/functions
+- **NetSuite Integration**: AWS Lambda + python-netsuite — required for Python library
 - **Real-time Latency**: < 2 seconds for queue updates
 - **Browser Support**: Modern browsers (Chrome, Safari, Firefox, Edge)
-- **Mobile Support**: Full functionality on devices ≥ 320px width
+- **Mobile Support**: Full functionality on devices >= 320px width
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Phone number optional in form | Not all customers want SMS; only notify those who opt in | — Pending |
-| Cache NetSuite data per session | Orders rarely change during pickup window; reduces API calls | — Pending |
-| Static QR code | Simpler implementation; single URL for all customers | — Pending |
-| Gates fixed at setup | Reduces complexity; staff rarely needs to add/remove gates | — Pending |
-| Gate must be empty to disable | Prevents orphaned customers in queue | — Pending |
-| Email mismatch → staff handles manually | Front desk can verify identity and add to queue via warehouse app | — Pending |
-| AWS Lambda for NetSuite | python-netsuite requires Python runtime; Supabase Edge is Deno-based | — Pending |
-| OpenTofu for AWS infrastructure | Infrastructure as code for reproducibility and version control | — Pending |
+| CHECK constraints over ENUM | Easier schema evolution without table locks | Good |
+| SECURITY DEFINER for queue functions | Required for atomic MAX calculation | Good |
+| Separate staff/ and customer/ apps | Clean separation, different auth requirements | Good |
+| Local Supabase for development | Faster iteration, no cloud setup | Good |
+| Dev mode mock for NetSuite | Allows testing without Lambda deployment | Good |
+| Phone number optional | Not all customers want SMS | Good |
+| Static QR code | Simpler implementation, single URL | Good |
+| Gate must be empty to disable | Prevents orphaned customers | Good |
+| Position 2 for priority insertion | Priority goes behind current service | Good |
 
 ---
-*Last updated: 2026-01-28 after initialization*
+*Last updated: 2026-01-30 after v1 milestone complete*
