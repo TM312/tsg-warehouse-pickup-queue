@@ -69,35 +69,35 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROC-01 | TBD | Pending |
-| PROC-02 | TBD | Pending |
-| PROC-03 | TBD | Pending |
-| PROC-04 | TBD | Pending |
-| PROC-05 | TBD | Pending |
-| GATE-01 | TBD | Pending |
-| GATE-02 | TBD | Pending |
-| GATE-03 | TBD | Pending |
-| GATE-04 | TBD | Pending |
-| GATE-05 | TBD | Pending |
-| GATE-06 | TBD | Pending |
-| GATE-07 | TBD | Pending |
-| GATE-08 | TBD | Pending |
-| GATE-09 | TBD | Pending |
-| HOUR-01 | TBD | Pending |
-| HOUR-02 | TBD | Pending |
-| HOUR-03 | TBD | Pending |
-| HOUR-04 | TBD | Pending |
-| HOUR-05 | TBD | Pending |
+| PROC-01 | Phase 11 | Pending |
+| PROC-02 | Phase 11 | Pending |
+| PROC-03 | Phase 11 | Pending |
+| PROC-04 | Phase 12 | Pending |
+| PROC-05 | Phase 12 | Pending |
+| GATE-01 | Phase 12 | Pending |
+| GATE-02 | Phase 12 | Pending |
+| GATE-03 | Phase 12 | Pending |
+| GATE-04 | Phase 12 | Pending |
+| GATE-05 | Phase 12 | Pending |
+| GATE-06 | Phase 12 | Pending |
+| GATE-07 | Phase 12 | Pending |
+| GATE-08 | Phase 12 | Pending |
+| GATE-09 | Phase 12 | Pending |
+| HOUR-01 | Phase 13 | Pending |
+| HOUR-02 | Phase 13 | Pending |
+| HOUR-03 | Phase 13 | Pending |
+| HOUR-04 | Phase 13 | Pending |
+| HOUR-05 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 (pending roadmap)
+- Mapped to phases: 19
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after initial definition*
+*Last updated: 2026-01-30 after roadmap creation*
