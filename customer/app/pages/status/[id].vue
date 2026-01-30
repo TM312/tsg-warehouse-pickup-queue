@@ -19,6 +19,7 @@ interface PickupRequest {
   assigned_gate_id: string | null
   sales_order_number: string
   company_name: string | null
+  processing_started_at?: string | null
 }
 
 interface Gate {
@@ -43,6 +44,7 @@ const { data: request, pending, error: fetchError, refresh } = await useAsyncDat
         assigned_gate_id,
         sales_order_number,
         company_name,
+        processing_started_at,
         gates:assigned_gate_id (
           id,
           gate_number
@@ -137,6 +139,12 @@ watch(
         takeoverDismissed.value = false // Reset for next time
       }
     }
+
+    // Dismiss takeover when entering processing (user is being served)
+    if (newRequest.status === 'processing') {
+      showTakeover.value = false
+      takeoverDismissed.value = true
+    }
   },
   { immediate: true }
 )
@@ -183,6 +191,12 @@ const statusDisplay = computed(() => {
         title: 'In Queue',
         message: null,
         showPosition: true,
+      }
+    case 'processing':
+      return {
+        title: 'Being Processed',
+        message: null,
+        showPosition: false,
       }
     case 'completed':
       return {
@@ -265,12 +279,21 @@ const gateNumber = computed(() => {
         </div>
       </div>
 
+      <!-- Processing Status -->
+      <div v-else-if="request.status === 'processing'" class="py-4 space-y-4">
+        <div class="bg-amber-50 dark:bg-amber-950 rounded-lg p-6">
+          <p class="text-amber-600 dark:text-amber-400 text-sm font-medium">Your Order is Being Processed</p>
+          <p class="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">Gate {{ gateNumber }}</p>
+          <p class="text-muted-foreground text-sm mt-2">Please proceed to the gate for pickup</p>
+        </div>
+      </div>
+
       <!-- Message for pending/approved/unknown statuses -->
       <p v-else-if="statusDisplay?.message" class="text-muted-foreground py-4">
         {{ statusDisplay.message }}
       </p>
 
-      <!-- Gate Assignment -->
+      <!-- Gate Assignment (only for in_queue, processing has its own display) -->
       <div
         v-if="gateNumber && request.status === 'in_queue'"
         class="bg-primary/10 rounded-lg p-4 mt-4"
