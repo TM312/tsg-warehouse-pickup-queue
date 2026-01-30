@@ -140,6 +140,52 @@ export function useQueueActions() {
     }
   }
 
+  async function startProcessing(requestId: string, gateId: string): Promise<string | null> {
+    pending.value[requestId] = true
+    try {
+      const { data, error } = await client.rpc('start_processing', {
+        p_request_id: requestId,
+        p_gate_id: gateId
+      })
+      if (error) throw error
+      toast.success('Processing started')
+      return data as string  // Returns the processing_started_at timestamp
+    } catch (e: any) {
+      // Handle specific error messages from database function
+      if (e.message?.includes('already has a processing request')) {
+        toast.error('Gate already has an active pickup')
+      } else if (e.message?.includes('not at position 1')) {
+        toast.error('Only position 1 can start processing')
+      } else {
+        toast.error('Failed to start processing')
+      }
+      return null
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
+  async function revertToQueue(requestId: string): Promise<number | null> {
+    pending.value[requestId] = true
+    try {
+      const { data, error } = await client.rpc('revert_to_queue', {
+        p_request_id: requestId
+      })
+      if (error) throw error
+      toast.success('Returned to queue')
+      return data as number  // Returns the preserved queue_position
+    } catch (e: any) {
+      if (e.message?.includes('not in processing status')) {
+        toast.error('Request is not being processed')
+      } else {
+        toast.error('Failed to return to queue')
+      }
+      return null
+    } finally {
+      pending.value[requestId] = false
+    }
+  }
+
   return {
     pending: readonly(pending),
     assignGate,
@@ -148,6 +194,8 @@ export function useQueueActions() {
     reorderQueue,
     setPriority,
     clearPriority,
-    moveToGate
+    moveToGate,
+    startProcessing,
+    revertToQueue
   }
 }
