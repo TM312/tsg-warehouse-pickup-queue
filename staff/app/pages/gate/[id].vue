@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { AlertCircle } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+import { AlertCircle, Users, Play, CheckCircle, RotateCcw } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import CurrentPickup from '@/components/gate/CurrentPickup.vue'
 import EmptyGateState from '@/components/gate/EmptyGateState.vue'
+import NextUpPreview from '@/components/gate/NextUpPreview.vue'
+import CompleteDialog from '@/components/gate/CompleteDialog.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -10,6 +13,10 @@ definePageMeta({
 
 const route = useRoute()
 const client = useSupabaseClient()
+const { pending, startProcessing, revertToQueue, completeRequest } = useQueueActions()
+
+// Dialog state
+const showCompleteDialog = ref(false)
 
 // Extract gate ID from route params
 const gateId = computed(() => route.params.id as string)
@@ -69,12 +76,47 @@ const currentPickup = computed(() => {
   return queue.value.find(r => r.queue_position === 1) ?? queue.value[0]
 })
 
+// Next up: position 2 in queue
+const nextUp = computed(() => {
+  return queue.value?.find(p => p.queue_position === 2 && p.status === 'in_queue') ?? null
+})
+
+// Queue count: number of in_queue items (excludes processing)
+const queueCount = computed(() => {
+  return queue.value?.filter(p => p.status === 'in_queue').length ?? 0
+})
+
 // Combined loading state
 const loading = computed(() => gateStatus.value === 'pending' || queueStatus.value === 'pending')
 
 // Error states
 const gateNotFound = computed(() => gateError.value !== null)
 const gateDisabled = computed(() => gate.value && !gate.value.is_active)
+
+// Action pending state
+const actionPending = computed(() => {
+  return currentPickup.value ? pending.value[currentPickup.value.id] : false
+})
+
+// Action handlers
+async function handleStartProcessing() {
+  if (!currentPickup.value || !gate.value) return
+  await startProcessing(currentPickup.value.id, gate.value.id)
+  await refreshNuxtData(`gate-queue-${gateId.value}`)
+}
+
+async function handleRevert() {
+  if (!currentPickup.value) return
+  await revertToQueue(currentPickup.value.id)
+  await refreshNuxtData(`gate-queue-${gateId.value}`)
+}
+
+async function handleComplete() {
+  if (!currentPickup.value) return
+  showCompleteDialog.value = false
+  await completeRequest(currentPickup.value.id, gate.value?.id)
+  await refreshNuxtData(`gate-queue-${gateId.value}`)
+}
 </script>
 
 <template>
@@ -123,6 +165,20 @@ const gateDisabled = computed(() => gate.value && !gate.value.is_active)
           :po-number="currentPickup.po_number"
         />
         <EmptyGateState v-else />
+
+        <!-- Next up section -->
+        <div v-if="nextUp" class="mt-6">
+          <h3 class="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+            <Users class="h-4 w-4" />
+            Next Up
+          </h3>
+          <NextUpPreview :sales-order-number="nextUp.sales_order_number" />
+        </div>
+
+        <!-- Queue count -->
+        <p v-if="queueCount > 1" class="text-center text-sm text-muted-foreground mt-4">
+          {{ queueCount - 1 }} more in queue
+        </p>
       </main>
     </template>
   </div>
