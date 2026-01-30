@@ -49,7 +49,7 @@ export function useQueueActions() {
     }
   }
 
-  async function completeRequest(requestId: string): Promise<void> {
+  async function completeRequest(requestId: string, gateId?: string): Promise<void> {
     pending.value[requestId] = true
     try {
       const { error } = await client
@@ -59,10 +59,23 @@ export function useQueueActions() {
           completed_at: new Date().toISOString(),
           queue_position: null,
           assigned_gate_id: null,
+          processing_started_at: null,
         })
         .eq('id', requestId)
 
       if (error) throw error
+
+      // Compact queue positions if gate was provided (PROC-05)
+      if (gateId) {
+        const { error: compactError } = await client.rpc('compact_queue_positions', {
+          p_gate_id: gateId
+        })
+        if (compactError) {
+          console.error('Failed to compact queue positions:', compactError)
+          // Don't throw - pickup is already completed, this is cleanup
+        }
+      }
+
       toast.success('Pickup marked complete')
     } catch (e) {
       toast.error('Failed to complete pickup')
