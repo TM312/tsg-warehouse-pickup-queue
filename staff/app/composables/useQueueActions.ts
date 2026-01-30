@@ -2,14 +2,81 @@ import { ref, readonly } from 'vue'
 import { toast } from 'vue-sonner'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
+import type { PickupRequest } from '#shared/types/pickup-request'
+import type { GateWithCount } from '#shared/types/gate'
 
 export function useQueueActions() {
-  // Cast to any to work around missing database types
-  // TODO: Generate proper database types with `supabase gen types typescript`
   const client = useSupabaseClient() as SupabaseClient
+  const queueStore = useQueueStore()
+  const gatesStore = useGatesStore()
 
   const pending = ref<Record<string, boolean>>({})
 
+  // === Data Fetching ===
+  async function fetchRequests(): Promise<void> {
+    queueStore.loading = true
+    try {
+      const { data, error } = await client
+        .from('pickup_requests')
+        .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, is_priority, processing_started_at, created_at, gate:gates(id, gate_number)')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      // Transform Supabase array response to expected shape
+      // Supabase returns joined relations as arrays, we need single object or null
+      const requests = (data ?? []).map(row => ({
+        ...row,
+        gate: Array.isArray(row.gate) ? (row.gate[0] ?? null) : row.gate
+      })) as PickupRequest[]
+
+      queueStore.setRequests(requests)
+    } finally {
+      queueStore.loading = false
+    }
+  }
+
+  async function fetchGates(): Promise<void> {
+    gatesStore.loading = true
+    try {
+      const { data, error } = await client
+        .from('gates')
+        .select('id, gate_number, is_active')
+        .order('gate_number')
+
+      if (error) throw error
+
+      // Get queue counts per gate
+      const { data: counts } = await client
+        .from('pickup_requests')
+        .select('assigned_gate_id')
+        .eq('status', PICKUP_STATUS.IN_QUEUE)
+
+      const countMap: Record<string, number> = {}
+      for (const row of counts ?? []) {
+        const gateId = (row as { assigned_gate_id: string | null }).assigned_gate_id
+        if (gateId) {
+          countMap[gateId] = (countMap[gateId] || 0) + 1
+        }
+      }
+
+      const gatesWithCount: GateWithCount[] = (data ?? []).map(g => ({
+        ...g,
+        queue_count: countMap[g.id] || 0
+      }))
+
+      gatesStore.setGates(gatesWithCount)
+    } finally {
+      gatesStore.loading = false
+    }
+  }
+
+  // Refresh both stores
+  async function refresh(): Promise<void> {
+    await Promise.all([fetchRequests(), fetchGates()])
+  }
+
+  // === Queue Actions ===
   async function assignGate(requestId: string, gateId: string): Promise<number> {
     pending.value[requestId] = true
     try {
@@ -202,6 +269,11 @@ export function useQueueActions() {
 
   return {
     pending: readonly(pending),
+    // Data fetching
+    fetchRequests,
+    fetchGates,
+    refresh,
+    // Actions
     assignGate,
     cancelRequest,
     completeRequest,
