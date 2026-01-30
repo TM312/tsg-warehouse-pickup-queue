@@ -1,40 +1,40 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 15 plan 03 complete
+**Status:** v2.0 IN PROGRESS - Phase 15 COMPLETE
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 15 (Pinia Infrastructure)
+**Current focus:** v2.0 Architecture Overhaul - Phase 15 Complete, ready for Phase 16
 
 ## Current Milestone: v2.0 Architecture Overhaul
 
 **Goal:** Improve code quality with Pinia state management, centralized types, and modernize UI with sidebar navigation and dashboard visualization.
 
 **Phases:**
-- Phase 14: Type Foundation (ARCH-06, ARCH-07, ARCH-08, ARCH-09)
-- Phase 15: Pinia Infrastructure (ARCH-01 through ARCH-05)
+- Phase 14: Type Foundation (COMPLETE)
+- Phase 15: Pinia Infrastructure (COMPLETE)
 - Phase 16: Sidebar Layout (SIDE-01 through SIDE-06)
 - Phase 17: Dashboard & Visualization (DASH-01 through DASH-05)
 - Phase 18: Gate Operator & Bug Fixes (GATE-12, GATE-13, BUG-01)
 
 ## Current Position
 
-**Phase:** 15 of 18 (Pinia Infrastructure)
-**Plan:** 03 of 04 complete
-**Status:** In progress
-**Last activity:** 2026-01-30 - Completed 15-03-PLAN.md (Composable Store Integration)
+**Phase:** 15 of 18 (Pinia Infrastructure) - COMPLETE
+**Plan:** 04 of 04 complete
+**Status:** Phase complete
+**Last activity:** 2026-01-30 - Completed 15-04-PLAN.md (Page Store Migration)
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - Phase 14 complete, Phase 15 in progress
+v2.0 Architecture Overhaul - Phase 14-15 complete
 
-[============        ] 75%
+[=============       ] 80%
 ```
 
 ## Deferred Items
@@ -67,6 +67,9 @@ v2.0 decisions implemented (continued):
 - Transform Supabase array response to single object for gate relation - 15-03
 - Keep refresh callback for gate changes (queue counts require full refresh) - 15-03
 - Server confirms before store update in useGateManagement (not optimistic) - 15-03
+- App-level subscription in app.vue prevents duplicate subscriptions on navigation - 15-04
+- Gate page uses hybrid pattern: local enriched fetch + store lastUpdated watcher - 15-04
+- Explicit type annotations required for storeToRefs callback parameters - 15-04
 
 v2.0 decisions pending implementation:
 - No sidebar on gate routes: gate operators need simplified mobile view
@@ -88,24 +91,24 @@ None
 
 ### Last Session Summary
 
-Completed 15-03-PLAN.md (Composable Store Integration):
-- Refactored useQueueActions with fetchRequests(), fetchGates(), refresh() methods
-- Refactored useRealtimeQueue to update queueStore directly on realtime events
-- Refactored useGateManagement to update gatesStore after CRUD operations
-- Established hybrid pattern: composables for side effects, stores for state
+Completed 15-04-PLAN.md (Page Store Migration):
+- Updated app.vue with app-level subscription and data fetching
+- Migrated index.vue to use storeToRefs for reactive state access
+- Migrated gate/[id].vue to use hybrid pattern (local fetch + store watcher)
+- Added explicit type annotations for storeToRefs callback parameters
 
-### Phase 15 In Progress
+### Phase 15 Complete
 
-Plan 3 of 4 complete:
+All 4 plans complete:
 - 15-01: Install Pinia Module (COMPLETE)
 - 15-02: Create Pinia Stores (COMPLETE)
 - 15-03: Integrate stores into composables (COMPLETE)
-- 15-04: Migrate components to stores (pending)
+- 15-04: Migrate components to stores (COMPLETE)
 
 ### Next Actions
 
-1. Execute 15-04-PLAN.md to migrate components to use stores
-2. Complete Phase 15 (Pinia Infrastructure)
+1. Plan Phase 16 (Sidebar Layout)
+2. Research sidebar navigation patterns for Nuxt 4
 
 ### Context for Next Session
 
@@ -123,8 +126,11 @@ Plan 3 of 4 complete:
 - Composables now use stores: useQueueActions, useRealtimeQueue, useGateManagement
 - fetchRequests() and fetchGates() populate stores from database
 - Realtime events update store state directly (INSERT/UPDATE/DELETE)
+- App-level subscription in app.vue (single realtime connection)
+- Pages use storeToRefs for reactive state access
+- Gate page uses lastUpdated watcher for enriched local data sync
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (Phase 15 plan 03 complete)*
+*Last updated: 2026-01-30 (Phase 15 complete)*
