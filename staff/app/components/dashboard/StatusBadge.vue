@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge'
-import { computed } from 'vue'
+import { Loader2 } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
 
 const props = defineProps<{
-  status: 'pending' | 'approved' | 'in_queue' | 'completed' | 'cancelled'
+  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
+  processingStartedAt?: string | null
 }>()
 
 const variantMap: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   pending: 'default',  // Will be styled blue via class
   approved: 'default',
   in_queue: 'default',
+  processing: 'default',
   completed: 'secondary',
   cancelled: 'outline',
 }
@@ -18,21 +22,70 @@ const labelMap: Record<string, string> = {
   pending: 'Pending',
   approved: 'Approved',
   in_queue: 'In Queue',
+  processing: 'Processing',
   completed: 'Completed',
   cancelled: 'Cancelled',
 }
 
-// Blue styling for pending status
+// Elapsed time calculation for processing status
+const elapsed = ref('')
+
+function calculateElapsed() {
+  if (props.status === 'processing' && props.processingStartedAt) {
+    const start = new Date(props.processingStartedAt).getTime()
+    const now = Date.now()
+    const minutes = Math.floor((now - start) / 60000)
+
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60)
+      const remainingMinutes = minutes % 60
+      elapsed.value = `${hours}h ${remainingMinutes}m`
+    } else {
+      elapsed.value = `${minutes}m`
+    }
+  } else {
+    elapsed.value = ''
+  }
+}
+
+const { pause, resume } = useIntervalFn(calculateElapsed, 60000, {
+  immediate: true,
+  immediateCallback: true
+})
+
+// Pause/resume timer based on status
+watch(() => props.status, (status) => {
+  if (status === 'processing') {
+    calculateElapsed() // Recalculate immediately when status changes
+    resume()
+  } else {
+    pause()
+  }
+}, { immediate: true })
+
+// Blue styling for pending status, amber for processing
 const customClass = computed(() => {
   if (props.status === 'pending') {
     return 'bg-blue-500 hover:bg-blue-600 text-white'
   }
+  if (props.status === 'processing') {
+    return 'bg-amber-500 hover:bg-amber-600 text-white'
+  }
   return ''
+})
+
+// Display label with elapsed time for processing
+const displayLabel = computed(() => {
+  if (props.status === 'processing' && elapsed.value) {
+    return `Processing (${elapsed.value})`
+  }
+  return labelMap[props.status]
 })
 </script>
 
 <template>
   <Badge :variant="variantMap[status]" :class="customClass">
-    {{ labelMap[status] }}
+    <Loader2 v-if="status === 'processing'" class="h-3 w-3 animate-spin mr-1" />
+    {{ displayLabel }}
   </Badge>
 </template>
