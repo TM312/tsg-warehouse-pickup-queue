@@ -1,6 +1,8 @@
 import { serverSupabaseClient } from '#supabase/server'
 import { z } from 'zod'
 import { validateOrder } from '../utils/validateOrder'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
+import type { PickupStatus } from '#shared/types/pickup-request'
 
 const submitSchema = z.object({
   salesOrderNumber: z
@@ -20,10 +22,11 @@ const submitSchema = z.object({
     )
 })
 
-interface PickupRequest {
+// Minimal interface for duplicate check response
+interface ExistingPickupRequest {
   id: string
   sales_order_number: string
-  status: string
+  status: PickupStatus
 }
 
 export default defineEventHandler(async (event) => {
@@ -47,14 +50,14 @@ export default defineEventHandler(async (event) => {
     .from('pickup_requests')
     .select('id, sales_order_number, status')
     .eq('sales_order_number', salesOrderNumber)
-    .in('status', ['pending', 'approved', 'in_queue'])
+    .in('status', [PICKUP_STATUS.PENDING, PICKUP_STATUS.APPROVED, PICKUP_STATUS.IN_QUEUE])
     .limit(1)
 
   if (existing && existing.length > 0) {
-    const existingRequest = existing[0] as PickupRequest
+    const existingRequest = existing[0] as ExistingPickupRequest
     throw createError({
       statusCode: 409,
-      message: `A pickup request for order ${existingRequest.sales_order_number} is already ${existingRequest.status === 'in_queue' ? 'in the queue' : existingRequest.status}.`
+      message: `A pickup request for order ${existingRequest.sales_order_number} is already ${existingRequest.status === PICKUP_STATUS.IN_QUEUE ? 'in the queue' : existingRequest.status}.`
     })
   }
 
@@ -79,7 +82,7 @@ export default defineEventHandler(async (event) => {
       item_count: validation.order!.item_count,
       po_number: validation.order!.po_number,
       email_flagged: !validation.order!.email_match,
-      status: 'pending'
+      status: PICKUP_STATUS.PENDING
     })
     .select('id')
     .single()
