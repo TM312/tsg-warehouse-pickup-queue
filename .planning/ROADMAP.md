@@ -37,11 +37,11 @@ See `.planning/archive/v1-milestone.md` for complete v1 phase history.
   2. StatusBadge component displays processing status with distinct visual styling (yellow/amber)
   3. Processing start timestamp is recorded when a pickup enters processing state
   4. Staff dashboard shows processing status for requests being actively served
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: Processing status schema and database functions
-- [ ] 11-02: StatusBadge and dashboard integration
+- [ ] 11-01-PLAN.md - Processing status schema migration and database functions (start_processing, revert_to_queue)
+- [ ] 11-02-PLAN.md - StatusBadge with live duration, NowProcessingSection, useQueueActions updates, customer status page
 
 ### Phase 12: Gate Operator View
 **Goal**: Gate operators can efficiently manage pickups at their assigned gate from a mobile device
@@ -83,7 +83,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-10 | v1.0 | 24/24 | Complete | 2026-01-30 |
-| 11. Processing Status | v1.1 | 0/2 | Not started | - |
+| 11. Processing Status | v1.1 | 0/2 | Planned | - |
 | 12. Gate Operator View | v1.1 | 0/3 | Not started | - |
 | 13. Business Hours | v1.1 | 0/2 | Not started | - |
 
