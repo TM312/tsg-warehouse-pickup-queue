@@ -1,21 +1,21 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v1.1 Phase 13 In Progress
+**Status:** v1.1 COMPLETE
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v1.1 Business Hours Management - Phase 13 In Progress
+**Current focus:** v1.1 Business Hours Management - COMPLETE
 
 ## Current Position
 
 **Phase:** 13 of 13 (Business Hours Management)
-**Plan:** 1 of 2
-**Status:** In progress
-**Last activity:** 2026-01-30 - Completed 13-01-PLAN.md
+**Plan:** 2 of 2
+**Status:** Complete
+**Last activity:** 2026-01-30 - Completed 13-02-PLAN.md
 
 **Progress:**
 ```
@@ -27,19 +27,19 @@ v1.1 Gate Operator Experience
 │   ├── 12-01: Gate Page Foundation [DONE]
 │   ├── 12-02: Realtime & Actions [DONE]
 │   └── 12-03: Queue Preview & Realtime [DONE]
-└── Phase 13: Business Hours Management [1/2] In progress
+└── Phase 13: Business Hours Management [2/2] COMPLETE
     ├── 13-01: Weekly Schedule Editor [DONE]
-    └── 13-02: Closure Scheduler & Customer Display [Not started]
+    └── 13-02: Closure Scheduler & Customer Display [DONE]
 
-[████████░░] 86% (6/7 plans)
+[██████████] 100% (7/7 plans)
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6 (v1.1)
+- Total plans completed: 7 (v1.1)
 - Average duration: 5min
-- Total execution time: 27min
+- Total execution time: 35min
 
 **By Phase:**
 
@@ -47,7 +47,7 @@ v1.1 Gate Operator Experience
 |-------|-------|-------|----------|
 | 11 | 2/2 | 12min | 6min |
 | 12 | 3/3 | 11min | 4min |
-| 13 | 1/2 | 4min | 4min |
+| 13 | 2/2 | 12min | 6min |
 
 *Updated after each plan completion*
 
@@ -81,6 +81,10 @@ See .planning/PROJECT.md for consolidated key decisions from v1.
 | 7-row list layout for weekly schedule | 13-01 | Simple, mobile-friendly per CONTEXT.md decision |
 | Single time range per day | 13-01 | Matches typical warehouse operations (one shift) |
 | Toggle switch per day (off = closed) | 13-01 | Clear visual indicator with hidden time inputs when closed |
+| Native date inputs for closure scheduling | 13-02 | Simpler than calendar picker, better mobile support |
+| Override expiry stored as ISO timestamp | 13-02 | Calculated at toggle time for next scheduled open |
+| Priority-based hours check | 13-02 | Override > closures > weekly schedule |
+| Hours display in both open/closed states | 13-02 | Customers can plan visits regardless of current status |
 
 ### Technical Debt
 
@@ -102,37 +106,39 @@ None
 
 ### Last Session Summary
 
-Completed 13-01-PLAN.md:
-- Created business_closures table for holiday scheduling
-- Created business_settings table with manual_override initialization
-- Built useBusinessHoursSettings composable for weekly schedule CRUD
-- Created /settings/business-hours page with 7-day editor
-- DayScheduleRow component with toggle and time inputs
-- WeeklyScheduleEditor with "Apply Monday to weekdays" button
+Completed 13-02-PLAN.md:
+- Extended useBusinessHoursSettings with closure CRUD and override toggle
+- Created ManualOverrideToggle component with auto-expiry display
+- Created ClosureScheduler component with date inputs and closures list
+- Updated customer API to check override > closures > weekly schedule
+- Created BusinessHoursDisplay with compact 7-day grid
+- Customer sees hours in both open and closed states
 
-Weekly schedule editor foundation complete.
+v1.1 Business Hours Management complete. Phase 13 complete.
 
 ### Next Actions
 
-1. Continue to Phase 13 Plan 02
-2. Add closure scheduler UI (date range picker, closures list)
-3. Add manual override toggle
-4. Display hours on customer app registration page
+v1.1 COMPLETE. Next steps:
+1. UAT testing of business hours features
+2. Plan v1.2 features if needed
+3. Production deployment preparation
 
 ### Context for Next Session
 
-- v1 shipped and archived
+- v1.1 complete
 - Staff app in `staff/` directory (Nuxt 4)
 - Customer app in `customer/` directory (Nuxt 4)
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
 - Business hours settings page at /settings/business-hours with:
+  - Manual override toggle at top
   - Weekly schedule editor (7 days)
-  - Toggle per day for open/closed
-  - Time inputs for open/close times
-  - "Apply Monday to weekdays" button
-- New tables: business_closures, business_settings
+  - Closure scheduler with date range picker
+- Customer app shows:
+  - Closed message when override/closure/schedule indicates closed
+  - 7-day hours display on registration page
+- Tables: business_hours, business_closures, business_settings
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (completed Phase 13 Plan 01 - Weekly Schedule Editor)*
+*Last updated: 2026-01-30 (completed Phase 13 Plan 02 - Closure Scheduler & Customer Display)*
