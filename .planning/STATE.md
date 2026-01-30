@@ -8,7 +8,7 @@
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 14 (Type Foundation)
+**Current focus:** v2.0 Architecture Overhaul - Phase 15 (Pinia Infrastructure)
 
 ## Current Milestone: v2.0 Architecture Overhaul
 

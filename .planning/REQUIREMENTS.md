@@ -31,10 +31,10 @@ Requirements for v2.0 Architecture Overhaul. Each maps to roadmap phases.
 - [ ] **ARCH-03**: Gates store manages shared gate state
 - [ ] **ARCH-04**: Composables handle realtime subscriptions (hybrid pattern)
 - [ ] **ARCH-05**: Composables handle RPC/mutation calls (hybrid pattern)
-- [ ] **ARCH-06**: Centralized type definitions in shared/types/ directory
-- [ ] **ARCH-07**: Request status uses typed constant (as const pattern)
-- [ ] **ARCH-08**: Gate status uses typed constant
-- [ ] **ARCH-09**: All magic strings replaced with typed constants
+- [x] **ARCH-06**: Centralized type definitions in shared/types/ directory
+- [x] **ARCH-07**: Request status uses typed constant (as const pattern)
+- [x] **ARCH-08**: Gate status uses typed constant
+- [x] **ARCH-09**: All magic strings replaced with typed constants
 
 ### Gate Operator Improvements
 
@@ -72,10 +72,10 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ARCH-06 | 14 | Pending |
-| ARCH-07 | 14 | Pending |
-| ARCH-08 | 14 | Pending |
-| ARCH-09 | 14 | Pending |
+| ARCH-06 | 14 | Complete |
+| ARCH-07 | 14 | Complete |
+| ARCH-08 | 14 | Complete |
+| ARCH-09 | 14 | Complete |
 | ARCH-01 | 15 | Pending |
 | ARCH-02 | 15 | Pending |
 | ARCH-03 | 15 | Pending |

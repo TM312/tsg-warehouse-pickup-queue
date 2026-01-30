@@ -12,7 +12,7 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
 
 ## Phases
 
-- [ ] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
+- [x] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
 - [ ] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
 - [ ] **Phase 16: Sidebar Layout** - Navigation structure for staff application
 - [ ] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
@@ -33,10 +33,10 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
 **Plans**: 4 plans
 
 Plans:
-- [ ] 14-01-PLAN.md - Create centralized type definitions (staff + customer shared types)
-- [ ] 14-02-PLAN.md - Migrate staff dashboard components
-- [ ] 14-03-PLAN.md - Migrate staff pages and composables
-- [ ] 14-04-PLAN.md - Migrate customer app files
+- [x] 14-01-PLAN.md - Create centralized type definitions (staff + customer shared types)
+- [x] 14-02-PLAN.md - Migrate staff dashboard components
+- [x] 14-03-PLAN.md - Migrate staff pages and composables
+- [x] 14-04-PLAN.md - Migrate customer app files
 
 ### Phase 15: Pinia Infrastructure
 
@@ -105,7 +105,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 14. Type Foundation | v2.0 | 0/4 | Planned | - |
+| 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 15. Pinia Infrastructure | v2.0 | 0/TBD | Not started | - |
 | 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
