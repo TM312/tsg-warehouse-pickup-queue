@@ -60,7 +60,10 @@ Customers always know their queue position and which gate to go to — no confus
 
 ### Active
 
-*(None yet — define for next milestone)*
+**v1.1 — Gate Operator Experience:**
+- Gate operator mobile-first view (/gate/[id])
+- Processing status for explicit pickup acceptance
+- Business hours configuration UI (weekly schedule, holidays, manual override)
 
 ### Out of Scope
 
@@ -109,5 +112,14 @@ Customers always know their queue position and which gate to go to — no confus
 | Gate must be empty to disable | Prevents orphaned customers | Good |
 | Position 2 for priority insertion | Priority goes behind current service | Good |
 
+## Current Milestone: v1.1 Gate Operator Experience
+
+**Goal:** Empower gate operators with a focused mobile view and explicit workflow states while giving supervisors business hours control.
+
+**Target features:**
+- Gate operator view — mobile-first /gate/[id] sub-page with current pickup, order/customer details, quick actions
+- Processing status — explicit "processing" state between queued and completed for clear acceptance workflow
+- Business hours management — weekly schedule, holiday/closure scheduling, manual override
+
 ---
-*Last updated: 2026-01-30 after v1 milestone complete*
+*Last updated: 2026-01-30 after v1.1 milestone started*
