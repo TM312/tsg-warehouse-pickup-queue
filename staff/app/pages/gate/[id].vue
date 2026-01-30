@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { AlertCircle, Users, Play, CheckCircle, RotateCcw } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import CurrentPickup from '@/components/gate/CurrentPickup.vue'
@@ -20,51 +20,61 @@ const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeQueue()
 // Dialog state
 const showCompleteDialog = ref(false)
 
-// Extract gate ID from route params
+// Gate ID from route
 const gateId = computed(() => route.params.id as string)
 
+// Gate and queue state
+const gate = ref<{ id: string; gate_number: number; is_active: boolean } | null>(null)
+const gateError = ref<Error | null>(null)
+const gateLoading = ref(true)
+
+const queue = ref<Array<{
+  id: string
+  sales_order_number: string
+  company_name: string | null
+  status: 'in_queue' | 'processing'
+  queue_position: number | null
+  processing_started_at: string | null
+  item_count: number | null
+  po_number: string | null
+}>>([])
+
 // Fetch gate info
-const { data: gate, error: gateError, status: gateStatus } = await useAsyncData(
-  `gate-${gateId.value}`,
-  async () => {
-    const { data, error } = await client
-      .from('gates')
-      .select('id, gate_number, is_active')
-      .eq('id', gateId.value)
-      .single()
+async function fetchGate() {
+  gateLoading.value = true
+  gateError.value = null
 
-    if (error) throw error
-    return data as { id: string; gate_number: number; is_active: boolean }
+  const { data, error } = await client
+    .from('gates')
+    .select('id, gate_number, is_active')
+    .eq('id', gateId.value)
+    .single()
+
+  if (error) {
+    console.error('Gate fetch error:', error)
+    gateError.value = error
+  } else {
+    gate.value = data
   }
-)
+  gateLoading.value = false
+}
 
-// Fetch gate queue data (pickups assigned to this gate)
-const { data: queue, status: queueStatus } = await useAsyncData(
-  `gate-queue-${gateId.value}`,
-  async () => {
-    if (!gate.value) return []
+// Fetch queue data
+async function fetchQueue() {
+  if (!gate.value) return
 
-    const { data, error } = await client
-      .from('pickup_requests')
-      .select('id, sales_order_number, company_name, status, queue_position, processing_started_at, item_count, po_number')
-      .eq('assigned_gate_id', gateId.value)
-      .in('status', ['in_queue', 'processing'])
-      .order('queue_position', { ascending: true })
+  const { data, error } = await client
+    .from('pickup_requests')
+    .select('id, sales_order_number, company_name, status, queue_position, processing_started_at, item_count, po_number')
+    .eq('assigned_gate_id', gateId.value)
+    .in('status', ['in_queue', 'processing'])
+    .order('queue_position', { ascending: true })
 
-    if (error) throw error
-    return data as Array<{
-      id: string
-      sales_order_number: string
-      company_name: string | null
-      status: 'in_queue' | 'processing'
-      queue_position: number | null
-      processing_started_at: string | null
-      item_count: number | null
-      po_number: string | null
-    }>
-  },
-  { watch: [gate] }
-)
+  if (!error && data) {
+    queue.value = data
+  }
+}
+
 
 // Current pickup: processing takes precedence, otherwise position 1
 const currentPickup = computed(() => {
@@ -88,11 +98,11 @@ const queueCount = computed(() => {
   return queue.value?.filter(p => p.status === 'in_queue').length ?? 0
 })
 
-// Combined loading state
-const loading = computed(() => gateStatus.value === 'pending' || queueStatus.value === 'pending')
+// Loading state
+const loading = computed(() => gateLoading.value)
 
 // Error states
-const gateNotFound = computed(() => gateError.value !== null)
+const gateNotFound = computed(() => !gateLoading.value && gateError.value !== null)
 const gateDisabled = computed(() => gate.value && !gate.value.is_active)
 
 // Action pending state
@@ -104,27 +114,30 @@ const actionPending = computed(() => {
 async function handleStartProcessing() {
   if (!currentPickup.value || !gate.value) return
   await startProcessing(currentPickup.value.id, gate.value.id)
-  await refreshNuxtData(`gate-queue-${gateId.value}`)
+  await fetchQueue()
 }
 
 async function handleRevert() {
   if (!currentPickup.value) return
   await revertToQueue(currentPickup.value.id)
-  await refreshNuxtData(`gate-queue-${gateId.value}`)
+  await fetchQueue()
 }
 
 async function handleComplete() {
   if (!currentPickup.value) return
   showCompleteDialog.value = false
   await completeRequest(currentPickup.value.id, gate.value?.id)
-  await refreshNuxtData(`gate-queue-${gateId.value}`)
+  await fetchQueue()
 }
 
 // Realtime subscription
-onMounted(() => {
+onMounted(async () => {
+  await fetchGate()
+  await fetchQueue()
+
   subscribe(() => {
     // Refresh queue data when any pickup change occurs
-    refreshNuxtData(`gate-queue-${gateId.value}`)
+    fetchQueue()
   })
 })
 
