@@ -19,6 +19,7 @@ import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
+import type { GateWithCount } from '#shared/types/gate'
 
 definePageMeta({
   middleware: 'auth'
@@ -48,7 +49,7 @@ const gates = activeGates
 
 // Action handlers
 async function handleGateSelect(requestId: string, gateId: string) {
-  const request = requests.value.find(r => r.id === requestId)
+  const request = requests.value.find((r: PickupRequest) => r.id === requestId)
   if (request?.status === PICKUP_STATUS.IN_QUEUE) {
     // Already in queue - this is a move operation
     await moveToGate(requestId, gateId)
@@ -59,7 +60,7 @@ async function handleGateSelect(requestId: string, gateId: string) {
   await refresh()
   // Update selected request if it's the one being modified
   if (selectedRequest.value?.id === requestId) {
-    const updated = requests.value.find(r => r.id === requestId)
+    const updated = requests.value.find((r: PickupRequest) => r.id === requestId)
     if (updated) selectedRequest.value = updated
   }
 }
@@ -106,7 +107,7 @@ async function handleClearPriority(requestId: string) {
 
 // Gate queue list row click - open detail view
 function handleQueueRowClick(requestId: string) {
-  const request = requests.value.find(r => r.id === requestId)
+  const request = requests.value.find((r: PickupRequest) => r.id === requestId)
   if (request) {
     selectedRequest.value = request
   }
@@ -155,8 +156,8 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
 // Computed for processing items (for NowProcessingSection)
 const processingItems = computed(() => {
   return requests.value
-    .filter(r => r.status === PICKUP_STATUS.PROCESSING && r.gate)
-    .map(r => ({
+    .filter((r: PickupRequest) => r.status === PICKUP_STATUS.PROCESSING && r.gate)
+    .map((r: PickupRequest) => ({
       id: r.id,
       sales_order_number: r.sales_order_number,
       company_name: r.company_name,
@@ -164,16 +165,16 @@ const processingItems = computed(() => {
       gate_id: r.assigned_gate_id!,
       processing_started_at: r.processing_started_at!
     }))
-    .sort((a, b) => a.gate_number - b.gate_number)
+    .sort((a: { gate_number: number }, b: { gate_number: number }) => a.gate_number - b.gate_number)
 })
 
 // Computed for per-gate queue items (includes both in_queue and processing for count)
 const gatesWithQueues = computed(() => {
-  return gates.value.map(gate => {
+  return gates.value.map((gate: GateWithCount) => {
     const queueItems = requests.value
-      .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
-      .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
-      .map(r => ({
+      .filter((r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
+      .sort((a: PickupRequest, b: PickupRequest) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
+      .map((r: PickupRequest) => ({
         id: r.id,
         sales_order_number: r.sales_order_number,
         company_name: r.company_name,
@@ -183,7 +184,7 @@ const gatesWithQueues = computed(() => {
 
     // Count includes both in_queue and processing for the tab badge
     const processingCount = requests.value
-      .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.PROCESSING)
+      .filter((r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.PROCESSING)
       .length
 
     return {
@@ -209,7 +210,7 @@ const filteredRequests = computed(() => {
   if (showCompleted.value) {
     return all
   }
-  return all.filter(r => !(TERMINAL_STATUSES as readonly string[]).includes(r.status))
+  return all.filter((r: PickupRequest) => !(TERMINAL_STATUSES as readonly string[]).includes(r.status))
 })
 
 // Sheet state
