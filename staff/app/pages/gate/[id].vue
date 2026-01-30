@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { AlertCircle, Users, Play, CheckCircle, RotateCcw } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import CurrentPickup from '@/components/gate/CurrentPickup.vue'
 import EmptyGateState from '@/components/gate/EmptyGateState.vue'
 import NextUpPreview from '@/components/gate/NextUpPreview.vue'
 import CompleteDialog from '@/components/gate/CompleteDialog.vue'
+import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 
 definePageMeta({
   middleware: 'auth'
@@ -14,6 +15,7 @@ definePageMeta({
 const route = useRoute()
 const client = useSupabaseClient()
 const { pending, startProcessing, revertToQueue, completeRequest } = useQueueActions()
+const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeQueue()
 
 // Dialog state
 const showCompleteDialog = ref(false)
@@ -117,6 +119,18 @@ async function handleComplete() {
   await completeRequest(currentPickup.value.id, gate.value?.id)
   await refreshNuxtData(`gate-queue-${gateId.value}`)
 }
+
+// Realtime subscription
+onMounted(() => {
+  subscribe(() => {
+    // Refresh queue data when any pickup change occurs
+    refreshNuxtData(`gate-queue-${gateId.value}`)
+  })
+})
+
+onUnmounted(() => {
+  unsubscribe()
+})
 </script>
 
 <template>
@@ -151,6 +165,9 @@ async function handleComplete() {
       <!-- Gate header -->
       <header class="bg-primary text-primary-foreground p-4">
         <h1 class="text-2xl font-bold text-center">Gate {{ gate.gate_number }}</h1>
+        <p v-if="realtimeStatus !== 'connected'" class="text-xs text-amber-200 text-center mt-1">
+          {{ realtimeStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...' }}
+        </p>
       </header>
 
       <!-- Main content -->
@@ -165,6 +182,51 @@ async function handleComplete() {
           :po-number="currentPickup.po_number"
         />
         <EmptyGateState v-else />
+
+        <!-- Action buttons -->
+        <div v-if="currentPickup" class="space-y-3 mt-6">
+          <!-- Start Processing (only when in_queue) -->
+          <Button
+            v-if="currentPickup.status === 'in_queue'"
+            class="h-14 w-full text-lg"
+            :disabled="actionPending"
+            @click="handleStartProcessing"
+          >
+            <Play class="h-6 w-6 mr-2" />
+            Start Processing
+          </Button>
+
+          <!-- Complete (only when processing) -->
+          <Button
+            v-if="currentPickup.status === 'processing'"
+            class="h-14 w-full text-lg"
+            :disabled="actionPending"
+            @click="showCompleteDialog = true"
+          >
+            <CheckCircle class="h-6 w-6 mr-2" />
+            Complete
+          </Button>
+
+          <!-- Revert to Queue (secondary, only when processing) -->
+          <Button
+            v-if="currentPickup.status === 'processing'"
+            variant="outline"
+            class="h-11 w-full"
+            :disabled="actionPending"
+            @click="handleRevert"
+          >
+            <RotateCcw class="h-5 w-5 mr-2" />
+            Return to Queue
+          </Button>
+        </div>
+
+        <!-- Complete confirmation dialog -->
+        <CompleteDialog
+          v-model:open="showCompleteDialog"
+          :sales-order-number="currentPickup?.sales_order_number ?? ''"
+          :company-name="currentPickup?.company_name ?? null"
+          @confirm="handleComplete"
+        />
 
         <!-- Next up section -->
         <div v-if="nextUp" class="mt-6">
