@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 14 Plan 01 complete
+**Status:** v2.0 IN PROGRESS - Phase 14 Plan 02 complete
 
 ## Project Reference
 
@@ -24,17 +24,17 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 14 of 18 (Type Foundation)
-**Plan:** 01 complete
+**Plan:** 02 complete
 **Status:** In progress
-**Last activity:** 2026-01-30 - Completed 14-01-PLAN.md (Shared Type Definitions)
+**Last activity:** 2026-01-30 - Completed 14-02-PLAN.md (Dashboard Type Migration)
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - Plan 14-01 complete
+v2.0 Architecture Overhaul - Plan 14-02 complete
 
-[=                   ] 5%
+[==                  ] 10%
 ```
 
 ## Deferred Items
@@ -52,6 +52,9 @@ See .planning/PROJECT.md for consolidated key decisions.
 v2.0 decisions implemented:
 - Use `as const` pattern: not TypeScript enums (better tree-shaking) - 14-01
 - Duplicate minimal types in customer app rather than cross-app shared package - 14-01
+- Re-export from columns.ts for backward compatibility during transition - 14-02
+- Keep variantMap/labelMap with string keys (local display logic) - 14-02
+- Derive GateStatus narrow type from PICKUP_STATUS for component-specific constraints - 14-02
 
 v2.0 decisions pending implementation:
 - Hybrid Pinia + composables: stores for state, composables for side effects
@@ -63,6 +66,7 @@ v2.0 decisions pending implementation:
 | Item | Priority | Introduced |
 |------|----------|------------|
 | Generate database types with `supabase gen types typescript` | Low | v1-05 |
+| Pre-existing type errors in native-select component | Low | Unknown |
 
 ### Blockers
 
@@ -72,26 +76,28 @@ None
 
 ### Last Session Summary
 
-Completed 14-01-PLAN.md (Shared Type Definitions):
-- Created staff/shared/types/pickup-request.ts with PICKUP_STATUS, PickupStatus, PickupRequest
-- Created staff/shared/types/gate.ts with Gate, GateWithCount
-- Created customer/shared/types/pickup-request.ts with minimal types
-- Verified Nuxt 4 auto-import working via nuxi prepare
+Completed 14-02-PLAN.md (Dashboard Type Migration):
+- Migrated columns.ts to use imports from #shared, added re-exports for backward compatibility
+- Migrated StatusBadge.vue to use PICKUP_STATUS constants for all comparisons
+- Migrated ActionButtons.vue to use PickupStatus type and PICKUP_STATUS constants
+- Migrated RequestDetail.vue to use ACTIVE_STATUSES for filtering
+- Migrated CurrentPickup.vue to use GateStatus type derived from PICKUP_STATUS
 
 ### Next Actions
 
-1. Execute 14-02-PLAN.md to migrate existing files to use centralized types
+1. Execute 14-03-PLAN.md to continue type migration (composables, other files)
 2. Continue with remaining Phase 14 plans
 3. Move to Phase 15 (Pinia Infrastructure) after Phase 14 complete
 
 ### Context for Next Session
 
-- Type definitions created in shared/types/ directories
-- PICKUP_STATUS, ACTIVE_STATUSES, TERMINAL_STATUSES, isActiveStatus auto-imported
-- Next step: migrate existing files (columns.ts, components, composables) to use new types
+- Type definitions in shared/types/ directories
+- Dashboard components (columns.ts, StatusBadge, ActionButtons, RequestDetail, CurrentPickup) now use #shared types
+- No magic status strings remain in dashboard components
+- columns.ts re-exports types for backward compatibility
 - Staff app in `staff/` directory (Nuxt 4)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (14-01-PLAN.md complete)*
+*Last updated: 2026-01-30 (14-02-PLAN.md complete)*
