@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 14 Plan 02 complete
+**Status:** v2.0 IN PROGRESS - Phase 14 Plan 04 complete
 
 ## Project Reference
 
@@ -24,17 +24,17 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 14 of 18 (Type Foundation)
-**Plan:** 02 complete
+**Plan:** 04 complete
 **Status:** In progress
-**Last activity:** 2026-01-30 - Completed 14-02-PLAN.md (Dashboard Type Migration)
+**Last activity:** 2026-01-30 - Completed 14-04-PLAN.md (Customer App Type Migration)
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - Plan 14-02 complete
+v2.0 Architecture Overhaul - Plan 14-04 complete
 
-[==                  ] 10%
+[====                ] 20%
 ```
 
 ## Deferred Items
@@ -55,6 +55,8 @@ v2.0 decisions implemented:
 - Re-export from columns.ts for backward compatibility during transition - 14-02
 - Keep variantMap/labelMap with string keys (local display logic) - 14-02
 - Derive GateStatus narrow type from PICKUP_STATUS for component-specific constraints - 14-02
+- StatusPageRequest extends PickupRequest for page-specific fields - 14-04
+- PICKUP_STATUS usable directly in Vue template conditionals - 14-04
 
 v2.0 decisions pending implementation:
 - Hybrid Pinia + composables: stores for state, composables for side effects
@@ -67,6 +69,7 @@ v2.0 decisions pending implementation:
 |------|----------|------------|
 | Generate database types with `supabase gen types typescript` | Low | v1-05 |
 | Pre-existing type errors in native-select component | Low | Unknown |
+| Pre-existing type errors in customer/server/ (missing database types) | Low | v1-05 |
 
 ### Blockers
 
@@ -76,28 +79,28 @@ None
 
 ### Last Session Summary
 
-Completed 14-02-PLAN.md (Dashboard Type Migration):
-- Migrated columns.ts to use imports from #shared, added re-exports for backward compatibility
-- Migrated StatusBadge.vue to use PICKUP_STATUS constants for all comparisons
-- Migrated ActionButtons.vue to use PickupStatus type and PICKUP_STATUS constants
-- Migrated RequestDetail.vue to use ACTIVE_STATUSES for filtering
-- Migrated CurrentPickup.vue to use GateStatus type derived from PICKUP_STATUS
+Completed 14-04-PLAN.md (Customer App Type Migration):
+- Migrated status/[id].vue to use PICKUP_STATUS constants and shared PickupRequest
+- Migrated useWaitTimeEstimate.ts to use PICKUP_STATUS.COMPLETED for query filter
+- Migrated submit.post.ts to use PICKUP_STATUS for duplicate check and initial status
+- Zero magic status strings remain in customer app
 
 ### Next Actions
 
-1. Execute 14-03-PLAN.md to continue type migration (composables, other files)
-2. Continue with remaining Phase 14 plans
+1. Execute 14-03-PLAN.md (staff app remaining files - gate pages, composables)
+2. Execute 14-05-PLAN.md (if exists) to complete Phase 14
 3. Move to Phase 15 (Pinia Infrastructure) after Phase 14 complete
 
 ### Context for Next Session
 
-- Type definitions in shared/types/ directories
-- Dashboard components (columns.ts, StatusBadge, ActionButtons, RequestDetail, CurrentPickup) now use #shared types
-- No magic status strings remain in dashboard components
-- columns.ts re-exports types for backward compatibility
+- Type definitions in shared/types/ directories for both staff and customer apps
+- Dashboard components fully migrated to #shared types
+- Customer app (status page, composable, server API) fully migrated
+- No magic status strings remain in customer app
 - Staff app in `staff/` directory (Nuxt 4)
+- Customer app in `customer/` directory (Nuxt 4)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (14-02-PLAN.md complete)*
+*Last updated: 2026-01-30 (14-04-PLAN.md complete)*
