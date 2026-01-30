@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 16 of 18 (Sidebar Layout)
-**Plan:** 02 of 06 complete
+**Plan:** 02 of 04 complete
 **Status:** In progress
-**Last activity:** 2026-01-30 - Completed 16-02-PLAN.md (Fullscreen Layout)
+**Last activity:** 2026-01-30 - Completed 16-01-PLAN.md (Install Sidebar Components)
 
 **Progress:**
 ```
@@ -72,6 +72,8 @@ v2.0 decisions implemented (continued):
 - Explicit type annotations required for storeToRefs callback parameters - 15-04
 
 v2.0 decisions implemented (Phase 16):
+- Tooltip installed as sidebar dependency (collapsed mode labels) - 16-01
+- Skeleton installed as sidebar dependency (menu loading states) - 16-01
 - Fullscreen layout minimal (div with bg, slot) - gate page has own header - 16-02
 - definePageMeta layout property for route-specific layouts - 16-02
 
@@ -94,22 +96,20 @@ None
 
 ### Last Session Summary
 
-Completed 16-02-PLAN.md (Fullscreen Layout):
-- Created fullscreen.vue layout for gate operator routes
-- Updated gate page definePageMeta to use fullscreen layout
-- Gate routes now render without sidebar/header chrome
+Completed 16-01-PLAN.md (Install Sidebar Components):
+- Installed shadcn-vue sidebar component with useSidebar composable
+- Installed avatar, dropdown-menu, and tooltip components
+- Skeleton component added as sidebar dependency
 
 ### Phase 16 Progress
 
 Plans complete:
-- 16-01: Context capture (COMPLETE)
+- 16-01: Install Sidebar Components (COMPLETE)
 - 16-02: Fullscreen Layout (COMPLETE)
 
 Plans remaining:
 - 16-03: Sidebar Component
 - 16-04: Default Layout Integration
-- 16-05: Navigation Links
-- 16-06: Responsive Behavior
 
 ### Next Actions
 
@@ -124,8 +124,9 @@ Plans remaining:
 - Other pages use default layout by default
 - Phase 16 implements sidebar navigation for non-gate routes
 - Pinia stores available: useQueueStore, useGatesStore
+- Sidebar components installed: Sidebar*, useSidebar, Avatar*, DropdownMenu*, Tooltip*, Skeleton
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (16-02 complete)*
+*Last updated: 2026-01-30 (16-01 complete)*
