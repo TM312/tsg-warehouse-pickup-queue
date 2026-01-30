@@ -4,9 +4,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 export function useGateManagement() {
-  // Cast to any to work around missing database types
-  // TODO: Generate proper database types with `supabase gen types typescript`
   const client = useSupabaseClient() as SupabaseClient
+  const gatesStore = useGatesStore()
 
   const pending = ref(false)
 
@@ -16,10 +15,14 @@ export function useGateManagement() {
       const { data, error } = await client
         .from('gates')
         .insert({ gate_number: gateNumber })
-        .select('id')
+        .select('id, gate_number, is_active')
         .single()
 
       if (error) throw error
+
+      // Add to store with queue_count of 0 (new gate has no queue)
+      gatesStore.addGate({ ...data, queue_count: 0 })
+
       toast.success(`Gate ${gateNumber} created`)
       return data.id as string
     } catch (e: unknown) {
@@ -58,6 +61,10 @@ export function useGateManagement() {
         .eq('id', gateId)
 
       if (error) throw error
+
+      // Update store
+      gatesStore.updateGate(gateId, { is_active: isActive })
+
       toast.success(isActive ? 'Gate enabled' : 'Gate disabled')
       return true
     } catch (e) {
