@@ -1,46 +1,46 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v1.1 Plan 11-01 Complete
+**Status:** v1.1 Phase 11 Complete
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v1.1 Gate Operator Experience - Phase 11
+**Current focus:** v1.1 Gate Operator Experience - Phase 12
 
 ## Current Position
 
-**Phase:** 11 of 13 (Processing Status Foundation)
-**Plan:** 1 of 2
-**Status:** In progress
-**Last activity:** 2026-01-30 — Completed 11-01-PLAN.md
+**Phase:** 11 of 13 (Processing Status Foundation) - COMPLETE
+**Plan:** 2 of 2
+**Status:** Phase complete
+**Last activity:** 2026-01-30 — Completed 11-02-PLAN.md
 
 **Progress:**
 ```
 v1.1 Gate Operator Experience
-├── Phase 11: Processing Status Foundation [1/2] In progress
+├── Phase 11: Processing Status Foundation [2/2] COMPLETE
 │   ├── 11-01: Processing Status Migration [DONE]
-│   └── 11-02: StatusBadge Component [pending]
+│   └── 11-02: StatusBadge Component [DONE]
 ├── Phase 12: Gate Operator View [0/3] Not started
 └── Phase 13: Business Hours Management [0/2] Not started
 
-[█░░░░░░░░░] 14% (1/7 plans)
+[███░░░░░░░] 29% (2/7 plans)
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (v1.1)
-- Average duration: 4min
-- Total execution time: 4min
+- Total plans completed: 2 (v1.1)
+- Average duration: 6min
+- Total execution time: 12min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 11 | 1/2 | 4min | 4min |
+| 11 | 2/2 | 12min | 6min |
 | 12 | 0/3 | - | - |
 | 13 | 0/2 | - | - |
 
@@ -65,6 +65,8 @@ See .planning/PROJECT.md for consolidated key decisions from v1.
 | Only position 1 can start processing | 11-01 | Matches physical reality where next-up customer approaches gate |
 | One processing per gate at a time | 11-01 | Prevents confusion about who is being served |
 | Queue position preserved during processing | 11-01 | Fairness on revert - position 1 returns to position 1 |
+| Amber color for processing status | 11-02 | Distinguishes from primary blue (pending) and default green (in_queue) |
+| Live elapsed time updates every 60 seconds | 11-02 | Balance between timely updates and minimizing re-renders |
 
 ### Technical Debt
 
@@ -86,18 +88,20 @@ None
 
 ### Last Session Summary
 
-Completed 11-01-PLAN.md:
-- Added processing_started_at column to pickup_requests
-- Extended status CHECK constraint to include 'processing'
-- Created start_processing function (position 1 only, one per gate)
-- Created revert_to_queue function (preserves queue position)
-- All tests passed
+Completed 11-02-PLAN.md:
+- Updated StatusBadge with processing status, amber styling, and live elapsed duration
+- Updated columns.ts with processing_started_at field and StatusBadge integration
+- Added startProcessing and revertToQueue methods to useQueueActions composable
+- Created NowProcessingSection component for dashboard
+- Updated customer status page with processing state display
+
+Phase 11 complete - processing status fully integrated in both apps.
 
 ### Next Actions
 
-1. Execute Phase 11 Plan 02 (StatusBadge Component)
-2. Complete Phase 11
-3. Continue to Phase 12 (Gate Operator View)
+1. Execute Phase 12 Plan 01 (Gate Operator View)
+2. Continue Phase 12 to completion
+3. Continue to Phase 13 (Business Hours Management)
 
 ### Context for Next Session
 
@@ -105,10 +109,10 @@ Completed 11-01-PLAN.md:
 - Staff app in `staff/` directory (Nuxt 4)
 - Customer app in `customer/` directory (Nuxt 4)
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
-- Processing status database foundation complete
-- Next: Update StatusBadge component to display processing status
+- Processing status fully implemented (database + UI)
+- Next: Build gate operator view for focused gate management
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (completed 11-01-PLAN.md)*
+*Last updated: 2026-01-30 (completed 11-02-PLAN.md)*
