@@ -170,8 +170,8 @@ function handleQueueRowClick(requestId: string) {
 }
 
 // Processing section handlers
-async function handleProcessingComplete(requestId: string) {
-  await completeRequest(requestId)
+async function handleProcessingComplete(requestId: string, gateId: string) {
+  await completeRequest(requestId, gateId)
   await refresh()
 }
 

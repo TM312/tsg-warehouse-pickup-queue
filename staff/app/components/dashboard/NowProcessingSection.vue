@@ -20,7 +20,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  complete: [requestId: string]
+  complete: [requestId: string, gateId: string]
   revert: [requestId: string]
   rowClick: [requestId: string]
 }>()
@@ -79,7 +79,7 @@ const emit = defineEmits<{
               <Button
                 size="sm"
                 :disabled="loading[item.id]"
-                @click="emit('complete', item.id)"
+                @click="emit('complete', item.id, item.gate_id)"
               >
                 <CheckCircle class="h-4 w-4 mr-1" />
                 Complete
