@@ -21,9 +21,9 @@ Requirements for Gate Operator Experience milestone. Each maps to roadmap phases
 
 ### Processing Status
 
-- [ ] **PROC-01**: New "processing" status between queued and completed
-- [ ] **PROC-02**: Visual indicator for processing status (StatusBadge update)
-- [ ] **PROC-03**: Processing timestamp recorded (started_at column)
+- [x] **PROC-01**: New "processing" status between queued and completed
+- [x] **PROC-02**: Visual indicator for processing status (StatusBadge update)
+- [x] **PROC-03**: Processing timestamp recorded (started_at column)
 - [ ] **PROC-04**: Customer notified when their pickup enters processing
 - [ ] **PROC-05**: Auto-advance to next pickup after completing current
 
@@ -73,9 +73,9 @@ Which phases cover which requirements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROC-01 | Phase 11 | Pending |
-| PROC-02 | Phase 11 | Pending |
-| PROC-03 | Phase 11 | Pending |
+| PROC-01 | Phase 11 | Complete |
+| PROC-02 | Phase 11 | Complete |
+| PROC-03 | Phase 11 | Complete |
 | PROC-04 | Phase 12 | Pending |
 | PROC-05 | Phase 12 | Pending |
 | GATE-01 | Phase 12 | Pending |
@@ -100,4 +100,4 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 after roadmap creation*
+*Last updated: 2026-01-30 (Phase 11 complete)*
