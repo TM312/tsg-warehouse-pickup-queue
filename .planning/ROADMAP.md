@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] **v1.0 MVP** - Phases 1-10 (shipped 2026-01-30)
-- [ ] **v1.1 Gate Operator Experience** - Phases 11-13 (in progress)
+- [x] **v1.1 Gate Operator Experience** - Phases 11-13 (shipped 2026-01-30)
 
 ## Overview
 
@@ -18,13 +18,13 @@ See `.planning/archive/v1-milestone.md` for complete v1 phase history.
 
 </details>
 
-### v1.1 Gate Operator Experience (In Progress)
+### v1.1 Gate Operator Experience (Complete)
 
 **Milestone Goal:** Empower gate operators with a focused mobile view and explicit workflow states while giving supervisors business hours control.
 
 - [x] **Phase 11: Processing Status Foundation** - Schema changes and StatusBadge for new processing state
 - [x] **Phase 12: Gate Operator View** - Mobile-first /gate/[id] with quick actions and real-time updates
-- [ ] **Phase 13: Business Hours Management** - Weekly schedule editor, holiday scheduling, manual override
+- [x] **Phase 13: Business Hours Management** - Weekly schedule editor, holiday scheduling, manual override
 
 ## Phase Details
 
@@ -75,8 +75,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 13-01-PLAN.md - Database schema, composable, and weekly schedule editor (Wave 1)
-- [ ] 13-02-PLAN.md - Closure scheduler, manual override, and customer hours display (Wave 2)
+- [x] 13-01-PLAN.md - Database schema, composable, and weekly schedule editor (Wave 1)
+- [x] 13-02-PLAN.md - Closure scheduler, manual override, and customer hours display (Wave 2)
 
 ## Progress
 
@@ -85,8 +85,8 @@ Plans:
 | 1-10 | v1.0 | 24/24 | Complete | 2026-01-30 |
 | 11. Processing Status | v1.1 | 2/2 | Complete | 2026-01-30 |
 | 12. Gate Operator View | v1.1 | 3/3 | Complete | 2026-01-30 |
-| 13. Business Hours | v1.1 | 0/2 | Not started | - |
+| 13. Business Hours | v1.1 | 2/2 | Complete | 2026-01-30 |
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-01-30 (Phase 13 planned)*
+*Last updated: 2026-01-30 (v1.1 milestone complete)*

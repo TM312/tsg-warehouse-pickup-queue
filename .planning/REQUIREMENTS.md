@@ -29,11 +29,11 @@ Requirements for Gate Operator Experience milestone. Each maps to roadmap phases
 
 ### Business Hours Management
 
-- [ ] **HOUR-01**: Weekly schedule editor (7-day grid with time pickers)
-- [ ] **HOUR-02**: Holiday/closure date scheduling (shadcn-vue date picker)
-- [ ] **HOUR-03**: View current configured hours
-- [ ] **HOUR-04**: Hours changes take effect immediately (no deploy required)
-- [ ] **HOUR-05**: Manual override toggle ("Closed now" / "Open late")
+- [x] **HOUR-01**: Weekly schedule editor (7-day grid with time pickers)
+- [x] **HOUR-02**: Holiday/closure date scheduling (shadcn-vue date picker)
+- [x] **HOUR-03**: View current configured hours
+- [x] **HOUR-04**: Hours changes take effect immediately (no deploy required)
+- [x] **HOUR-05**: Manual override toggle ("Closed now" / "Open late")
 
 ## Future Requirements
 
@@ -87,11 +87,11 @@ Which phases cover which requirements.
 | GATE-07 | Phase 12 | Complete |
 | GATE-08 | Phase 12 | Complete |
 | GATE-09 | Phase 12 | Complete |
-| HOUR-01 | Phase 13 | Pending |
-| HOUR-02 | Phase 13 | Pending |
-| HOUR-03 | Phase 13 | Pending |
-| HOUR-04 | Phase 13 | Pending |
-| HOUR-05 | Phase 13 | Pending |
+| HOUR-01 | Phase 13 | Complete |
+| HOUR-02 | Phase 13 | Complete |
+| HOUR-03 | Phase 13 | Complete |
+| HOUR-04 | Phase 13 | Complete |
+| HOUR-05 | Phase 13 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 19 total
@@ -100,4 +100,4 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 (Phase 12 complete)*
+*Last updated: 2026-01-30 (Phase 13 complete - v1.1 milestone complete)*
