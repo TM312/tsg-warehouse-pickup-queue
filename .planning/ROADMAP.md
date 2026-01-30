@@ -68,10 +68,13 @@ Plans:
   3. Current page is visually highlighted in sidebar
   4. Gate operator routes (/gate/[id]) show fullscreen without sidebar
   5. Sidebar state persists across page navigation
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 16-01: TBD
+- [ ] 16-01-PLAN.md — Install shadcn-vue sidebar, avatar, dropdown-menu, tooltip components
+- [ ] 16-02-PLAN.md — Create fullscreen layout and update gate page to use it
+- [ ] 16-03-PLAN.md — Create AppSidebar and NavUser components
+- [ ] 16-04-PLAN.md — Update default layout with sidebar structure
 
 ### Phase 17: Dashboard & Visualization
 
@@ -110,7 +113,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
-| 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
+| 16. Sidebar Layout | v2.0 | 0/4 | Not started | - |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
 
