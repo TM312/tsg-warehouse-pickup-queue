@@ -49,10 +49,13 @@ Plans:
   3. Realtime updates flow through stores (UI updates when data changes)
   4. Vue DevTools shows store state and reactive updates
   5. No duplicate subscriptions after page navigation
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 15-01: TBD
+- [ ] 15-01-PLAN.md - Install @pinia/nuxt and configure Pinia
+- [ ] 15-02-PLAN.md - Create queue and gates stores
+- [ ] 15-03-PLAN.md - Refactor composables to use stores (hybrid pattern)
+- [ ] 15-04-PLAN.md - Migrate pages to read from stores
 
 ### Phase 16: Sidebar Layout
 
@@ -106,7 +109,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
-| 15. Pinia Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 15. Pinia Infrastructure | v2.0 | 0/4 | Not started | - |
 | 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
