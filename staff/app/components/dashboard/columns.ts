@@ -5,21 +5,12 @@ import { Button } from '@/components/ui/button'
 import StatusBadge from './StatusBadge.vue'
 import GateSelect from './GateSelect.vue'
 import ActionButtons from './ActionButtons.vue'
+import type { PickupRequest } from '#shared/types/pickup-request'
+import { ACTIVE_STATUSES } from '#shared/types/pickup-request'
 
-export interface PickupRequest {
-  id: string
-  sales_order_number: string
-  company_name: string | null
-  customer_email: string
-  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
-  email_flagged: boolean
-  assigned_gate_id: string | null
-  queue_position: number | null
-  is_priority?: boolean
-  processing_started_at?: string | null
-  created_at: string
-  gate?: { id: string; gate_number: number } | null
-}
+// Re-export for backward compatibility - TODO: update imports elsewhere then remove
+export type { PickupRequest, PickupStatus } from '#shared/types/pickup-request'
+export { PICKUP_STATUS, ACTIVE_STATUSES } from '#shared/types/pickup-request'
 
 export interface ColumnCallbacks {
   gates: Array<{ id: string; gate_number: number; queue_count: number }>
@@ -69,7 +60,7 @@ export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupReque
       header: 'Gate',
       cell: ({ row }) => {
         const status = row.original.status
-        const isActive = ['pending', 'approved', 'in_queue', 'processing'].includes(status)
+        const isActive = (ACTIVE_STATUSES as readonly string[]).includes(status)
 
         if (isActive) {
           return h(GateSelect, {
