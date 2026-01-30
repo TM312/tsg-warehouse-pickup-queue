@@ -8,7 +8,7 @@ import NextUpPreview from '@/components/gate/NextUpPreview.vue'
 import CompleteDialog from '@/components/gate/CompleteDialog.vue'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
-import type { PickupStatus } from '#shared/types/pickup-request'
+import type { GateStatus } from '#shared/types/pickup-request'
 
 definePageMeta({
   middleware: 'auth'
@@ -34,7 +34,7 @@ const queue = ref<Array<{
   id: string
   sales_order_number: string
   company_name: string | null
-  status: PickupStatus
+  status: GateStatus
   queue_position: number | null
   processing_started_at: string | null
   item_count: number | null

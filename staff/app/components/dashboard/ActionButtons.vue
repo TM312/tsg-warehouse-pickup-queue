@@ -26,8 +26,8 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const showComplete = computed(() => [PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING].includes(props.status))
-const showCancel = computed(() => [PICKUP_STATUS.PENDING, PICKUP_STATUS.APPROVED, PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING].includes(props.status))
+const showComplete = computed(() => ([PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING] as PickupStatus[]).includes(props.status))
+const showCancel = computed(() => ([PICKUP_STATUS.PENDING, PICKUP_STATUS.APPROVED, PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING] as PickupStatus[]).includes(props.status))
 </script>
 
 <template>

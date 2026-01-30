@@ -1,6 +1,7 @@
 import { ref, readonly } from 'vue'
 import { toast } from 'vue-sonner'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 export function useQueueActions() {
   // Cast to any to work around missing database types
@@ -33,7 +34,7 @@ export function useQueueActions() {
       const { error } = await client
         .from('pickup_requests')
         .update({
-          status: 'cancelled',
+          status: PICKUP_STATUS.CANCELLED,
           assigned_gate_id: null,
           queue_position: null
         })
@@ -55,7 +56,7 @@ export function useQueueActions() {
       const { error } = await client
         .from('pickup_requests')
         .update({
-          status: 'completed',
+          status: PICKUP_STATUS.COMPLETED,
           completed_at: new Date().toISOString(),
           queue_position: null,
           assigned_gate_id: null,

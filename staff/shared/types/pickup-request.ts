@@ -25,6 +25,15 @@ export const TERMINAL_STATUSES = [
   PICKUP_STATUS.CANCELLED,
 ] as const satisfies readonly PickupStatus[]
 
+// Gate operator view only shows these statuses
+export const GATE_STATUSES = [
+  PICKUP_STATUS.IN_QUEUE,
+  PICKUP_STATUS.PROCESSING,
+] as const satisfies readonly PickupStatus[]
+
+// Type for gate operator queue items
+export type GateStatus = typeof GATE_STATUSES[number]
+
 // Helper type guard
 export function isActiveStatus(status: PickupStatus): status is typeof ACTIVE_STATUSES[number] {
   return (ACTIVE_STATUSES as readonly string[]).includes(status)

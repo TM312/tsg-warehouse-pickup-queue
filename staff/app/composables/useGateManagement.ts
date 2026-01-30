@@ -1,6 +1,7 @@
 import { ref, readonly } from 'vue'
 import { toast } from 'vue-sonner'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 export function useGateManagement() {
   // Cast to any to work around missing database types
@@ -43,7 +44,7 @@ export function useGateManagement() {
           .from('pickup_requests')
           .select('id', { count: 'exact', head: true })
           .eq('assigned_gate_id', gateId)
-          .eq('status', 'in_queue')
+          .eq('status', PICKUP_STATUS.IN_QUEUE)
 
         if (count && count > 0) {
           toast.error('Cannot disable gate with customers in queue')
