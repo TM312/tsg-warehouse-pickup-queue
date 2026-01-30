@@ -22,11 +22,14 @@ function applyMondayToWeekdays() {
   const updated = [...props.modelValue]
   // Days 1-5 are Mon-Fri
   for (let i = 1; i <= 5; i++) {
-    updated[i] = {
-      ...updated[i],
-      isClosed: monday.isClosed,
-      openTime: monday.openTime,
-      closeTime: monday.closeTime
+    const existing = updated[i]
+    if (existing) {
+      updated[i] = {
+        dayOfWeek: existing.dayOfWeek,
+        isClosed: monday.isClosed,
+        openTime: monday.openTime,
+        closeTime: monday.closeTime
+      }
     }
   }
   emit('update:modelValue', updated)

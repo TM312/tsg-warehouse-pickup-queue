@@ -3,22 +3,39 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { weeklySchedule, pending, loadWeeklySchedule, saveWeeklySchedule } = useBusinessHoursSettings()
+const {
+  weeklySchedule,
+  closures,
+  override,
+  pending,
+  loadAllSettings,
+  saveWeeklySchedule,
+  addClosure,
+  deleteClosure,
+  toggleOverride
+} = useBusinessHoursSettings()
 
-// Load on mount
+// Load all settings on mount
 onMounted(() => {
-  loadWeeklySchedule()
+  loadAllSettings()
 })
 </script>
 
 <template>
-  <div class="max-w-2xl">
-    <div class="flex items-center justify-between mb-6">
+  <div class="max-w-2xl space-y-6">
+    <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">Business Hours</h1>
       <Button @click="saveWeeklySchedule" :disabled="pending">
         {{ pending ? 'Saving...' : 'Save Changes' }}
       </Button>
     </div>
+
+    <!-- Manual Override Toggle at top -->
+    <ManualOverrideToggle
+      :model-value="override"
+      :pending="pending"
+      @toggle="toggleOverride"
+    />
 
     <!-- Weekly Schedule Card -->
     <Card>
@@ -30,6 +47,24 @@ onMounted(() => {
       </CardHeader>
       <CardContent>
         <WeeklyScheduleEditor v-model="weeklySchedule" />
+      </CardContent>
+    </Card>
+
+    <!-- Scheduled Closures Card -->
+    <Card>
+      <CardHeader>
+        <CardTitle>Scheduled Closures</CardTitle>
+        <CardDescription>
+          Holidays and special closure dates
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ClosureScheduler
+          :closures="closures"
+          :pending="pending"
+          @add="addClosure"
+          @delete="deleteClosure"
+        />
       </CardContent>
     </Card>
   </div>
