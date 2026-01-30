@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 15 COMPLETE
+**Status:** v2.0 IN PROGRESS - Phase 16 STARTED
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 15 Complete, ready for Phase 16
+**Current focus:** v2.0 Architecture Overhaul - Phase 16 Sidebar Layout in progress
 
 ## Current Milestone: v2.0 Architecture Overhaul
 
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-**Phase:** 15 of 18 (Pinia Infrastructure) - COMPLETE
-**Plan:** 04 of 04 complete
-**Status:** Phase complete
-**Last activity:** 2026-01-30 - Completed 15-04-PLAN.md (Page Store Migration)
+**Phase:** 16 of 18 (Sidebar Layout)
+**Plan:** 02 of 06 complete
+**Status:** In progress
+**Last activity:** 2026-01-30 - Completed 16-02-PLAN.md (Fullscreen Layout)
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - Phase 14-15 complete
+v2.0 Architecture Overhaul - Phase 14-15 complete, Phase 16 in progress
 
-[=============       ] 80%
+[==============      ] 82%
 ```
 
 ## Deferred Items
@@ -71,8 +71,11 @@ v2.0 decisions implemented (continued):
 - Gate page uses hybrid pattern: local enriched fetch + store lastUpdated watcher - 15-04
 - Explicit type annotations required for storeToRefs callback parameters - 15-04
 
+v2.0 decisions implemented (Phase 16):
+- Fullscreen layout minimal (div with bg, slot) - gate page has own header - 16-02
+- definePageMeta layout property for route-specific layouts - 16-02
+
 v2.0 decisions pending implementation:
-- No sidebar on gate routes: gate operators need simplified mobile view
 - Gate navigation alphabetical: consistent ordering for prev/next buttons
 
 ### Technical Debt
@@ -91,46 +94,38 @@ None
 
 ### Last Session Summary
 
-Completed 15-04-PLAN.md (Page Store Migration):
-- Updated app.vue with app-level subscription and data fetching
-- Migrated index.vue to use storeToRefs for reactive state access
-- Migrated gate/[id].vue to use hybrid pattern (local fetch + store watcher)
-- Added explicit type annotations for storeToRefs callback parameters
+Completed 16-02-PLAN.md (Fullscreen Layout):
+- Created fullscreen.vue layout for gate operator routes
+- Updated gate page definePageMeta to use fullscreen layout
+- Gate routes now render without sidebar/header chrome
 
-### Phase 15 Complete
+### Phase 16 Progress
 
-All 4 plans complete:
-- 15-01: Install Pinia Module (COMPLETE)
-- 15-02: Create Pinia Stores (COMPLETE)
-- 15-03: Integrate stores into composables (COMPLETE)
-- 15-04: Migrate components to stores (COMPLETE)
+Plans complete:
+- 16-01: Context capture (COMPLETE)
+- 16-02: Fullscreen Layout (COMPLETE)
+
+Plans remaining:
+- 16-03: Sidebar Component
+- 16-04: Default Layout Integration
+- 16-05: Navigation Links
+- 16-06: Responsive Behavior
 
 ### Next Actions
 
-1. Plan Phase 16 (Sidebar Layout)
-2. Research sidebar navigation patterns for Nuxt 4
+1. Execute 16-03-PLAN.md (Sidebar Component)
+2. Build collapsible sidebar with navigation structure
 
 ### Context for Next Session
 
-- Type definitions in shared/types/ directories for both staff and customer apps
-- All staff and customer components migrated to #shared types
-- PICKUP_STATUS, PickupStatus, PickupRequest, GateStatus all available via auto-import
-- No magic status strings remain in either app
 - Staff app in `staff/` directory (Nuxt 4)
-- Customer app in `customer/` directory (Nuxt 4)
-- Pinia module installed and configured in staff app
-- defineStore and storeToRefs available via auto-import
-- useQueueStore available at staff/app/stores/queue.ts
-- useGatesStore available at staff/app/stores/gates.ts
-- Stores use setup store pattern (composition API style)
-- Composables now use stores: useQueueActions, useRealtimeQueue, useGateManagement
-- fetchRequests() and fetchGates() populate stores from database
-- Realtime events update store state directly (INSERT/UPDATE/DELETE)
-- App-level subscription in app.vue (single realtime connection)
-- Pages use storeToRefs for reactive state access
-- Gate page uses lastUpdated watcher for enriched local data sync
+- Layouts available: default.vue (with header), fullscreen.vue (minimal), auth.vue
+- Gate page uses fullscreen layout (layout: 'fullscreen' in definePageMeta)
+- Other pages use default layout by default
+- Phase 16 implements sidebar navigation for non-gate routes
+- Pinia stores available: useQueueStore, useGatesStore
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (Phase 15 complete)*
+*Last updated: 2026-01-30 (16-02 complete)*
