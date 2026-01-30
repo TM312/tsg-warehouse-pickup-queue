@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { RefreshCw } from 'lucide-vue-next'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -18,7 +19,6 @@ import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
-import type { GateWithCount } from '#shared/types/gate'
 
 definePageMeta({
   middleware: 'auth'
@@ -26,81 +26,29 @@ definePageMeta({
 
 const client = useSupabaseClient()
 
-// Fetch pickup requests with gate relation
-const { data: requests, refresh: refreshRequests, status } = await useAsyncData<PickupRequest[]>(
-  'pickup-requests-list',
-  async () => {
-    const { data, error } = await client
-      .from('pickup_requests')
-      .select('id, sales_order_number, company_name, customer_email, status, email_flagged, assigned_gate_id, queue_position, is_priority, processing_started_at, created_at, gate:gates(id, gate_number)')
-      .order('created_at', { ascending: false })
+// Use stores via storeToRefs for reactive state
+const queueStore = useQueueStore()
+const gatesStore = useGatesStore()
+const { requests, loading: requestsLoading } = storeToRefs(queueStore)
+const { gates: allGates, activeGates } = storeToRefs(gatesStore)
 
-    if (error) throw error
-    return data as PickupRequest[]
-  }
-)
-
-// Fetch ALL gates for management tab (not just active)
-const { data: allGates, refresh: refreshGates } = await useAsyncData<GateWithCount[]>('all-gates', async () => {
-  const { data, error } = await client
-    .from('gates')
-    .select('id, gate_number, is_active')
-    .order('gate_number')
-
-  if (error) throw error
-
-  // Get queue counts per gate
-  const { data: counts } = await client
-    .from('pickup_requests')
-    .select('assigned_gate_id')
-    .eq('status', PICKUP_STATUS.IN_QUEUE)
-
-  const countMap: Record<string, number> = {}
-  for (const row of counts ?? []) {
-    const gateId = (row as { assigned_gate_id: string | null }).assigned_gate_id
-    if (gateId) {
-      countMap[gateId] = (countMap[gateId] || 0) + 1
-    }
-  }
-
-  return (data as { id: string; gate_number: number; is_active: boolean }[]).map(g => ({
-    ...g,
-    queue_count: countMap[g.id] || 0
-  }))
-})
-
-// Active gates for tabs (filter from allGates)
-const gates = computed(() => (allGates.value ?? []).filter(g => g.is_active))
-
-// Queue actions composable
-const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue } = useQueueActions()
-
-// Gate management composable
+// Composables for actions
+const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue, refresh } = useQueueActions()
 const { createGate, toggleGateActive } = useGateManagement()
+const { status: realtimeStatus } = useRealtimeQueue()
 
-// Realtime subscription
-const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeQueue()
+// NOTE: Realtime subscription is handled at app level (app.vue)
+// No need for local subscribe/unsubscribe
 
 // Show completed/cancelled toggle
 const showCompleted = ref(false)
 
-// Setup realtime subscription
-onMounted(() => {
-  subscribe(() => refresh())
-})
-
-onUnmounted(() => {
-  unsubscribe()
-})
-
-// Refresh all data
-async function refresh() {
-  await Promise.all([refreshRequests(), refreshGates()])
-}
+// Computed for active gates (from store getter)
+const gates = activeGates
 
 // Action handlers
 async function handleGateSelect(requestId: string, gateId: string) {
-  const request = requests.value?.find(r => r.id === requestId)
+  const request = requests.value.find(r => r.id === requestId)
   if (request?.status === PICKUP_STATUS.IN_QUEUE) {
     // Already in queue - this is a move operation
     await moveToGate(requestId, gateId)
@@ -111,7 +59,7 @@ async function handleGateSelect(requestId: string, gateId: string) {
   await refresh()
   // Update selected request if it's the one being modified
   if (selectedRequest.value?.id === requestId) {
-    const updated = requests.value?.find(r => r.id === requestId)
+    const updated = requests.value.find(r => r.id === requestId)
     if (updated) selectedRequest.value = updated
   }
 }
@@ -158,7 +106,7 @@ async function handleClearPriority(requestId: string) {
 
 // Gate queue list row click - open detail view
 function handleQueueRowClick(requestId: string) {
-  const request = requests.value?.find(r => r.id === requestId)
+  const request = requests.value.find(r => r.id === requestId)
   if (request) {
     selectedRequest.value = request
   }
@@ -178,12 +126,10 @@ async function handleProcessingRevert(requestId: string) {
 // Gate management handlers
 async function handleCreateGate(gateNumber: number) {
   await createGate(gateNumber)
-  await refreshGates()
 }
 
 async function handleToggleGateActive(gateId: string, isActive: boolean) {
   await toggleGateActive(gateId, isActive)
-  await refreshGates()
 }
 
 // Manual order creation
@@ -208,7 +154,7 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
 
 // Computed for processing items (for NowProcessingSection)
 const processingItems = computed(() => {
-  return (requests.value ?? [])
+  return requests.value
     .filter(r => r.status === PICKUP_STATUS.PROCESSING && r.gate)
     .map(r => ({
       id: r.id,
@@ -223,8 +169,8 @@ const processingItems = computed(() => {
 
 // Computed for per-gate queue items (includes both in_queue and processing for count)
 const gatesWithQueues = computed(() => {
-  return (gates.value ?? []).map(gate => {
-    const queueItems = (requests.value ?? [])
+  return gates.value.map(gate => {
+    const queueItems = requests.value
       .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
       .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
       .map(r => ({
@@ -236,7 +182,7 @@ const gatesWithQueues = computed(() => {
       }))
 
     // Count includes both in_queue and processing for the tab badge
-    const processingCount = (requests.value ?? [])
+    const processingCount = requests.value
       .filter(r => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.PROCESSING)
       .length
 
@@ -250,7 +196,7 @@ const gatesWithQueues = computed(() => {
 
 // Create columns with callbacks
 const columns = computed(() => createColumns({
-  gates: gates.value ?? [],
+  gates: gates.value,
   pendingIds: pending.value,
   onGateSelect: handleGateSelect,
   onComplete: handleComplete,
@@ -259,7 +205,7 @@ const columns = computed(() => createColumns({
 
 // Filter requests based on showCompleted toggle
 const filteredRequests = computed(() => {
-  const all = requests.value ?? []
+  const all = requests.value
   if (showCompleted.value) {
     return all
   }
@@ -297,7 +243,7 @@ async function handleDetailCancel() {
   }
 }
 
-const refreshing = computed(() => status.value === 'pending')
+const refreshing = computed(() => requestsLoading.value)
 </script>
 
 <template>
