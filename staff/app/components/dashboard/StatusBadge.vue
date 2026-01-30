@@ -3,9 +3,11 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2 } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useIntervalFn } from '@vueuse/core'
+import type { PickupStatus } from '#shared/types/pickup-request'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 const props = defineProps<{
-  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
+  status: PickupStatus
   processingStartedAt?: string | null
 }>()
 
@@ -31,7 +33,7 @@ const labelMap: Record<string, string> = {
 const elapsed = ref('')
 
 function calculateElapsed() {
-  if (props.status === 'processing' && props.processingStartedAt) {
+  if (props.status === PICKUP_STATUS.PROCESSING && props.processingStartedAt) {
     const start = new Date(props.processingStartedAt).getTime()
     const now = Date.now()
     const minutes = Math.floor((now - start) / 60000)
@@ -55,7 +57,7 @@ const { pause, resume } = useIntervalFn(calculateElapsed, 60000, {
 
 // Pause/resume timer based on status
 watch(() => props.status, (status) => {
-  if (status === 'processing') {
+  if (status === PICKUP_STATUS.PROCESSING) {
     calculateElapsed() // Recalculate immediately when status changes
     resume()
   } else {
@@ -65,10 +67,10 @@ watch(() => props.status, (status) => {
 
 // Blue styling for pending status, amber for processing
 const customClass = computed(() => {
-  if (props.status === 'pending') {
+  if (props.status === PICKUP_STATUS.PENDING) {
     return 'bg-blue-500 hover:bg-blue-600 text-white'
   }
-  if (props.status === 'processing') {
+  if (props.status === PICKUP_STATUS.PROCESSING) {
     return 'bg-amber-500 hover:bg-amber-600 text-white'
   }
   return ''
@@ -76,7 +78,7 @@ const customClass = computed(() => {
 
 // Display label with elapsed time for processing
 const displayLabel = computed(() => {
-  if (props.status === 'processing' && elapsed.value) {
+  if (props.status === PICKUP_STATUS.PROCESSING && elapsed.value) {
     return `Processing (${elapsed.value})`
   }
   return labelMap[props.status]
@@ -85,7 +87,7 @@ const displayLabel = computed(() => {
 
 <template>
   <Badge :variant="variantMap[status]" :class="customClass">
-    <Loader2 v-if="status === 'processing'" class="h-3 w-3 animate-spin mr-1" />
+    <Loader2 v-if="status === PICKUP_STATUS.PROCESSING" class="h-3 w-3 animate-spin mr-1" />
     {{ displayLabel }}
   </Badge>
 </template>

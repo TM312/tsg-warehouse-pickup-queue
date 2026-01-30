@@ -13,9 +13,11 @@ import {
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Check, X, Loader2 } from 'lucide-vue-next'
 import { computed } from 'vue'
+import type { PickupStatus } from '#shared/types/pickup-request'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 const props = defineProps<{
-  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
+  status: PickupStatus
   loading?: boolean
 }>()
 
@@ -24,8 +26,8 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const showComplete = computed(() => ['in_queue', 'processing'].includes(props.status))
-const showCancel = computed(() => ['pending', 'approved', 'in_queue', 'processing'].includes(props.status))
+const showComplete = computed(() => [PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING].includes(props.status))
+const showCancel = computed(() => [PICKUP_STATUS.PENDING, PICKUP_STATUS.APPROVED, PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING].includes(props.status))
 </script>
 
 <template>

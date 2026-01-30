@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import StatusBadge from '@/components/dashboard/StatusBadge.vue'
+import type { PickupStatus } from '#shared/types/pickup-request'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
+
+// Gate view only shows in_queue or processing statuses
+type GateStatus = typeof PICKUP_STATUS.IN_QUEUE | typeof PICKUP_STATUS.PROCESSING
 
 interface Props {
   salesOrderNumber: string
   companyName: string | null
-  status: 'in_queue' | 'processing'
+  status: GateStatus
   processingStartedAt: string | null
   itemCount: number | null
   poNumber: string | null

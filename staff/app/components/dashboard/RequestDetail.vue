@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { PickupRequest } from './columns'
+import type { PickupRequest } from '#shared/types/pickup-request'
+import { ACTIVE_STATUSES } from '#shared/types/pickup-request'
 import StatusBadge from './StatusBadge.vue'
 import GateSelect from './GateSelect.vue'
 import ActionButtons from './ActionButtons.vue'
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const showActions = computed(() => {
-  return ['pending', 'approved', 'in_queue', 'processing'].includes(props.request.status)
+  return (ACTIVE_STATUSES as readonly string[]).includes(props.request.status)
 })
 
 const formattedDate = computed(() => {
