@@ -30,10 +30,13 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
   2. PickupRequest and Gate types are imported from shared/types/
   3. IDE autocomplete works for all status values
   4. Build passes with no type errors
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 14-01: TBD
+- [ ] 14-01-PLAN.md - Create centralized type definitions (staff + customer shared types)
+- [ ] 14-02-PLAN.md - Migrate staff dashboard components
+- [ ] 14-03-PLAN.md - Migrate staff pages and composables
+- [ ] 14-04-PLAN.md - Migrate customer app files
 
 ### Phase 15: Pinia Infrastructure
 
@@ -102,7 +105,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 14. Type Foundation | v2.0 | 0/TBD | Not started | - |
+| 14. Type Foundation | v2.0 | 0/4 | Planned | - |
 | 15. Pinia Infrastructure | v2.0 | 0/TBD | Not started | - |
 | 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
