@@ -55,12 +55,12 @@ Plans:
   5. Gate operator sees real-time updates when queue changes (new assignments, reorders)
   6. Customer sees "Your order is being processed at Gate X" when their pickup enters processing
   7. Layout is mobile-responsive with 44x44px minimum touch targets
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 12-01: Gate operator page foundation and current pickup display
-- [ ] 12-02: Quick actions (start processing, complete) and customer notification
-- [ ] 12-03: Next-up preview and real-time updates
+- [ ] 12-01-PLAN.md - Gate operator page foundation and current pickup display (Wave 1)
+- [ ] 12-02-PLAN.md - Quick actions with Start Processing, Complete dialog, and pending state (Wave 2)
+- [ ] 12-03-PLAN.md - Next-up preview, queue count, real-time updates, and transitions (Wave 2)
 
 ### Phase 13: Business Hours Management
 **Goal**: Supervisors can configure when the warehouse is open for pickups
