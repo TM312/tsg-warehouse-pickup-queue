@@ -72,11 +72,11 @@ Plans:
   3. Supervisor can schedule holiday/closure dates using a date picker
   4. Hours changes take effect immediately without requiring deployment
   5. Supervisor can toggle manual override ("Closed now" / "Open late") for immediate effect
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 13-01: Weekly schedule editor
-- [ ] 13-02: Holiday scheduling and manual override
+- [ ] 13-01-PLAN.md - Database schema, composable, and weekly schedule editor (Wave 1)
+- [ ] 13-02-PLAN.md - Closure scheduler, manual override, and customer hours display (Wave 2)
 
 ## Progress
 
@@ -89,4 +89,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-01-30*
-*Last updated: 2026-01-30 (Phase 12 complete)*
+*Last updated: 2026-01-30 (Phase 13 planned)*
