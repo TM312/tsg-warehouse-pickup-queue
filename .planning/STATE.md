@@ -1,21 +1,21 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v1.1 Phase 12 Complete
+**Status:** v1.1 Phase 13 In Progress
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v1.1 Gate Operator Experience - Phase 12 Complete
+**Current focus:** v1.1 Business Hours Management - Phase 13 In Progress
 
 ## Current Position
 
-**Phase:** 12 of 13 (Gate Operator View)
-**Plan:** 3 of 3
-**Status:** Phase complete
-**Last activity:** 2026-01-30 - Completed 12-03-PLAN.md
+**Phase:** 13 of 13 (Business Hours Management)
+**Plan:** 1 of 2
+**Status:** In progress
+**Last activity:** 2026-01-30 - Completed 13-01-PLAN.md
 
 **Progress:**
 ```
@@ -27,17 +27,19 @@ v1.1 Gate Operator Experience
 │   ├── 12-01: Gate Page Foundation [DONE]
 │   ├── 12-02: Realtime & Actions [DONE]
 │   └── 12-03: Queue Preview & Realtime [DONE]
-└── Phase 13: Business Hours Management [0/2] Not started
+└── Phase 13: Business Hours Management [1/2] In progress
+    ├── 13-01: Weekly Schedule Editor [DONE]
+    └── 13-02: Closure Scheduler & Customer Display [Not started]
 
-[██████░░░░] 71% (5/7 plans)
+[████████░░] 86% (6/7 plans)
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5 (v1.1)
+- Total plans completed: 6 (v1.1)
 - Average duration: 5min
-- Total execution time: 23min
+- Total execution time: 27min
 
 **By Phase:**
 
@@ -45,7 +47,7 @@ v1.1 Gate Operator Experience
 |-------|-------|-------|----------|
 | 11 | 2/2 | 12min | 6min |
 | 12 | 3/3 | 11min | 4min |
-| 13 | 0/2 | - | - |
+| 13 | 1/2 | 4min | 4min |
 
 *Updated after each plan completion*
 
@@ -76,6 +78,9 @@ See .planning/PROJECT.md for consolidated key decisions from v1.
 | Reuse useRealtimeQueue for gate page | 12-03 | Existing composable sufficient, no gate-specific subscription needed |
 | Queue positions compact after completion | 12-02 | PROC-05: Position 2 becomes 1 after completing current pickup |
 | Optional gateId in completeRequest | 12-02 | Backward compatible with dashboard callers while enabling queue compaction |
+| 7-row list layout for weekly schedule | 13-01 | Simple, mobile-friendly per CONTEXT.md decision |
+| Single time range per day | 13-01 | Matches typical warehouse operations (one shift) |
+| Toggle switch per day (off = closed) | 13-01 | Clear visual indicator with hidden time inputs when closed |
 
 ### Technical Debt
 
@@ -97,20 +102,22 @@ None
 
 ### Last Session Summary
 
-Completed 12-03-PLAN.md:
-- Created NextUpPreview component showing position 2 sales order
-- Added queue count display ("X more in queue")
-- Integrated useRealtimeQueue for live updates
-- Added Vue Transition animations for smooth pickup changes (200ms)
-- Connection status indicator in header
+Completed 13-01-PLAN.md:
+- Created business_closures table for holiday scheduling
+- Created business_settings table with manual_override initialization
+- Built useBusinessHoursSettings composable for weekly schedule CRUD
+- Created /settings/business-hours page with 7-day editor
+- DayScheduleRow component with toggle and time inputs
+- WeeklyScheduleEditor with "Apply Monday to weekdays" button
 
-Gate operator view complete with realtime updates and transitions.
+Weekly schedule editor foundation complete.
 
 ### Next Actions
 
-1. Continue to Phase 13 (Business Hours Management)
-2. Phase 13 Plan 01: Business hours configuration
-3. Phase 13 Plan 02: Display hours on customer app
+1. Continue to Phase 13 Plan 02
+2. Add closure scheduler UI (date range picker, closures list)
+3. Add manual override toggle
+4. Display hours on customer app registration page
 
 ### Context for Next Session
 
@@ -118,15 +125,14 @@ Gate operator view complete with realtime updates and transitions.
 - Staff app in `staff/` directory (Nuxt 4)
 - Customer app in `customer/` directory (Nuxt 4)
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
-- Gate page complete at /gate/[id] with:
-  - Current pickup display with large sales order number
-  - Action buttons (Start Processing, Complete, Return to Queue)
-  - Next-up preview showing position 2
-  - Queue count showing remaining pickups
-  - Realtime subscription for live updates
-  - Smooth transition animations
+- Business hours settings page at /settings/business-hours with:
+  - Weekly schedule editor (7 days)
+  - Toggle per day for open/closed
+  - Time inputs for open/close times
+  - "Apply Monday to weekdays" button
+- New tables: business_closures, business_settings
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (completed Phase 12 - Gate Operator View)*
+*Last updated: 2026-01-30 (completed Phase 13 Plan 01 - Weekly Schedule Editor)*
