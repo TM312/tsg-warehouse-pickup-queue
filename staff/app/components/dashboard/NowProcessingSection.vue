@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import StatusBadge from './StatusBadge.vue'
 import { CheckCircle, RotateCcw } from 'lucide-vue-next'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 interface ProcessingItem {
   id: string
@@ -60,7 +61,7 @@ const emit = defineEmits<{
             <!-- Status Badge -->
             <div class="flex-shrink-0">
               <StatusBadge
-                status="processing"
+                :status="PICKUP_STATUS.PROCESSING"
                 :processing-started-at="item.processing_started_at"
               />
             </div>
