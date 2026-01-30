@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v1.1 Roadmap Created
+**Status:** v1.1 Plan 11-01 Complete
 
 ## Project Reference
 
@@ -13,32 +13,34 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 11 of 13 (Processing Status Foundation)
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-01-30 — Roadmap created for v1.1 milestone
+**Plan:** 1 of 2
+**Status:** In progress
+**Last activity:** 2026-01-30 — Completed 11-01-PLAN.md
 
 **Progress:**
 ```
 v1.1 Gate Operator Experience
-├── Phase 11: Processing Status Foundation [0/2] Not started
+├── Phase 11: Processing Status Foundation [1/2] In progress
+│   ├── 11-01: Processing Status Migration [DONE]
+│   └── 11-02: StatusBadge Component [pending]
 ├── Phase 12: Gate Operator View [0/3] Not started
 └── Phase 13: Business Hours Management [0/2] Not started
 
-[░░░░░░░░░░] 0% (0/7 plans)
+[█░░░░░░░░░] 14% (1/7 plans)
 ```
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (v1.1)
-- Average duration: -
-- Total execution time: -
+- Total plans completed: 1 (v1.1)
+- Average duration: 4min
+- Total execution time: 4min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 11 | 0/2 | - | - |
+| 11 | 1/2 | 4min | 4min |
 | 12 | 0/3 | - | - |
 | 13 | 0/2 | - | - |
 
@@ -56,6 +58,14 @@ v1.1 Gate Operator Experience
 
 See .planning/PROJECT.md for consolidated key decisions from v1.
 
+**v1.1 Decisions:**
+
+| Decision | Phase | Rationale |
+|----------|-------|-----------|
+| Only position 1 can start processing | 11-01 | Matches physical reality where next-up customer approaches gate |
+| One processing per gate at a time | 11-01 | Prevents confusion about who is being served |
+| Queue position preserved during processing | 11-01 | Fairness on revert - position 1 returns to position 1 |
+
 ### Technical Debt
 
 | Item | Priority | Introduced |
@@ -68,25 +78,26 @@ None
 
 ### Pending Todos
 
-| Todo | Area | Created |
-|------|------|---------|
-| Add "processing" status for active pickups | database | 2026-01-29 |
+| Todo | Area | Created | Status |
+|------|------|---------|--------|
+| Add "processing" status for active pickups | database | 2026-01-29 | DONE (11-01) |
 
 ## Session Continuity
 
 ### Last Session Summary
 
-Created v1.1 roadmap:
-- 3 phases (11-13) covering 19 requirements
-- Phase 11: Processing Status Foundation (PROC-01, PROC-02, PROC-03)
-- Phase 12: Gate Operator View (GATE-01-09, PROC-04, PROC-05)
-- Phase 13: Business Hours Management (HOUR-01-05)
+Completed 11-01-PLAN.md:
+- Added processing_started_at column to pickup_requests
+- Extended status CHECK constraint to include 'processing'
+- Created start_processing function (position 1 only, one per gate)
+- Created revert_to_queue function (preserves queue position)
+- All tests passed
 
 ### Next Actions
 
-1. Plan Phase 11 (`/gsd:plan-phase 11`)
-2. Execute Phase 11 plans
-3. Continue to Phase 12
+1. Execute Phase 11 Plan 02 (StatusBadge Component)
+2. Complete Phase 11
+3. Continue to Phase 12 (Gate Operator View)
 
 ### Context for Next Session
 
@@ -94,11 +105,10 @@ Created v1.1 roadmap:
 - Staff app in `staff/` directory (Nuxt 4)
 - Customer app in `customer/` directory (Nuxt 4)
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
-- Research completed with phase structure recommendations
-- Processing status must come first (foundation for gate operator view)
-- Business hours can be done in parallel with gate operator view
+- Processing status database foundation complete
+- Next: Update StatusBadge component to display processing status
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (v1.1 roadmap created)*
+*Last updated: 2026-01-30 (completed 11-01-PLAN.md)*
