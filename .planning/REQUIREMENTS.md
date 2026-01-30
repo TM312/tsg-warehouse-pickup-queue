@@ -26,11 +26,11 @@ Requirements for v2.0 Architecture Overhaul. Each maps to roadmap phases.
 
 ### Architecture
 
-- [ ] **ARCH-01**: Pinia installed and configured with @pinia/nuxt
-- [ ] **ARCH-02**: Queue store manages shared queue state
-- [ ] **ARCH-03**: Gates store manages shared gate state
-- [ ] **ARCH-04**: Composables handle realtime subscriptions (hybrid pattern)
-- [ ] **ARCH-05**: Composables handle RPC/mutation calls (hybrid pattern)
+- [x] **ARCH-01**: Pinia installed and configured with @pinia/nuxt
+- [x] **ARCH-02**: Queue store manages shared queue state
+- [x] **ARCH-03**: Gates store manages shared gate state
+- [x] **ARCH-04**: Composables handle realtime subscriptions (hybrid pattern)
+- [x] **ARCH-05**: Composables handle RPC/mutation calls (hybrid pattern)
 - [x] **ARCH-06**: Centralized type definitions in shared/types/ directory
 - [x] **ARCH-07**: Request status uses typed constant (as const pattern)
 - [x] **ARCH-08**: Gate status uses typed constant
@@ -76,11 +76,11 @@ Which phases cover which requirements.
 | ARCH-07 | 14 | Complete |
 | ARCH-08 | 14 | Complete |
 | ARCH-09 | 14 | Complete |
-| ARCH-01 | 15 | Pending |
-| ARCH-02 | 15 | Pending |
-| ARCH-03 | 15 | Pending |
-| ARCH-04 | 15 | Pending |
-| ARCH-05 | 15 | Pending |
+| ARCH-01 | 15 | Complete |
+| ARCH-02 | 15 | Complete |
+| ARCH-03 | 15 | Complete |
+| ARCH-04 | 15 | Complete |
+| ARCH-05 | 15 | Complete |
 | SIDE-01 | 16 | Pending |
 | SIDE-02 | 16 | Pending |
 | SIDE-03 | 16 | Pending |

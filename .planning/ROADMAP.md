@@ -13,7 +13,7 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
 ## Phases
 
 - [x] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
-- [ ] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
+- [x] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
 - [ ] **Phase 16: Sidebar Layout** - Navigation structure for staff application
 - [ ] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
 - [ ] **Phase 18: Gate Operator & Bug Fixes** - Navigation improvements and filter fix
@@ -52,10 +52,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 15-01-PLAN.md - Install @pinia/nuxt and configure Pinia
-- [ ] 15-02-PLAN.md - Create queue and gates stores
-- [ ] 15-03-PLAN.md - Refactor composables to use stores (hybrid pattern)
-- [ ] 15-04-PLAN.md - Migrate pages to read from stores
+- [x] 15-01-PLAN.md - Install @pinia/nuxt and configure Pinia
+- [x] 15-02-PLAN.md - Create queue and gates stores
+- [x] 15-03-PLAN.md - Refactor composables to use stores (hybrid pattern)
+- [x] 15-04-PLAN.md - Migrate pages to read from stores
 
 ### Phase 16: Sidebar Layout
 
@@ -109,7 +109,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
-| 15. Pinia Infrastructure | v2.0 | 0/4 | Not started | - |
+| 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 16. Sidebar Layout | v2.0 | 0/TBD | Not started | - |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
