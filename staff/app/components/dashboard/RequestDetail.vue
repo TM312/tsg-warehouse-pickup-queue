@@ -20,7 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const showActions = computed(() => {
-  return ['pending', 'approved', 'in_queue'].includes(props.request.status)
+  return ['pending', 'approved', 'in_queue', 'processing'].includes(props.request.status)
 })
 
 const formattedDate = computed(() => {

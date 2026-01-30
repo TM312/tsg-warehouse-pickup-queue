@@ -15,7 +15,7 @@ import { Check, X, Loader2 } from 'lucide-vue-next'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  status: 'pending' | 'approved' | 'in_queue' | 'completed' | 'cancelled'
+  status: 'pending' | 'approved' | 'in_queue' | 'processing' | 'completed' | 'cancelled'
   loading?: boolean
 }>()
 
@@ -24,8 +24,8 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const showComplete = computed(() => props.status === 'in_queue')
-const showCancel = computed(() => ['pending', 'approved', 'in_queue'].includes(props.status))
+const showComplete = computed(() => ['in_queue', 'processing'].includes(props.status))
+const showCancel = computed(() => ['pending', 'approved', 'in_queue', 'processing'].includes(props.status))
 </script>
 
 <template>
