@@ -10,7 +10,7 @@ Customers always know their queue position and which gate to go to — no confus
 
 ## Current State
 
-**Version:** v1.1 shipped 2026-01-30
+**Version:** v1.1 shipped 2026-01-30 | v2.0 in progress
 **Codebase:** ~11,550 LOC (Vue, TypeScript, SQL, Python, Terraform)
 **Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
 
@@ -83,7 +83,25 @@ Customers always know their queue position and which gate to go to — no confus
 
 ### Active
 
-(None — planning next milestone)
+**v2.0 Architecture Overhaul — in progress:**
+
+*UI/UX:*
+- SIDE-01: Sidebar layout with shadcn-vue Sidebar component
+- SIDE-02: Navigation structure (Dashboard, Gates, Opening Schedule)
+- DASH-01: Dashboard page with gate queue visualization (bar chart)
+- DASH-02: Queue overview showing current state across all gates
+- GATE-10: Prev/next gate navigation for operators (alphabetical order)
+- GATE-11: Fix mobile scroll issue on gate pages (no scroll when content fits)
+
+*Architecture:*
+- ARCH-01: Pinia state management for shared state
+- ARCH-02: Composables for realtime/RPC logic (hybrid pattern)
+- ARCH-03: Centralized type definitions (enums for statuses, gate states, etc.)
+- ARCH-04: Replace magic strings with typed constants throughout codebase
+- ARCH-05: Separation of concerns (logic decoupled from UI)
+
+*Bug Fixes:*
+- BUG-01: Show completed/cancelled toggle not filtering correctly
 
 ### Out of Scope
 
@@ -138,6 +156,9 @@ Customers always know their queue position and which gate to go to — no confus
 | Queue positions compact after completion | Auto-advance to next customer | Good |
 | 7-row list layout for weekly schedule | Simple, mobile-friendly | Good |
 | Priority-based hours check | Override > closures > weekly schedule | Good |
+| Hybrid Pinia + composables | Stores for state, composables for side effects | — Pending |
+| No sidebar on gate routes | Gate operators need simplified mobile view | — Pending |
+| Gate navigation alphabetical | Consistent ordering for prev/next buttons | — Pending |
 
 ---
-*Last updated: 2026-01-30 after v1.1 milestone*
+*Last updated: 2026-01-30 after starting v2.0 milestone*

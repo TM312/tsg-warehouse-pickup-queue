@@ -1,28 +1,41 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-01-30
-**Status:** v1.1 SHIPPED
+**Status:** v2.0 DEFINING REQUIREMENTS
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** Planning next milestone
+**Current focus:** v2.0 Architecture Overhaul
+
+## Current Milestone: v2.0 Architecture Overhaul
+
+**Goal:** Improve code quality with Pinia state management, centralized types, and modernize UI with sidebar navigation and dashboard visualization.
+
+**Target features:**
+- Sidebar layout with Dashboard, Gates, Opening Schedule navigation
+- Dashboard with gate queue bar chart visualization
+- Pinia state management (hybrid with composables)
+- Centralized status types (replace magic strings)
+- Gate operator prev/next navigation
+- Bug fixes (completed/cancelled filter)
 
 ## Current Position
 
-**Phase:** 13 of 13 complete (v1.1 shipped)
-**Plan:** N/A
-**Status:** Milestone complete
-**Last activity:** 2026-01-30 — v1.1 milestone shipped
+**Phase:** Not started (defining requirements)
+**Plan:** —
+**Status:** Defining requirements
+**Last activity:** 2026-01-30 — Milestone v2.0 started
 
 **Progress:**
 ```
 v1.0 MVP — SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience — SHIPPED (Phases 11-13)
+v2.0 Architecture Overhaul — DEFINING
 
-[██████████] 100% complete
+[░░░░░░░░░░] 0%
 ```
 
 ## Deferred Items
@@ -51,28 +64,26 @@ None
 
 ### Last Session Summary
 
-Completed v1.1 milestone:
-- Processing status workflow with live duration display
-- Gate operator mobile view (/gate/[id]) with quick actions
-- Business hours management with weekly schedule, closures, and override
-- All 19 v1.1 requirements shipped
+Started v2.0 Architecture Overhaul milestone:
+- Gathered requirements for sidebar layout, Pinia state management, dashboard visualization
+- Key decisions: hybrid Pinia + composables, no sidebar on gate routes, alphabetical gate navigation
 
 ### Next Actions
 
-1. `/gsd:new-milestone` — start v1.2 or v2.0 planning
-2. Production deployment preparation
-3. UAT testing with warehouse staff
+1. Define detailed requirements
+2. Create roadmap with phase structure
+3. `/gsd:plan-phase [N]` to start execution
 
 ### Context for Next Session
 
-- v1.1 shipped
+- v2.0 milestone started
 - Staff app in `staff/` directory (Nuxt 4)
 - Customer app in `customer/` directory (Nuxt 4)
 - Local Supabase: `supabase start` (test user: staff@example.com / password123)
-- Gate operator view at /gate/[id]
-- Business hours settings at /settings/business-hours
+- Reference: shadcn-vue Sidebar component, Dashboard 01 block
+- Gate operator view at /gate/[id] (no sidebar here)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (v1.1 milestone shipped)*
+*Last updated: 2026-01-30 (v2.0 milestone started)*
