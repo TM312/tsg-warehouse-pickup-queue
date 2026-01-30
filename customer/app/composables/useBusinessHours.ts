@@ -1,8 +1,17 @@
+interface DayHours {
+  dayOfWeek: number
+  dayName: string
+  isClosed: boolean
+  openTime: string | null
+  closeTime: string | null
+}
+
 interface BusinessHoursResponse {
   isOpen: boolean
   message: string | null
   openTime?: string
   closeTime?: string
+  weeklyHours?: DayHours[]
 }
 
 export function useBusinessHours() {
@@ -23,12 +32,14 @@ export function useBusinessHours() {
 
   const openTime = computed(() => data.value?.openTime)
   const closeTime = computed(() => data.value?.closeTime)
+  const weeklyHours = computed(() => data.value?.weeklyHours ?? [])
 
   return {
     isOpen,
     closedMessage,
     openTime,
     closeTime,
+    weeklyHours,
     isLoading: pending,
     refresh
   }

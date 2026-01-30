@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const { isOpen, closedMessage, isLoading } = useBusinessHours()
+const { isOpen, closedMessage, weeklyHours, isLoading } = useBusinessHours()
 </script>
 
 <template>
@@ -17,9 +17,15 @@ const { isOpen, closedMessage, isLoading } = useBusinessHours()
     </CardContent>
   </Card>
 
-  <!-- Open: Show Form -->
-  <PickupRequestForm v-else-if="isOpen" />
+  <!-- Open: Show Form + Hours -->
+  <template v-else-if="isOpen">
+    <PickupRequestForm />
+    <BusinessHoursDisplay v-if="weeklyHours.length > 0" :hours="weeklyHours" class="mt-6" />
+  </template>
 
-  <!-- Closed: Show Message -->
-  <ClosedMessage v-else :message="closedMessage" />
+  <!-- Closed: Show Message + Hours -->
+  <template v-else>
+    <ClosedMessage :message="closedMessage" />
+    <BusinessHoursDisplay v-if="weeklyHours.length > 0" :hours="weeklyHours" class="mt-6" />
+  </template>
 </template>
