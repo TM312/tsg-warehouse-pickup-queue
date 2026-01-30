@@ -172,53 +172,58 @@ onUnmounted(() => {
 
       <!-- Main content -->
       <main class="flex-1 p-4">
-        <CurrentPickup
-          v-if="currentPickup"
-          :sales-order-number="currentPickup.sales_order_number"
-          :company-name="currentPickup.company_name"
-          :status="currentPickup.status"
-          :processing-started-at="currentPickup.processing_started_at"
-          :item-count="currentPickup.item_count"
-          :po-number="currentPickup.po_number"
-        />
-        <EmptyGateState v-else />
+        <Transition name="pickup-advance" mode="out-in">
+          <CurrentPickup
+            v-if="currentPickup"
+            :key="currentPickup.id"
+            :sales-order-number="currentPickup.sales_order_number"
+            :company-name="currentPickup.company_name"
+            :status="currentPickup.status"
+            :processing-started-at="currentPickup.processing_started_at"
+            :item-count="currentPickup.item_count"
+            :po-number="currentPickup.po_number"
+          />
+          <EmptyGateState v-else key="empty" />
+        </Transition>
 
         <!-- Action buttons -->
-        <div v-if="currentPickup" class="space-y-3 mt-6">
-          <!-- Start Processing (only when in_queue) -->
-          <Button
-            v-if="currentPickup.status === 'in_queue'"
-            class="h-14 w-full text-lg"
-            :disabled="actionPending"
-            @click="handleStartProcessing"
-          >
-            <Play class="h-6 w-6 mr-2" />
-            Start Processing
-          </Button>
+        <Transition name="pickup-advance" mode="out-in">
+          <div v-if="currentPickup" :key="currentPickup.id" class="space-y-3 mt-6">
+            <!-- Start Processing (only when in_queue) -->
+            <Button
+              v-if="currentPickup.status === 'in_queue'"
+              class="h-14 w-full text-lg"
+              :disabled="actionPending"
+              @click="handleStartProcessing"
+            >
+              <Play class="h-6 w-6 mr-2" />
+              Start Processing
+            </Button>
 
-          <!-- Complete (only when processing) -->
-          <Button
-            v-if="currentPickup.status === 'processing'"
-            class="h-14 w-full text-lg"
-            :disabled="actionPending"
-            @click="showCompleteDialog = true"
-          >
-            <CheckCircle class="h-6 w-6 mr-2" />
-            Complete
-          </Button>
+            <!-- Complete (only when processing) -->
+            <Button
+              v-if="currentPickup.status === 'processing'"
+              class="h-14 w-full text-lg"
+              :disabled="actionPending"
+              @click="showCompleteDialog = true"
+            >
+              <CheckCircle class="h-6 w-6 mr-2" />
+              Complete
+            </Button>
 
-          <!-- Revert to Queue (secondary, only when processing) -->
-          <Button
-            v-if="currentPickup.status === 'processing'"
-            variant="outline"
-            class="h-11 w-full"
-            :disabled="actionPending"
-            @click="handleRevert"
-          >
-            <RotateCcw class="h-5 w-5 mr-2" />
-            Return to Queue
-          </Button>
-        </div>
+            <!-- Revert to Queue (secondary, only when processing) -->
+            <Button
+              v-if="currentPickup.status === 'processing'"
+              variant="outline"
+              class="h-11 w-full"
+              :disabled="actionPending"
+              @click="handleRevert"
+            >
+              <RotateCcw class="h-5 w-5 mr-2" />
+              Return to Queue
+            </Button>
+          </div>
+        </Transition>
 
         <!-- Complete confirmation dialog -->
         <CompleteDialog
@@ -245,3 +250,20 @@ onUnmounted(() => {
     </template>
   </div>
 </template>
+
+<style scoped>
+.pickup-advance-enter-active,
+.pickup-advance-leave-active {
+  transition: all 0.2s ease;
+}
+
+.pickup-advance-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.pickup-advance-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>
