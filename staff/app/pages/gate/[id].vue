@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { computed, ref, onMounted, watch } from 'vue'
 import { AlertCircle, Users, Play, CheckCircle, RotateCcw } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import CurrentPickup from '@/components/gate/CurrentPickup.vue'
@@ -16,8 +17,14 @@ definePageMeta({
 
 const route = useRoute()
 const client = useSupabaseClient()
+
+// Store for watching updates (triggers refresh)
+const queueStore = useQueueStore()
+const { lastUpdated } = storeToRefs(queueStore)
+
+// Composables for actions and status
 const { pending, startProcessing, revertToQueue, completeRequest } = useQueueActions()
-const { status: realtimeStatus, subscribe, unsubscribe } = useRealtimeQueue()
+const { status: realtimeStatus } = useRealtimeQueue()
 
 // Dialog state
 const showCompleteDialog = ref(false)
@@ -25,7 +32,7 @@ const showCompleteDialog = ref(false)
 // Gate ID from route
 const gateId = computed(() => route.params.id as string)
 
-// Gate and queue state
+// Gate and queue state (local fetching - gate-specific with extra fields)
 const gate = ref<{ id: string; gate_number: number; is_active: boolean } | null>(null)
 const gateError = ref<Error | null>(null)
 const gateLoading = ref(true)
@@ -61,7 +68,7 @@ async function fetchGate() {
   gateLoading.value = false
 }
 
-// Fetch queue data
+// Fetch queue data (local - needs item_count, po_number not in main store)
 async function fetchQueue() {
   if (!gate.value) return
 
@@ -112,40 +119,42 @@ const actionPending = computed(() => {
   return currentPickup.value ? pending.value[currentPickup.value.id] : false
 })
 
-// Action handlers
+// Action handlers - no need to call fetchQueue after, watcher handles it
 async function handleStartProcessing() {
   if (!currentPickup.value || !gate.value) return
   await startProcessing(currentPickup.value.id, gate.value.id)
-  await fetchQueue()
+  // Realtime update will trigger store.lastUpdated change -> fetchQueue via watcher
 }
 
 async function handleRevert() {
   if (!currentPickup.value) return
   await revertToQueue(currentPickup.value.id)
-  await fetchQueue()
+  // Realtime update will trigger store.lastUpdated change -> fetchQueue via watcher
 }
 
 async function handleComplete() {
   if (!currentPickup.value) return
   showCompleteDialog.value = false
   await completeRequest(currentPickup.value.id, gate.value?.id)
-  await fetchQueue()
+  // Realtime update will trigger store.lastUpdated change -> fetchQueue via watcher
 }
 
-// Realtime subscription
+// Fetch gate and queue on mount
 onMounted(async () => {
   await fetchGate()
   await fetchQueue()
+})
 
-  subscribe(() => {
-    // Refresh queue data when any pickup change occurs
+// Watch store updates to refresh local queue data
+// When realtime events update the store, lastUpdated changes, triggering local refresh
+watch(lastUpdated, () => {
+  if (gate.value) {
     fetchQueue()
-  })
+  }
 })
 
-onUnmounted(() => {
-  unsubscribe()
-})
+// NOTE: Realtime subscription handled at app level (app.vue)
+// No local subscribe/unsubscribe needed
 </script>
 
 <template>
