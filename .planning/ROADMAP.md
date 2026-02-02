@@ -87,10 +87,13 @@ Plans:
   3. Total pickups completed today is displayed
   4. Average waiting time (queue to processing) is displayed
   5. Average processing time (processing to complete) is displayed
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 17-01: TBD
+- [ ] 17-01-PLAN.md — Install chart dependencies and SSR plugin
+- [ ] 17-02-PLAN.md — Create KPI composable and utilities
+- [ ] 17-03-PLAN.md — Create dashboard UI components
+- [ ] 17-04-PLAN.md — Integrate dashboard page
 
 ### Phase 18: Gate Operator & Bug Fixes
 
@@ -114,7 +117,7 @@ Plans:
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 16. Sidebar Layout | v2.0 | 4/4 | Complete | 2026-02-02 |
-| 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
+| 17. Dashboard & Visualization | v2.0 | 0/4 | Not started | - |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
 
 ---
