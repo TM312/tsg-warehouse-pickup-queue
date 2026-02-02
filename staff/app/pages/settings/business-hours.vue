@@ -31,7 +31,7 @@ onMounted(() => {
     </div>
 
     <!-- Manual Override Toggle at top -->
-    <ManualOverrideToggle
+    <BusinessHoursManualOverrideToggle
       :model-value="override"
       :pending="pending"
       @toggle="toggleOverride"
@@ -46,7 +46,7 @@ onMounted(() => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <WeeklyScheduleEditor v-model="weeklySchedule" />
+        <BusinessHoursWeeklyScheduleEditor v-model="weeklySchedule" />
       </CardContent>
     </Card>
 
@@ -59,7 +59,7 @@ onMounted(() => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ClosureScheduler
+        <BusinessHoursClosureScheduler
           :closures="closures"
           :pending="pending"
           @add="addClosure"
