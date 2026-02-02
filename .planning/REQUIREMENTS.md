@@ -9,12 +9,12 @@ Requirements for v2.0 Architecture Overhaul. Each maps to roadmap phases.
 
 ### Sidebar & Navigation
 
-- [ ] **SIDE-01**: Staff app has sidebar layout using shadcn-vue Sidebar component
-- [ ] **SIDE-02**: Sidebar contains navigation: Dashboard, Gates, Opening Schedule
-- [ ] **SIDE-03**: Sidebar collapses to icon-only mode
-- [ ] **SIDE-04**: Sidebar shows mobile overlay on small screens
-- [ ] **SIDE-05**: Active route is visually highlighted in sidebar
-- [ ] **SIDE-06**: Gate operator routes (/gate/[id]) have no sidebar (minimal layout)
+- [x] **SIDE-01**: Staff app has sidebar layout using shadcn-vue Sidebar component
+- [x] **SIDE-02**: Sidebar contains navigation: Dashboard, Gates, Opening Schedule
+- [x] **SIDE-03**: Sidebar collapses to icon-only mode
+- [x] **SIDE-04**: Sidebar shows mobile overlay on small screens
+- [x] **SIDE-05**: Active route is visually highlighted in sidebar
+- [x] **SIDE-06**: Gate operator routes (/gate/[id]) have no sidebar (minimal layout)
 
 ### Dashboard
 
@@ -81,12 +81,12 @@ Which phases cover which requirements.
 | ARCH-03 | 15 | Complete |
 | ARCH-04 | 15 | Complete |
 | ARCH-05 | 15 | Complete |
-| SIDE-01 | 16 | Pending |
-| SIDE-02 | 16 | Pending |
-| SIDE-03 | 16 | Pending |
-| SIDE-04 | 16 | Pending |
-| SIDE-05 | 16 | Pending |
-| SIDE-06 | 16 | Pending |
+| SIDE-01 | 16 | Complete |
+| SIDE-02 | 16 | Complete |
+| SIDE-03 | 16 | Complete |
+| SIDE-04 | 16 | Complete |
+| SIDE-05 | 16 | Complete |
+| SIDE-06 | 16 | Complete |
 | DASH-01 | 17 | Pending |
 | DASH-02 | 17 | Pending |
 | DASH-03 | 17 | Pending |

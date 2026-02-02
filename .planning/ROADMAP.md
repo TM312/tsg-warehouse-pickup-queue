@@ -14,7 +14,7 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
 
 - [x] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
 - [x] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
-- [ ] **Phase 16: Sidebar Layout** - Navigation structure for staff application
+- [x] **Phase 16: Sidebar Layout** - Navigation structure for staff application
 - [ ] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
 - [ ] **Phase 18: Gate Operator & Bug Fixes** - Navigation improvements and filter fix
 
@@ -71,10 +71,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 16-01-PLAN.md — Install shadcn-vue sidebar, avatar, dropdown-menu, tooltip components
-- [ ] 16-02-PLAN.md — Create fullscreen layout and update gate page to use it
-- [ ] 16-03-PLAN.md — Create AppSidebar and NavUser components
-- [ ] 16-04-PLAN.md — Update default layout with sidebar structure
+- [x] 16-01-PLAN.md — Install shadcn-vue sidebar, avatar, dropdown-menu, tooltip components
+- [x] 16-02-PLAN.md — Create fullscreen layout and update gate page to use it
+- [x] 16-03-PLAN.md — Create AppSidebar and NavUser components
+- [x] 16-04-PLAN.md — Update default layout with sidebar structure
 
 ### Phase 17: Dashboard & Visualization
 
@@ -113,7 +113,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
-| 16. Sidebar Layout | v2.0 | 0/4 | Not started | - |
+| 16. Sidebar Layout | v2.0 | 4/4 | Complete | 2026-02-02 |
 | 17. Dashboard & Visualization | v2.0 | 0/TBD | Not started | - |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
 

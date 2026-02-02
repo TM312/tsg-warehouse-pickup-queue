@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
-**Session:** 2026-01-30
-**Status:** v2.0 IN PROGRESS - Phase 16 STARTED
+**Session:** 2026-02-02
+**Status:** v2.0 IN PROGRESS - Phase 16 COMPLETE
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 16 Sidebar Layout in progress
+**Current focus:** v2.0 Architecture Overhaul - Phase 16 complete, Phase 17 next
 
 ## Current Milestone: v2.0 Architecture Overhaul
 
@@ -17,24 +17,24 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 **Phases:**
 - Phase 14: Type Foundation (COMPLETE)
 - Phase 15: Pinia Infrastructure (COMPLETE)
-- Phase 16: Sidebar Layout (SIDE-01 through SIDE-06)
+- Phase 16: Sidebar Layout (COMPLETE)
 - Phase 17: Dashboard & Visualization (DASH-01 through DASH-05)
 - Phase 18: Gate Operator & Bug Fixes (GATE-12, GATE-13, BUG-01)
 
 ## Current Position
 
-**Phase:** 16 of 18 (Sidebar Layout)
-**Plan:** 03 of 04 complete
-**Status:** In progress
-**Last activity:** 2026-01-30 - Completed 16-03-PLAN.md (Sidebar Component)
+**Phase:** 16 of 18 (Sidebar Layout) - COMPLETE
+**Plan:** 04 of 04 complete
+**Status:** Phase verified, ready for Phase 17
+**Last activity:** 2026-02-02 - Completed Phase 16
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - Phase 14-15 complete, Phase 16 in progress
+v2.0 Architecture Overhaul - Phase 14-16 complete
 
-[===============     ] 84%
+[================    ] 88%
 ```
 
 ## Deferred Items
@@ -79,6 +79,8 @@ v2.0 decisions implemented (Phase 16):
 - House, DoorOpen, Calendar icons for Dashboard, Gates, Schedule nav items - 16-03
 - Dropdown opens upward (side="top") from footer position - 16-03
 - Avatar initials derived from first 2 characters of email - 16-03
+- SidebarProvider at layout level with SidebarInset for main content - 16-04
+- settings.vue parent route needs NuxtPage to render child routes - 16-04
 
 v2.0 decisions pending implementation:
 - Gate navigation alphabetical: consistent ordering for prev/next buttons
@@ -99,39 +101,28 @@ None
 
 ### Last Session Summary
 
-Completed 16-03-PLAN.md (Sidebar Component):
-- Created AppSidebar component with Dashboard, Gates, Schedule navigation
-- Active route highlighting via route.path comparison
-- Mobile auto-close via handleNavigation function
-- Created NavUser component with avatar, email display, logout dropdown
+Completed Phase 16: Sidebar Layout
+- 16-01: Installed shadcn-vue sidebar, avatar, dropdown-menu, tooltip, skeleton components
+- 16-02: Created fullscreen layout for gate operator pages
+- 16-03: Created AppSidebar and NavUser components with navigation
+- 16-04: Integrated sidebar into default layout with SidebarProvider
 
-### Phase 16 Progress
-
-Plans complete:
-- 16-01: Install Sidebar Components (COMPLETE)
-- 16-02: Fullscreen Layout (COMPLETE)
-- 16-03: Sidebar Component (COMPLETE)
-
-Plans remaining:
-- 16-04: Default Layout Integration
+Phase verification passed (7/7 must-haves).
 
 ### Next Actions
 
-1. Execute 16-04-PLAN.md (Default Layout Integration)
-2. Integrate AppSidebar into default layout with SidebarProvider
+1. `/gsd:discuss-phase 17` — gather context for Dashboard & Visualization
+2. `/gsd:plan-phase 17` — create execution plans
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- Layouts available: default.vue (with header), fullscreen.vue (minimal), auth.vue
-- Gate page uses fullscreen layout (layout: 'fullscreen' in definePageMeta)
-- Other pages use default layout by default
-- Phase 16 implements sidebar navigation for non-gate routes
-- Pinia stores available: useQueueStore, useGatesStore
-- Sidebar components installed: Sidebar*, useSidebar, Avatar*, DropdownMenu*, Tooltip*, Skeleton
-- AppSidebar.vue and NavUser.vue created in staff/app/components/
+- Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
+- Sidebar components: AppSidebar, NavUser with logout
+- Pinia stores: useQueueStore, useGatesStore
+- Phase 17 needs: Dashboard overview page, bar chart visualization, KPI cards
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-01-30 (16-03 complete)*
+*Last updated: 2026-02-02 (Phase 16 complete)*
