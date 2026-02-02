@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-02
-**Status:** v2.0 IN PROGRESS - Phase 17 Plans 01-02 COMPLETE
+**Status:** v2.0 IN PROGRESS - Phase 17 Plans 01-03 COMPLETE
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 17 in progress (Plans 01-02 complete)
+**Current focus:** v2.0 Architecture Overhaul - Phase 17 in progress (Plans 01-03 complete)
 
 ## Current Milestone: v2.0 Architecture Overhaul
 
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 ## Current Position
 
 **Phase:** 17 of 18 (Dashboard & Visualization)
-**Plan:** 02 of 05 complete (17-02)
+**Plan:** 03 of 05 complete (17-03)
 **Status:** In progress
-**Last activity:** 2026-02-02 - Completed 17-02-PLAN.md (KPI Data Layer)
+**Last activity:** 2026-02-02 - Completed 17-03-PLAN.md (Dashboard Components)
 
 **Progress:**
 ```
@@ -34,7 +34,7 @@ v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - Phase 14-16 complete, Phase 17 in progress
 
-[=================   ] 89%
+[=================   ] 90%
 ```
 
 ## Deferred Items
@@ -89,6 +89,8 @@ v2.0 decisions implemented (Phase 17):
 - 30-second refresh interval for KPI data - 17-02
 - Return null from composable when no data, caller formats as '--' - 17-02
 - Use startOfDay from date-fns for timezone-aware today filtering - 17-02
+- Add @unovis/ts as direct dependency for GroupedBar.selectors type export - 17-03
+- Use hsl(var(--chart-1)) for bar color theming - 17-03
 
 v2.0 decisions pending implementation:
 - Gate navigation alphabetical: consistent ordering for prev/next buttons
@@ -109,36 +111,31 @@ None
 
 ### Last Session Summary
 
-Completed Plan 17-01: Chart Dependencies
-- Installed @unovis/vue for chart visualization primitives
-- Generated shadcn-vue chart components (ChartContainer, ChartTooltip, etc.)
-- Created SSR width plugin to prevent hydration mismatches
-- Fixed TypeScript error in ChartLegendContent.vue
-
-Also completed: Plan 17-02: KPI Data Layer
-- Added completed_at field to PickupRequest TypeScript type
-- Created formatDuration utility for human-readable duration display
-- Created useDashboardKpis composable with today's completed pickups query
-- Implemented average wait/processing time calculations with 30s periodic refresh
+Completed Plan 17-03: Dashboard Components
+- Created KpiCard component with value/label display and skeleton loading state
+- Created QueueBarChart component using Unovis (VisXYContainer, VisGroupedBar)
+- Added @unovis/ts as direct dependency for type exports
+- Both components handle empty/null data gracefully
 
 ### Next Actions
 
-1. Execute 17-03-PLAN.md (Bar Chart Component)
-2. Execute 17-04-PLAN.md (KPI Cards Component)
-3. Execute 17-05-PLAN.md (Dashboard Page Assembly)
+1. Execute 17-04-PLAN.md (KPI Cards Row)
+2. Execute 17-05-PLAN.md (Dashboard Page Assembly)
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- New: Chart components in staff/app/components/ui/chart/ (ChartContainer, ChartTooltip, etc.)
-- New: SSR width plugin at staff/app/plugins/ssr-width.ts (provideSSRWidth 1024px)
-- New: useDashboardKpis composable provides completedCount, avgWaitTimeMinutes, avgProcessingTimeMinutes
-- New: formatDuration utility formats minutes as "Xh Ym" or "--" for null
+- Chart components in staff/app/components/ui/chart/ (ChartContainer, ChartTooltip, etc.)
+- SSR width plugin at staff/app/plugins/ssr-width.ts (provideSSRWidth 1024px)
+- useDashboardKpis composable provides completedCount, avgWaitTimeMinutes, avgProcessingTimeMinutes
+- formatDuration utility formats minutes as "Xh Ym" or "--" for null
+- New: KpiCard component at staff/app/components/dashboard/KpiCard.vue
+- New: QueueBarChart component at staff/app/components/dashboard/QueueBarChart.vue
 - Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
 - Pinia stores: useQueueStore, useGatesStore
-- Phase 17 remaining: Bar chart, KPI cards, dashboard page assembly (Plans 03-05)
+- Phase 17 remaining: KPI cards row, dashboard page assembly (Plans 04-05)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-02 (Plans 17-01 and 17-02 complete)*
+*Last updated: 2026-02-02 (Plan 17-03 complete)*
