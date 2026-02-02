@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-02
-**Status:** v2.0 IN PROGRESS - Phase 17 Plan 02 COMPLETE
+**Status:** v2.0 IN PROGRESS - Phase 17 Plans 01-02 COMPLETE
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-30)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.0 Architecture Overhaul - Phase 17 in progress (Plan 02 complete)
+**Current focus:** v2.0 Architecture Overhaul - Phase 17 in progress (Plans 01-02 complete)
 
 ## Current Milestone: v2.0 Architecture Overhaul
 
@@ -83,6 +83,9 @@ v2.0 decisions implemented (Phase 16):
 - settings.vue parent route needs NuxtPage to render child routes - 16-04
 
 v2.0 decisions implemented (Phase 17):
+- Use @unovis/vue for chart visualization primitives (shadcn-vue charts dependency) - 17-01
+- 1024px default SSR width for desktop-first chart rendering - 17-01
+- SSR width plugin pattern: provideSSRWidth in Nuxt plugin for hydration-safe responsive components - 17-01
 - 30-second refresh interval for KPI data - 17-02
 - Return null from composable when no data, caller formats as '--' - 17-02
 - Use startOfDay from date-fns for timezone-aware today filtering - 17-02
@@ -106,7 +109,13 @@ None
 
 ### Last Session Summary
 
-Completed Plan 17-02: KPI Data Layer
+Completed Plan 17-01: Chart Dependencies
+- Installed @unovis/vue for chart visualization primitives
+- Generated shadcn-vue chart components (ChartContainer, ChartTooltip, etc.)
+- Created SSR width plugin to prevent hydration mismatches
+- Fixed TypeScript error in ChartLegendContent.vue
+
+Also completed: Plan 17-02: KPI Data Layer
 - Added completed_at field to PickupRequest TypeScript type
 - Created formatDuration utility for human-readable duration display
 - Created useDashboardKpis composable with today's completed pickups query
@@ -121,13 +130,15 @@ Completed Plan 17-02: KPI Data Layer
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
+- New: Chart components in staff/app/components/ui/chart/ (ChartContainer, ChartTooltip, etc.)
+- New: SSR width plugin at staff/app/plugins/ssr-width.ts (provideSSRWidth 1024px)
 - New: useDashboardKpis composable provides completedCount, avgWaitTimeMinutes, avgProcessingTimeMinutes
 - New: formatDuration utility formats minutes as "Xh Ym" or "--" for null
 - Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
 - Pinia stores: useQueueStore, useGatesStore
-- Phase 17 remaining: Bar chart, KPI cards, dashboard page assembly
+- Phase 17 remaining: Bar chart, KPI cards, dashboard page assembly (Plans 03-05)
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-02 (Plan 17-02 complete)*
+*Last updated: 2026-02-02 (Plans 17-01 and 17-02 complete)*
