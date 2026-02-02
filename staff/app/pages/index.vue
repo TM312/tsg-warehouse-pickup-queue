@@ -20,6 +20,7 @@ import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { useDashboardKpis } from '@/composables/useDashboardKpis'
 import { formatDuration } from '@/utils/formatDuration'
 import KpiCard from '@/components/dashboard/KpiCard.vue'
+import QueueBarChart from '@/components/dashboard/QueueBarChart.vue'
 import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
 import type { GateWithCount } from '#shared/types/gate'
@@ -34,7 +35,7 @@ const client = useSupabaseClient()
 const queueStore = useQueueStore()
 const gatesStore = useGatesStore()
 const { requests, loading: requestsLoading } = storeToRefs(queueStore)
-const { gates: allGates, activeGates } = storeToRefs(gatesStore)
+const { gates: allGates, activeGates, sortedActiveGates } = storeToRefs(gatesStore)
 
 // Composables for actions
 const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue, refresh } = useQueueActions()
@@ -53,6 +54,17 @@ const {
 const currentlyWaiting = computed(() =>
   requests.value.filter((r: PickupRequest) => r.status === PICKUP_STATUS.IN_QUEUE).length
 )
+
+// Chart data: gate queue counts
+const chartData = computed(() => {
+  return sortedActiveGates.value.map((gate: GateWithCount) => ({
+    gate: `Gate ${gate.gate_number}`,
+    count: requests.value.filter(
+      (r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE
+    ).length,
+    gateId: gate.id
+  }))
+})
 
 // NOTE: Realtime subscription is handled at app level (app.vue)
 // No need for local subscribe/unsubscribe
@@ -285,6 +297,15 @@ const refreshing = computed(() => requestsLoading.value)
       <KpiCard
         label="Currently Waiting"
         :value="currentlyWaiting"
+        :loading="requestsLoading"
+      />
+    </div>
+
+    <!-- Queue Bar Chart -->
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold mb-4">Queue by Gate</h2>
+      <QueueBarChart
+        :data="chartData"
         :loading="requestsLoading"
       />
     </div>
