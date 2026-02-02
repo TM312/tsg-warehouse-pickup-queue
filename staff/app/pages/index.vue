@@ -17,6 +17,9 @@ import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
 import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
+import { useDashboardKpis } from '@/composables/useDashboardKpis'
+import { formatDuration } from '@/utils/formatDuration'
+import KpiCard from '@/components/dashboard/KpiCard.vue'
 import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
 import type { GateWithCount } from '#shared/types/gate'
@@ -37,6 +40,19 @@ const { gates: allGates, activeGates } = storeToRefs(gatesStore)
 const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue, refresh } = useQueueActions()
 const { createGate, toggleGateActive } = useGateManagement()
 const { status: realtimeStatus } = useRealtimeQueue()
+
+// Dashboard KPIs
+const {
+  loading: kpiLoading,
+  completedCount,
+  avgWaitTimeMinutes,
+  avgProcessingTimeMinutes
+} = useDashboardKpis()
+
+// Currently waiting (items with IN_QUEUE status)
+const currentlyWaiting = computed(() =>
+  requests.value.filter((r: PickupRequest) => r.status === PICKUP_STATUS.IN_QUEUE).length
+)
 
 // NOTE: Realtime subscription is handled at app level (app.vue)
 // No need for local subscribe/unsubscribe
@@ -249,6 +265,30 @@ const refreshing = computed(() => requestsLoading.value)
 
 <template>
   <div>
+    <!-- KPI Cards Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <KpiCard
+        label="Completed Today"
+        :value="completedCount"
+        :loading="kpiLoading"
+      />
+      <KpiCard
+        label="Avg Wait Time"
+        :value="formatDuration(avgWaitTimeMinutes)"
+        :loading="kpiLoading"
+      />
+      <KpiCard
+        label="Avg Processing Time"
+        :value="formatDuration(avgProcessingTimeMinutes)"
+        :loading="kpiLoading"
+      />
+      <KpiCard
+        label="Currently Waiting"
+        :value="currentlyWaiting"
+        :loading="requestsLoading"
+      />
+    </div>
+
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold">Pickup Queue</h1>
       <div class="flex items-center gap-2">
