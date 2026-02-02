@@ -19,6 +19,12 @@ const props = defineProps<{
 const x = (d: GateQueueData) => d.gate
 const y = (d: GateQueueData) => d.count
 
+// Y-axis domain: minimum 0-5, extends if data exceeds 5
+const yDomain = computed(() => {
+  const maxCount = Math.max(...props.data.map(d => d.count), 0)
+  return [0, Math.max(5, maxCount)]
+})
+
 // Tooltip template
 const tooltipTemplate = (d: GateQueueData) => {
   return `<div class="bg-popover text-popover-foreground rounded-md border px-3 py-1.5 text-sm shadow-md">
@@ -32,13 +38,16 @@ const barColor = 'hsl(var(--chart-1))'
 
 // Check if there's any data
 const hasData = computed(() => props.data.length > 0)
+
+// Stable skeleton heights (avoid Math.random causing re-renders)
+const skeletonHeights = ['40%', '65%', '50%', '75%']
 </script>
 
 <template>
   <div class="w-full h-[300px]">
-    <!-- Loading state -->
-    <div v-if="loading" class="flex items-end justify-around h-full p-4 gap-4">
-      <Skeleton v-for="i in 4" :key="i" class="flex-1" :style="{ height: `${30 + Math.random() * 50}%` }" />
+    <!-- Loading state - only show on initial load (no data yet) -->
+    <div v-if="loading && !hasData" class="flex items-end justify-around h-full p-4 gap-4">
+      <Skeleton v-for="(height, i) in skeletonHeights" :key="i" class="flex-1" :style="{ height }" />
     </div>
 
     <!-- Empty state -->
@@ -47,7 +56,7 @@ const hasData = computed(() => props.data.length > 0)
     </div>
 
     <!-- Chart -->
-    <VisXYContainer v-else :data="data" class="h-full">
+    <VisXYContainer v-else :data="data" :yDomain="yDomain" class="h-full">
       <VisGroupedBar
         :x="x"
         :y="y"
