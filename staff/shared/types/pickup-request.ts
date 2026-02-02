@@ -51,6 +51,7 @@ export interface PickupRequest {
   queue_position: number | null
   is_priority?: boolean
   processing_started_at?: string | null
+  completed_at?: string | null
   created_at: string
   gate?: { id: string; gate_number: number } | null
 }
