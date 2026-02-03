@@ -27,10 +27,10 @@ Polish the dashboard experience by refactoring for maintainability, creating a d
   2. Components are extracted where appropriate (computed data, handlers grouped logically)
   3. Template sections map clearly to single-responsibility components
   4. Code is easier to modify for DASH-06/07/08 changes
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 19-01: Analyze and refactor index.vue
+- [ ] 19-01-PLAN.md — Create useDashboardData composable and refactor index.vue
 
 ### Phase 20: Gates View
 **Goal**: Staff can manage all gates from a dedicated /gates page
@@ -67,7 +67,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 19. Dashboard Refactoring | 0/1 | Not started | - |
+| 19. Dashboard Refactoring | 0/1 | Planned | - |
 | 20. Gates View | 0/1 | Not started | - |
 | 21. Dashboard Polish | 0/2 | Not started | - |
 
