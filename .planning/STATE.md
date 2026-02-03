@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** v2.1 IN PROGRESS — Dashboard Polish & Gates View
+**Status:** v2.1 COMPLETE — Dashboard Polish & Gates View
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.1 Dashboard Polish & Gates View
+**Current focus:** v2.1 milestone complete — ready for audit
 
 ## Milestone History
 
@@ -20,16 +20,16 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Phase:** 21 - Dashboard Polish (3 of 3 in v2.1)
 **Plan:** 02 of 02 complete
-**Status:** In progress
-**Last activity:** 2026-02-03 — Completed 21-02-PLAN.md
+**Status:** Milestone complete
+**Last activity:** 2026-02-03 — Phase 21 complete, all v2.1 phases done
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
-v2.1 Dashboard Polish & Gates View - IN PROGRESS
-  [==================  ] Phases 19-20 complete, 21 plan 02 complete
+v2.1 Dashboard Polish & Gates View - COMPLETE
+  [====================] All 3 phases complete
 ```
 
 ## v2.1 Phase Overview
@@ -38,7 +38,7 @@ v2.1 Dashboard Polish & Gates View - IN PROGRESS
 |-------|------|--------------|--------|
 | 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Complete |
 | 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Complete |
-| 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | In progress (plan 02 complete) |
+| 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | Complete |
 
 ## Deferred Items
 
@@ -64,6 +64,8 @@ See .planning/PROJECT.md for consolidated key decisions.
 | DEC-21-01-02 | Idle gates show "Idle" text in muted italic styling | 21-01 |
 | DEC-21-01-03 | O(1) processing order lookup using computed Map pattern | 21-01 |
 | DEC-21-02-01 | Use ref-controlled AlertDialog for Cancel action in dropdown | 21-02 |
+| DEC-21-GC-01 | Rename components for clarity: NowProcessingSection→ProcessingGatesTable, DataTable→RequestsTable, ActionButtons→RequestActionButtons | 21 (gap closure) |
+| DEC-21-GC-02 | Both tables use same RequestActionButtons component with dropdown pattern | 21 (gap closure) |
 
 ### Technical Debt
 
@@ -82,12 +84,13 @@ None
 
 ### Last Session Summary
 
-Completed Phase 21 Plan 02 (DataTable Action Buttons):
-- 3 tasks, 3 commits
-- ActionButtons conditionally renders dropdown for processing state
-- Processing orders: Complete as primary + dropdown with Return to Queue and Cancel
-- Non-processing orders: keep existing inline button pattern
-- Wired onRevert callback through columns.ts to index.vue
+Completed Phase 21 (Dashboard Polish) and v2.1 milestone:
+- 2 plans, 6 tasks total
+- Plan 21-01: Dashboard tabs/processing section (ShowUnassignedToggle, ProcessingGatesTable, useDashboardData updates)
+- Plan 21-02: DataTable action buttons (RequestActionButtons with dropdown pattern)
+- Gap closure: Aligned both tables to use same dropdown action pattern
+- Component renames: NowProcessingSection→ProcessingGatesTable, DataTable→RequestsTable, ActionButtons→RequestActionButtons, columns.ts→requestsTableColumns.ts
+- All v2.1 requirements satisfied (DASH-06, DASH-07, DASH-08, FIX-01, FIX-02)
 
 ### Archived
 
@@ -97,13 +100,12 @@ Completed Phase 21 Plan 02 (DataTable Action Buttons):
 
 ### Context for Next Session
 
+- v2.1 milestone complete — run `/gsd:audit-milestone` to verify requirements and archive
 - Staff app in `staff/` directory (Nuxt 4)
-- Dashboard at index.vue with section comments for organization
-- ActionButtons: Conditional dropdown for processing state
-- Phase 21 plans complete, check if phase requirements (DASH-06, DASH-07, DASH-08, FIX-01, FIX-02) are satisfied
-- May need additional plans or phase can be marked complete
+- Dashboard components renamed for clarity (ProcessingGatesTable, RequestsTable, RequestActionButtons)
+- Both tables use consistent RequestActionButtons with dropdown pattern
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 21 plan 02 complete)*
+*Last updated: 2026-02-03 (Phase 21 complete, v2.1 milestone complete)*

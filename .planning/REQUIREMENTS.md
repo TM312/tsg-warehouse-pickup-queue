@@ -9,8 +9,8 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 
 ### Action Fixes
 
-- [ ] **FIX-01**: DataTable actions respect processing state — Processing orders show Complete + Return to Queue
-- [ ] **FIX-02**: Cancel action is secondary throughout all states
+- [x] **FIX-01**: DataTable actions respect processing state — Processing orders show Complete + Return to Queue
+- [x] **FIX-02**: Cancel action is secondary throughout all states
 
 ### Gates View
 
@@ -21,9 +21,9 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 
 ### Dashboard Improvements
 
-- [ ] **DASH-06**: Dashboard tabs contain only queue filtering (All, Gate 1, Gate 2, etc.)
-- [ ] **DASH-07**: "Now processing" section shows table with one row per active gate
-- [ ] **DASH-08**: Processing table shows order info or "Idle" state per gate
+- [x] **DASH-06**: Dashboard tabs contain only queue filtering (All, Gate 1, Gate 2, etc.)
+- [x] **DASH-07**: "Now processing" section shows table with one row per active gate
+- [x] **DASH-08**: Processing table shows order info or "Idle" state per gate
 
 ### Code Quality
 
@@ -42,15 +42,15 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-01 | Phase 21 | Pending |
-| FIX-02 | Phase 21 | Pending |
+| FIX-01 | Phase 21 | Complete |
+| FIX-02 | Phase 21 | Complete |
 | GATE-14 | Phase 20 | Complete |
 | GATE-15 | Phase 20 | Complete |
 | GATE-16 | Phase 20 | Complete |
 | GATE-17 | Phase 20 | Complete |
-| DASH-06 | Phase 21 | Pending |
-| DASH-07 | Phase 21 | Pending |
-| DASH-08 | Phase 21 | Pending |
+| DASH-06 | Phase 21 | Complete |
+| DASH-07 | Phase 21 | Complete |
+| DASH-08 | Phase 21 | Complete |
 | ARCH-10 | Phase 19 | Complete |
 | ARCH-11 | Phase 19 | Complete |
 

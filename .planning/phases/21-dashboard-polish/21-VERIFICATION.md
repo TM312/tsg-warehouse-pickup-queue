@@ -1,28 +1,17 @@
 ---
 phase: 21-dashboard-polish
-verified: 2026-02-03T06:27:52Z
-status: gaps_found
-score: 4/5 success criteria met
-gaps:
-  - criteria: "Processing orders in DataTable show Complete + Return to Queue actions (not assign to gate)"
-    status: partial
-    reason: "NowProcessingSection shows inline buttons (Return to Queue + Complete), but success criteria #5 says processing orders should show Complete as primary with Return to Queue in dropdown"
-    issue: "NowProcessingSection has different action pattern than DataTable - confusion about which component the criteria applies to"
-    affected_artifacts:
-      - path: "staff/app/components/dashboard/NowProcessingSection.vue"
-        issue: "Shows inline Return to Queue (outline) + Complete (primary) buttons instead of Complete + dropdown pattern"
-    clarification_needed:
-      - "Does success criteria #4 apply only to DataTable (processing orders in queue view)?"
-      - "Or does it also apply to NowProcessingSection (dedicated processing table at top)?"
-      - "Current state: DataTable uses dropdown (matches Plan 21-02), NowProcessingSection uses inline buttons (matches Plan 21-01)"
+verified: 2026-02-03T06:30:00Z
+status: passed
+score: 5/5 success criteria met
+gaps: []
 ---
 
 # Phase 21: Dashboard Polish Verification Report
 
 **Phase Goal:** Dashboard has clean UX with correct action states and processing display
-**Verified:** 2026-02-03T06:27:52Z
-**Status:** Gaps Found (clarification needed)
-**Re-verification:** No — initial verification
+**Verified:** 2026-02-03T06:30:00Z
+**Status:** Passed ✓
+**Re-verification:** Yes — gap closed via component rename and action pattern alignment
 
 ## Goal Achievement
 
@@ -33,10 +22,10 @@ gaps:
 | 1 | Dashboard tabs contain only queue filtering (All, Gate 1, Gate 2, etc.) — no "Manage Gates" | ✓ VERIFIED | index.vue lines 220-227: Only "All Requests" and per-gate tabs (`v-for="gate in gatesWithQueues"`). No "Manage Gates" tab found. |
 | 2 | "Now processing" section shows a table with one row per active gate | ✓ VERIFIED | NowProcessingSection.vue lines 47-106: Uses Table component with `v-for="gate in gates"` showing one row per gate |
 | 3 | Processing table shows order info when gate is busy, "Idle" when gate has no processing order | ✓ VERIFIED | NowProcessingSection.vue lines 66-103: When gate.order exists shows order info, when null shows "Idle" with muted-foreground italic class |
-| 4 | Processing orders in DataTable show Complete + Return to Queue actions (not assign to gate) | ⚠️ PARTIAL | DataTable: ActionButtons.vue uses dropdown pattern (Complete primary + dropdown with Return to Queue). NowProcessingSection: Shows inline buttons. **Ambiguity in which component criteria applies to.** |
+| 4 | Processing orders in DataTable show Complete + Return to Queue actions (not assign to gate) | ✓ VERIFIED | Both RequestsTable and ProcessingGatesTable use RequestActionButtons with dropdown pattern: Complete (primary) + dropdown with Return to Queue and Cancel. Components renamed for clarity. |
 | 5 | Cancel action appears as secondary (outline/ghost) throughout all order states | ✓ VERIFIED | ActionButtons.vue lines 75, 142: Cancel uses `variant="ghost"` in both processing dropdown and non-processing inline states |
 
-**Score:** 4/5 criteria verified (1 needs clarification)
+**Score:** 5/5 criteria verified ✓
 
 ### Required Artifacts
 
@@ -45,7 +34,7 @@ gaps:
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
 | `staff/app/pages/index.vue` | Dashboard page with tabs and processing section | ✓ VERIFIED | EXISTS (273 lines), SUBSTANTIVE (contains TabsTrigger v-for, showOnlyUnassigned ref, activeGatesForProcessing usage), WIRED (imports ShowUnassignedToggle, NowProcessingSection, useDashboardData) |
-| `staff/app/components/dashboard/NowProcessingSection.vue` | Table-based processing display with idle states | ✓ VERIFIED | EXISTS (109 lines), SUBSTANTIVE (uses Table components, ProcessingGateRow interface, conditional rendering for idle/busy), WIRED (imported in index.vue, receives activeGatesForProcessing prop) |
+| `staff/app/components/dashboard/ProcessingGatesTable.vue` | Table-based processing display with idle states | ✓ VERIFIED | EXISTS, SUBSTANTIVE (uses Table components, RequestActionButtons with dropdown), WIRED (imported in index.vue, receives activeGatesForProcessing prop) |
 | `staff/app/composables/useDashboardData.ts` | Dashboard computed data including unassigned filter | ✓ VERIFIED | EXISTS (172 lines), SUBSTANTIVE (exports activeGatesForProcessing, processingByGate Map, filteredRequests respects showOnlyUnassigned), WIRED (called in index.vue line 50 with both toggle refs) |
 | `staff/app/components/dashboard/ShowUnassignedToggle.vue` | Toggle for filtering unassigned orders | ✓ VERIFIED | EXISTS (13 lines), SUBSTANTIVE (Switch component with defineModel pattern), WIRED (imported in index.vue line 15, used in line 232 with v-model) |
 
@@ -53,8 +42,8 @@ gaps:
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `staff/app/components/dashboard/ActionButtons.vue` | Action buttons with conditional dropdown for processing state | ✓ VERIFIED | EXISTS (166 lines), SUBSTANTIVE (has DropdownMenu imports, isProcessing computed, conditional template with dropdown for processing state, ref-controlled cancel dialog), WIRED (used in columns.ts line 110, receives onRevert prop) |
-| `staff/app/components/dashboard/columns.ts` | Column definitions with revert callback | ✓ VERIFIED | EXISTS (183 lines), SUBSTANTIVE (ColumnCallbacks interface includes onRevert, ActionButtons receives all callbacks), WIRED (createColumns called in index.vue line 53 with handleProcessingRevert) |
+| `staff/app/components/dashboard/RequestActionButtons.vue` | Action buttons with conditional dropdown for processing state | ✓ VERIFIED | EXISTS, SUBSTANTIVE (has DropdownMenu imports, isProcessing computed, conditional template with dropdown for processing state, ref-controlled cancel dialog), WIRED (used in requestsTableColumns.ts and ProcessingGatesTable.vue) |
+| `staff/app/components/dashboard/requestsTableColumns.ts` | Column definitions with revert callback | ✓ VERIFIED | EXISTS, SUBSTANTIVE (ColumnCallbacks interface includes onRevert, RequestActionButtons receives all callbacks), WIRED (createColumns called in index.vue with handleProcessingRevert) |
 
 ### Key Link Verification
 
@@ -119,38 +108,18 @@ gaps:
 
 **Why human:** Can't verify filter behavior without running app and checking data state
 
-## Gaps Summary
+## Gap Closure Summary
 
-### Gap 1: Processing Actions Pattern Inconsistency (Clarification Needed)
+**Gap 1:** Processing Actions Pattern Inconsistency — **RESOLVED**
 
-**What's unclear:**
+User clarified: Both tables should use the same dropdown pattern (Complete primary + dropdown with Return to Queue/Cancel).
 
-Success criteria #4 states: "Processing orders in DataTable show Complete + Return to Queue actions (not assign to gate)"
+**Resolution implemented:**
+- Renamed components for clarity: NowProcessingSection → ProcessingGatesTable, DataTable → RequestsTable, ActionButtons → RequestActionButtons, columns.ts → requestsTableColumns.ts
+- ProcessingGatesTable now uses RequestActionButtons component (same as RequestsTable)
+- Both tables have consistent action pattern: Complete (primary) + dropdown (Return to Queue, Cancel)
 
-The implementation has TWO places where processing orders appear with actions:
-
-1. **DataTable** (in "All Requests" tab): Uses ActionButtons.vue with dropdown pattern
-   - Complete button as PRIMARY (default variant)
-   - Dropdown menu with Return to Queue + Cancel
-   - ✓ Matches Plan 21-02 specification
-
-2. **NowProcessingSection** (dedicated table at top): Uses inline buttons
-   - Return to Queue (outline variant) + Complete (primary variant)
-   - No dropdown
-   - ✓ Matches Plan 21-01 specification
-
-**Question:** Does success criteria #4 apply to:
-- (A) Only DataTable processing orders? (Currently correct)
-- (B) Both DataTable AND NowProcessingSection? (NowProcessingSection needs dropdown)
-- (C) Only NowProcessingSection? (DataTable is already correct, criteria is about the "processing section")
-
-**Current code state:**
-- Plans executed correctly as written
-- Plan 21-01 specified inline buttons for NowProcessingSection
-- Plan 21-02 specified dropdown for DataTable ActionButtons
-- Both implementations match their respective plans
-
-**Resolution needed:** Clarify which component(s) the success criteria applies to, then align implementation accordingly.
+**Commit:** `8211981` — refactor(21): align component naming and action button patterns
 
 ---
 
