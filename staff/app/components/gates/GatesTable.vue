@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ExternalLink } from 'lucide-vue-next'
 import { computed } from 'vue'
 import {
   Table,
@@ -81,7 +82,10 @@ function handleToggle(gateId: string, checked: boolean) {
                 @update:checked="(checked: boolean) => handleToggle(gate.id, checked)"
               />
               <Button variant="outline" size="sm" as-child>
-                <NuxtLink :to="`/gate/${gate.id}`">Open</NuxtLink>
+                <NuxtLink :to="`/gate/${gate.id}`" target="_blank">
+                  Open
+                  <ExternalLink class="h-4 w-4" />
+                </NuxtLink>
               </Button>
             </div>
           </TableCell>
