@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
+// === Imports ===
 import { RefreshCw } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
@@ -18,75 +18,64 @@ import { useQueueActions } from '@/composables/useQueueActions'
 import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { useDashboardKpis } from '@/composables/useDashboardKpis'
+import { useDashboardData } from '@/composables/useDashboardData'
 import { formatDuration } from '@/utils/formatDuration'
 import KpiCard from '@/components/dashboard/KpiCard.vue'
 import QueueBarChart from '@/components/dashboard/QueueBarChart.vue'
-import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
+import { PICKUP_STATUS } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
-import type { GateWithCount } from '#shared/types/gate'
 
+// === Page Meta ===
 definePageMeta({
   middleware: 'auth'
 })
 
+// === Store & Composable Setup ===
 const client = useSupabaseClient()
-
-// Use stores via storeToRefs for reactive state
 const queueStore = useQueueStore()
 const gatesStore = useGatesStore()
 const { requests, loading: requestsLoading } = storeToRefs(queueStore)
-const { gates: allGates, activeGates, sortedActiveGates } = storeToRefs(gatesStore)
+const { gates: allGates, activeGates } = storeToRefs(gatesStore)
 
-// Composables for actions
-const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, startProcessing, revertToQueue, refresh } = useQueueActions()
+const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, revertToQueue, refresh } = useQueueActions()
 const { createGate, toggleGateActive } = useGateManagement()
 const { status: realtimeStatus } = useRealtimeQueue()
 
-// Dashboard KPIs
-const {
-  loading: kpiLoading,
-  completedCount,
-  avgWaitTimeMinutes,
-  avgProcessingTimeMinutes
-} = useDashboardKpis()
+const { loading: kpiLoading, completedCount, avgWaitTimeMinutes, avgProcessingTimeMinutes } = useDashboardKpis()
 
-// Currently waiting (items with IN_QUEUE status)
-const currentlyWaiting = computed(() =>
-  requests.value.filter((r: PickupRequest) => r.status === PICKUP_STATUS.IN_QUEUE).length
-)
+// === Local UI State ===
+const showCompleted = ref(false)
+const selectedRequest = ref<PickupRequest | null>(null)
 
-// Chart data: gate queue counts
-const chartData = computed(() => {
-  return sortedActiveGates.value.map((gate: GateWithCount) => ({
-    gate: `Gate ${gate.gate_number}`,
-    count: requests.value.filter(
-      (r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE
-    ).length,
-    gateId: gate.id
-  }))
+// === Dashboard-Specific Derived Data ===
+const { currentlyWaiting, chartData, processingItems, gatesWithQueues, filteredRequests } = useDashboardData(showCompleted)
+
+// === Column Configuration ===
+const columns = computed(() => createColumns({
+  gates: activeGates.value,
+  pendingIds: pending.value,
+  onGateSelect: handleGateSelect,
+  onComplete: handleComplete,
+  onCancel: handleCancel,
+}))
+
+// === Sheet State ===
+const sheetOpen = computed({
+  get: () => selectedRequest.value !== null,
+  set: (v) => { if (!v) selectedRequest.value = null }
 })
 
-// NOTE: Realtime subscription is handled at app level (app.vue)
-// No need for local subscribe/unsubscribe
+const refreshing = computed(() => requestsLoading.value)
 
-// Show completed/cancelled toggle
-const showCompleted = ref(false)
-
-// Computed for active gates (from store getter)
-const gates = activeGates
-
-// Action handlers
+// === Queue Action Handlers ===
 async function handleGateSelect(requestId: string, gateId: string) {
   const request = requests.value.find((r: PickupRequest) => r.id === requestId)
   if (request?.status === PICKUP_STATUS.IN_QUEUE) {
-    // Already in queue - this is a move operation
     await moveToGate(requestId, gateId)
   } else {
-    // Not in queue - assign to queue
     await assignGate(requestId, gateId)
   }
   await refresh()
-  // Update selected request if it's the one being modified
   if (selectedRequest.value?.id === requestId) {
     const updated = requests.value.find((r: PickupRequest) => r.id === requestId)
     if (updated) selectedRequest.value = updated
@@ -96,7 +85,6 @@ async function handleGateSelect(requestId: string, gateId: string) {
 async function handleComplete(requestId: string) {
   await completeRequest(requestId)
   await refresh()
-  // Close sheet after completing
   if (selectedRequest.value?.id === requestId) {
     selectedRequest.value = null
   }
@@ -105,24 +93,17 @@ async function handleComplete(requestId: string) {
 async function handleCancel(requestId: string) {
   await cancelRequest(requestId)
   await refresh()
-  // Close sheet after canceling
   if (selectedRequest.value?.id === requestId) {
     selectedRequest.value = null
   }
 }
 
-// Reorder handler with optimistic rollback
 async function handleReorder(gateId: string, requestIds: string[]) {
   const success = await reorderQueue(gateId, requestIds)
-  if (!success) {
-    // Refresh to restore correct order on failure
-    await refresh()
-  } else {
-    await refresh() // Sync with server state
-  }
+  await refresh()
 }
 
-// Priority handlers
+// === Priority Handlers ===
 async function handleSetPriority(requestId: string) {
   await setPriority(requestId)
   await refresh()
@@ -133,15 +114,7 @@ async function handleClearPriority(requestId: string) {
   await refresh()
 }
 
-// Gate queue list row click - open detail view
-function handleQueueRowClick(requestId: string) {
-  const request = requests.value.find((r: PickupRequest) => r.id === requestId)
-  if (request) {
-    selectedRequest.value = request
-  }
-}
-
-// Processing section handlers
+// === Processing Section Handlers ===
 async function handleProcessingComplete(requestId: string, gateId: string) {
   await completeRequest(requestId, gateId)
   await refresh()
@@ -152,7 +125,7 @@ async function handleProcessingRevert(requestId: string) {
   await refresh()
 }
 
-// Gate management handlers
+// === Gate Management Handlers ===
 async function handleCreateGate(gateNumber: number) {
   await createGate(gateNumber)
 }
@@ -161,7 +134,7 @@ async function handleToggleGateActive(gateId: string, isActive: boolean) {
   await toggleGateActive(gateId, isActive)
 }
 
-// Manual order creation
+// === Manual Order Creation ===
 async function handleCreateOrder(data: { salesOrderNumber: string; email: string; phone: string }) {
   try {
     const { error } = await (client as any)
@@ -172,7 +145,6 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
         customer_phone: data.phone || null,
         status: PICKUP_STATUS.PENDING,
       })
-
     if (error) throw error
     toast.success('Pickup request created')
     await refresh()
@@ -181,79 +153,19 @@ async function handleCreateOrder(data: { salesOrderNumber: string; email: string
   }
 }
 
-// Computed for processing items (for NowProcessingSection)
-const processingItems = computed(() => {
-  return requests.value
-    .filter((r: PickupRequest) => r.status === PICKUP_STATUS.PROCESSING && r.gate)
-    .map((r: PickupRequest) => ({
-      id: r.id,
-      sales_order_number: r.sales_order_number,
-      company_name: r.company_name,
-      gate_number: r.gate!.gate_number,
-      gate_id: r.assigned_gate_id!,
-      processing_started_at: r.processing_started_at!
-    }))
-    .sort((a: { gate_number: number }, b: { gate_number: number }) => a.gate_number - b.gate_number)
-})
-
-// Computed for per-gate queue items (includes both in_queue and processing for count)
-const gatesWithQueues = computed(() => {
-  return gates.value.map((gate: GateWithCount) => {
-    const queueItems = requests.value
-      .filter((r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
-      .sort((a: PickupRequest, b: PickupRequest) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
-      .map((r: PickupRequest) => ({
-        id: r.id,
-        sales_order_number: r.sales_order_number,
-        company_name: r.company_name,
-        queue_position: r.queue_position ?? 0,
-        is_priority: r.is_priority ?? false
-      }))
-
-    // Count includes both in_queue and processing for the tab badge
-    const processingCount = requests.value
-      .filter((r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.PROCESSING)
-      .length
-
-    return {
-      ...gate,
-      queue: queueItems,
-      totalActive: queueItems.length + processingCount
-    }
-  })
-})
-
-// Create columns with callbacks
-const columns = computed(() => createColumns({
-  gates: gates.value,
-  pendingIds: pending.value,
-  onGateSelect: handleGateSelect,
-  onComplete: handleComplete,
-  onCancel: handleCancel,
-}))
-
-// Filter requests based on showCompleted toggle
-const filteredRequests = computed(() => {
-  const all = requests.value
-  if (showCompleted.value) {
-    return all
-  }
-  return all.filter((r: PickupRequest) => !(TERMINAL_STATUSES as readonly string[]).includes(r.status))
-})
-
-// Sheet state
-const selectedRequest = ref<PickupRequest | null>(null)
-const sheetOpen = computed({
-  get: () => selectedRequest.value !== null,
-  set: (v) => { if (!v) selectedRequest.value = null }
-})
-
-// Row click handler
+// === UI Interaction Handlers ===
 function handleRowClick(request: PickupRequest) {
   selectedRequest.value = request
 }
 
-// Detail panel handlers (delegate to main handlers)
+function handleQueueRowClick(requestId: string) {
+  const request = requests.value.find((r: PickupRequest) => r.id === requestId)
+  if (request) {
+    selectedRequest.value = request
+  }
+}
+
+// === Detail Panel Delegates ===
 async function handleDetailGateSelect(gateId: string) {
   if (selectedRequest.value) {
     await handleGateSelect(selectedRequest.value.id, gateId)
@@ -271,43 +183,22 @@ async function handleDetailCancel() {
     await handleCancel(selectedRequest.value.id)
   }
 }
-
-const refreshing = computed(() => requestsLoading.value)
 </script>
 
 <template>
   <div>
     <!-- KPI Cards Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <KpiCard
-        label="Completed Today"
-        :value="completedCount"
-        :loading="kpiLoading"
-      />
-      <KpiCard
-        label="Avg Wait Time"
-        :value="formatDuration(avgWaitTimeMinutes)"
-        :loading="kpiLoading"
-      />
-      <KpiCard
-        label="Avg Processing Time"
-        :value="formatDuration(avgProcessingTimeMinutes)"
-        :loading="kpiLoading"
-      />
-      <KpiCard
-        label="Currently Waiting"
-        :value="currentlyWaiting"
-        :loading="requestsLoading"
-      />
+      <KpiCard label="Completed Today" :value="completedCount" :loading="kpiLoading" />
+      <KpiCard label="Avg Wait Time" :value="formatDuration(avgWaitTimeMinutes)" :loading="kpiLoading" />
+      <KpiCard label="Avg Processing Time" :value="formatDuration(avgProcessingTimeMinutes)" :loading="kpiLoading" />
+      <KpiCard label="Currently Waiting" :value="currentlyWaiting" :loading="requestsLoading" />
     </div>
 
     <!-- Queue Bar Chart -->
     <div class="mb-6">
       <h2 class="text-lg font-semibold mb-4">Queue by Gate</h2>
-      <QueueBarChart
-        :data="chartData"
-        :loading="requestsLoading"
-      />
+      <QueueBarChart :data="chartData" :loading="requestsLoading" />
     </div>
 
     <div class="flex items-center justify-between mb-6">
@@ -339,17 +230,11 @@ const refreshing = computed(() => requestsLoading.value)
           All Requests
           <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ filteredRequests.length }}</span>
         </TabsTrigger>
-        <TabsTrigger
-          v-for="gate in gatesWithQueues"
-          :key="gate.id"
-          :value="`gate-${gate.id}`"
-        >
+        <TabsTrigger v-for="gate in gatesWithQueues" :key="gate.id" :value="`gate-${gate.id}`">
           Gate {{ gate.gate_number }}
           <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.totalActive }}</span>
         </TabsTrigger>
-        <TabsTrigger value="manage">
-          Manage Gates
-        </TabsTrigger>
+        <TabsTrigger value="manage">Manage Gates</TabsTrigger>
       </TabsList>
 
       <TabsContent value="all" class="mt-4">
@@ -359,12 +244,7 @@ const refreshing = computed(() => requestsLoading.value)
         <DataTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
       </TabsContent>
 
-      <TabsContent
-        v-for="gate in gatesWithQueues"
-        :key="gate.id"
-        :value="`gate-${gate.id}`"
-        class="mt-4"
-      >
+      <TabsContent v-for="gate in gatesWithQueues" :key="gate.id" :value="`gate-${gate.id}`" class="mt-4">
         <GateQueueList
           :key="gate.id"
           :gate-id="gate.id"
@@ -378,11 +258,7 @@ const refreshing = computed(() => requestsLoading.value)
       </TabsContent>
 
       <TabsContent value="manage" class="mt-4">
-        <GateManagement
-          :gates="allGates ?? []"
-          @create="handleCreateGate"
-          @toggle-active="handleToggleGateActive"
-        />
+        <GateManagement :gates="allGates ?? []" @create="handleCreateGate" @toggle-active="handleToggleGateActive" />
       </TabsContent>
     </Tabs>
 
@@ -396,7 +272,7 @@ const refreshing = computed(() => requestsLoading.value)
           <RequestDetail
             v-if="selectedRequest"
             :request="selectedRequest"
-            :gates="gates ?? []"
+            :gates="activeGates ?? []"
             :loading="pending[selectedRequest.id] ?? false"
             @gate-select="handleDetailGateSelect"
             @complete="handleDetailComplete"
