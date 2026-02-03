@@ -2,6 +2,7 @@ import { computed, type Ref, type ComputedRef } from 'vue'
 import { PICKUP_STATUS, TERMINAL_STATUSES } from '#shared/types/pickup-request'
 import type { PickupRequest } from '#shared/types/pickup-request'
 import type { GateWithCount } from '#shared/types/gate'
+import type { DragItem } from '@/components/dashboard/queueTableColumns'
 
 // === Local Types ===
 
@@ -26,16 +27,8 @@ export interface ProcessingGateRow {
   } | null
 }
 
-interface GateQueueItem {
-  id: string
-  sales_order_number: string
-  company_name: string | null
-  queue_position: number
-  is_priority: boolean
-}
-
 interface GateWithQueue extends GateWithCount {
-  queue: GateQueueItem[]
+  queue: DragItem[]
   totalActive: number
 }
 
@@ -90,15 +83,19 @@ export function useDashboardData(showCompleted: Ref<boolean>, showOnlyUnassigned
   const gatesWithQueues: ComputedRef<GateWithQueue[]> = computed(() => {
     return activeGates.value.map((gate: GateWithCount) => {
       // Items waiting in this gate's queue
-      const queueItems = requests.value
+      const queueItems: DragItem[] = requests.value
         .filter((r: PickupRequest) => r.assigned_gate_id === gate.id && r.status === PICKUP_STATUS.IN_QUEUE)
         .sort((a: PickupRequest, b: PickupRequest) => (a.queue_position ?? 0) - (b.queue_position ?? 0))
-        .map((r: PickupRequest) => ({
+        .map((r: PickupRequest): DragItem => ({
           id: r.id,
           sales_order_number: r.sales_order_number,
           company_name: r.company_name,
           queue_position: r.queue_position ?? 0,
-          is_priority: r.is_priority ?? false
+          is_priority: r.is_priority ?? false,
+          status: r.status,
+          email_flagged: r.email_flagged ?? false,
+          created_at: r.created_at,
+          processing_started_at: r.processing_started_at ?? null
         }))
 
       // Count includes both in_queue and processing for the tab badge

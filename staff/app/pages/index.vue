@@ -5,10 +5,9 @@ import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import RequestsTable from '@/components/dashboard/RequestsTable.vue'
-import { createColumns } from '@/components/dashboard/requestsTableColumns'
+import QueueTable from '@/components/dashboard/QueueTable.vue'
+import { createColumns } from '@/components/dashboard/queueTableColumns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
-import GateQueueList from '@/components/dashboard/GateQueueList.vue'
 import ProcessingGatesTable from '@/components/dashboard/ProcessingGatesTable.vue'
 import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
 import ShowCompletedToggle from '@/components/dashboard/ShowCompletedToggle.vue'
@@ -147,7 +146,14 @@ function handleRowClick(request: PickupRequest) {
   selectedRequest.value = request
 }
 
-function handleQueueRowClick(requestId: string) {
+function handleQueueRowClick(item: { id: string }) {
+  const request = requests.value.find((r: PickupRequest) => r.id === item.id)
+  if (request) {
+    selectedRequest.value = request
+  }
+}
+
+function handleProcessingRowClick(requestId: string) {
   const request = requests.value.find((r: PickupRequest) => r.id === requestId)
   if (request) {
     selectedRequest.value = request
@@ -207,7 +213,7 @@ async function handleDetailCancel() {
       @complete="handleProcessingComplete"
       @revert="handleProcessingRevert"
       @cancel="handleCancel"
-      @row-click="handleQueueRowClick"
+      @row-click="handleProcessingRowClick"
     />
 
     <Tabs default-value="all" class="w-full">
@@ -227,14 +233,19 @@ async function handleDetailCancel() {
           <ShowUnassignedToggle v-model:showOnlyUnassigned="showOnlyUnassigned" />
           <ShowCompletedToggle v-model:showCompleted="showCompleted" />
         </div>
-        <RequestsTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
+        <QueueTable
+          mode="sort"
+          :columns="columns"
+          :data="filteredRequests"
+          @row-click="handleRowClick"
+        />
       </TabsContent>
 
       <TabsContent v-for="gate in gatesWithQueues" :key="gate.id" :value="`gate-${gate.id}`" class="mt-4">
-        <GateQueueList
-          :key="gate.id"
+        <QueueTable
+          mode="drag"
           :gate-id="gate.id"
-          :items="gate.queue"
+          :data="gate.queue"
           @reorder="(ids) => handleReorder(gate.id, ids)"
           @set-priority="handleSetPriority"
           @clear-priority="handleClearPriority"

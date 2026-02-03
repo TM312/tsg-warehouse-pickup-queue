@@ -6,7 +6,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { ref, shallowRef, watch, useTemplateRef, nextTick } from 'vue'
+import { ref, shallowRef, watch, useTemplateRef, nextTick, computed } from 'vue'
 import { useSortable, moveArrayElement } from '@vueuse/integrations/useSortable'
 import type { SortableEvent } from 'sortablejs'
 import { GripVertical, Check, X, Flag } from 'lucide-vue-next'
@@ -24,11 +24,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import PriorityButton from './PriorityButton.vue'
 import StatusBadge from './StatusBadge.vue'
-import type { QueueItem } from './queueTableColumns'
+import type { QueueItem, DragItem } from './queueTableColumns'
 
 const props = defineProps<{
   mode: 'sort' | 'drag'
-  columns: ColumnDef<TData, TValue>[]
+  columns?: ColumnDef<TData, TValue>[]
   data: TData[]
   gateId?: string
 }>()
@@ -52,7 +52,7 @@ const sorting = ref<SortingState>([
 
 const table = useVueTable({
   get data() { return props.data },
-  get columns() { return props.columns },
+  get columns() { return props.columns ?? [] },
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
   onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
@@ -67,6 +67,10 @@ const table = useVueTable({
 
 const listRef = useTemplateRef('listRef')
 const localItems = shallowRef<TData[]>([...props.data])
+
+// Cast items to DragItem for template access to extended fields
+// In drag mode, caller must provide data that satisfies DragItem interface
+const dragItems = computed(() => localItems.value as unknown as DragItem[])
 
 // Watch for external updates (e.g., after server sync or other staff changes)
 watch(() => props.data, (newItems) => {
@@ -145,6 +149,16 @@ function handleRowClick(e: MouseEvent, item: TData) {
   emit('row-click', item)
 }
 
+function handleDragRowClick(e: MouseEvent, item: DragItem) {
+  // Don't open detail if clicking on buttons or drag handle
+  const target = e.target as HTMLElement
+  if (target.closest('button') || target.closest('.drag-handle')) {
+    return
+  }
+  // Cast DragItem back to TData for emit (they're the same underlying data)
+  emit('row-click', item as unknown as TData)
+}
+
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
   return date.toLocaleString()
@@ -183,7 +197,7 @@ function formatDate(dateString: string): string {
           </TableRow>
         </template>
         <TableRow v-else>
-          <TableCell :colspan="columns.length" class="h-24 text-center">
+          <TableCell :colspan="columns?.length ?? 1" class="h-24 text-center">
             No pickup requests.
           </TableCell>
         </TableRow>
@@ -201,7 +215,7 @@ function formatDate(dateString: string): string {
         {{ announcement }}
       </div>
 
-      <div v-if="localItems.length === 0" class="text-center py-8 text-muted-foreground">
+      <div v-if="dragItems.length === 0" class="text-center py-8 text-muted-foreground">
         No customers in queue
       </div>
       <template v-else>
@@ -225,7 +239,7 @@ function formatDate(dateString: string): string {
           aria-label="Reorderable queue"
         >
           <div
-            v-for="(item, index) in localItems"
+            v-for="(item, index) in dragItems"
             :key="item.id"
             tabindex="0"
             role="option"
@@ -234,7 +248,7 @@ function formatDate(dateString: string): string {
               'flex items-center gap-3 p-3 border-b cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset',
               grabbedIndex === index ? 'bg-accent' : 'hover:bg-muted/50'
             ]"
-            @click="(e) => handleRowClick(e, item)"
+            @click="(e) => handleDragRowClick(e, item)"
             @keydown="(e) => handleRowKeydown(e, index)"
           >
             <div class="drag-handle cursor-grab active:cursor-grabbing">
@@ -246,7 +260,7 @@ function formatDate(dateString: string): string {
               <StatusBadge :status="item.status" :processing-started-at="item.processing_started_at" />
               <Flag v-if="item.email_flagged" class="h-4 w-4 text-destructive" />
               <div v-else class="text-muted-foreground">-</div>
-              <div>#{{ item.queue_position }}</div>
+              <div>{{ item.queue_position != null ? `#${item.queue_position}` : '-' }}</div>
             </div>
             <!-- Action buttons (from GateQueueList) -->
             <div class="flex items-center gap-2 w-[180px] justify-end">

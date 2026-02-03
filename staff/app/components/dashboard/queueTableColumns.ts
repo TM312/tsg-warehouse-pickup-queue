@@ -12,11 +12,15 @@ import { ACTIVE_STATUSES } from '#shared/types/pickup-request'
 export type { PickupRequest, PickupStatus } from '#shared/types/pickup-request'
 export { PICKUP_STATUS, ACTIVE_STATUSES } from '#shared/types/pickup-request'
 
-// Type for drag mode items (subset of PickupRequest used in QueueTable drag mode)
+// Minimal base interface for QueueTable - both PickupRequest and DragItem extend this
 export interface QueueItem {
   id: string
   sales_order_number: string
   company_name: string | null
+}
+
+// Extended interface for drag mode with all fields needed for inline rendering
+export interface DragItem extends QueueItem {
   status: PickupStatus
   queue_position: number
   is_priority: boolean
