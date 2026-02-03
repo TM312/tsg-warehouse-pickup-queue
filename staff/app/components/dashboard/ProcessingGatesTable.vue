@@ -7,10 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import StatusBadge from './StatusBadge.vue'
-import { CheckCircle, RotateCcw } from 'lucide-vue-next'
+import RequestActionButtons from './RequestActionButtons.vue'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
 interface ProcessingGateRow {
@@ -33,6 +32,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   complete: [requestId: string, gateId: string]
   revert: [requestId: string]
+  cancel: [requestId: string]
   rowClick: [requestId: string]
 }>()
 </script>
@@ -72,26 +72,14 @@ const emit = defineEmits<{
                 :processing-started-at="gate.order.processing_started_at"
               />
             </TableCell>
-            <TableCell>
-              <div class="flex gap-2" @click.stop>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  :disabled="loading[gate.order.id]"
-                  @click="emit('revert', gate.order.id)"
-                >
-                  <RotateCcw class="h-4 w-4 mr-1" />
-                  Return to Queue
-                </Button>
-                <Button
-                  size="sm"
-                  :disabled="loading[gate.order.id]"
-                  @click="emit('complete', gate.order.id, gate.order.gate_id)"
-                >
-                  <CheckCircle class="h-4 w-4 mr-1" />
-                  Complete
-                </Button>
-              </div>
+            <TableCell @click.stop>
+              <RequestActionButtons
+                :status="PICKUP_STATUS.PROCESSING"
+                :loading="loading[gate.order.id]"
+                @complete="emit('complete', gate.order.id, gate.order.gate_id)"
+                @revert="emit('revert', gate.order.id)"
+                @cancel="emit('cancel', gate.order.id)"
+              />
             </TableCell>
           </template>
 

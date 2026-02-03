@@ -5,11 +5,11 @@ import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import DataTable from '@/components/dashboard/DataTable.vue'
-import { createColumns } from '@/components/dashboard/columns'
+import RequestsTable from '@/components/dashboard/RequestsTable.vue'
+import { createColumns } from '@/components/dashboard/requestsTableColumns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
-import NowProcessingSection from '@/components/dashboard/NowProcessingSection.vue'
+import ProcessingGatesTable from '@/components/dashboard/ProcessingGatesTable.vue'
 import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
 import ShowCompletedToggle from '@/components/dashboard/ShowCompletedToggle.vue'
 import ShowUnassignedToggle from '@/components/dashboard/ShowUnassignedToggle.vue'
@@ -204,14 +204,15 @@ async function handleDetailCancel() {
       </div>
     </div>
 
-    <!-- Now Processing Section -->
-    <NowProcessingSection
+    <!-- Processing Gates Section -->
+    <ProcessingGatesTable
       v-if="activeGatesForProcessing.length > 0"
       :gates="activeGatesForProcessing"
       :loading="pending"
       class="mb-6"
       @complete="handleProcessingComplete"
       @revert="handleProcessingRevert"
+      @cancel="handleCancel"
       @row-click="handleQueueRowClick"
     />
 
@@ -232,7 +233,7 @@ async function handleDetailCancel() {
           <ShowUnassignedToggle v-model:showOnlyUnassigned="showOnlyUnassigned" />
           <ShowCompletedToggle v-model:showCompleted="showCompleted" />
         </div>
-        <DataTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
+        <RequestsTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
       </TabsContent>
 
       <TabsContent v-for="gate in gatesWithQueues" :key="gate.id" :value="`gate-${gate.id}`" class="mt-4">

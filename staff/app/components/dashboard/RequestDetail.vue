@@ -3,7 +3,7 @@ import type { PickupRequest } from '#shared/types/pickup-request'
 import { ACTIVE_STATUSES } from '#shared/types/pickup-request'
 import StatusBadge from './StatusBadge.vue'
 import GateSelect from './GateSelect.vue'
-import ActionButtons from './ActionButtons.vue'
+import RequestActionButtons from './RequestActionButtons.vue'
 import { Flag } from 'lucide-vue-next'
 import { computed } from 'vue'
 import { Separator } from '@/components/ui/separator'
@@ -118,7 +118,7 @@ const formattedDate = computed(() => {
           </div>
 
           <div>
-            <ActionButtons
+            <RequestActionButtons
               :status="request.status"
               :loading="loading"
               @complete="emit('complete')"

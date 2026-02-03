@@ -4,7 +4,7 @@ import { ArrowUpDown, Flag } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import StatusBadge from './StatusBadge.vue'
 import GateSelect from './GateSelect.vue'
-import ActionButtons from './ActionButtons.vue'
+import RequestActionButtons from './RequestActionButtons.vue'
 import type { PickupRequest } from '#shared/types/pickup-request'
 import { ACTIVE_STATUSES } from '#shared/types/pickup-request'
 
@@ -107,7 +107,7 @@ export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupReque
       id: 'actions',
       header: '',
       cell: ({ row }) => {
-        return h(ActionButtons, {
+        return h(RequestActionButtons, {
           status: row.original.status,
           loading: callbacks.pendingIds[row.original.id] ?? false,
           onComplete: () => callbacks.onComplete(row.original.id),
