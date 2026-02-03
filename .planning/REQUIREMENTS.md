@@ -51,8 +51,8 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 | DASH-06 | Phase 21 | Pending |
 | DASH-07 | Phase 21 | Pending |
 | DASH-08 | Phase 21 | Pending |
-| ARCH-10 | Phase 19 | Pending |
-| ARCH-11 | Phase 19 | Pending |
+| ARCH-10 | Phase 19 | Complete |
+| ARCH-11 | Phase 19 | Complete |
 
 **Coverage:**
 - v2.1 requirements: 11 total
