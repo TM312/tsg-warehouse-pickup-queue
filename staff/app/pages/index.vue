@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import RequestsTable from '@/components/dashboard/RequestsTable.vue'
 import { createColumns } from '@/components/dashboard/requestsTableColumns'
@@ -220,11 +221,11 @@ async function handleDetailCancel() {
       <TabsList class="flex-wrap">
         <TabsTrigger value="all">
           All Requests
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ filteredRequests.length }}</span>
+          <Badge variant="secondary" class="ml-2 tabular-nums">{{ filteredRequests.length }}</Badge>
         </TabsTrigger>
         <TabsTrigger v-for="gate in gatesWithQueues" :key="gate.id" :value="`gate-${gate.id}`">
           Gate {{ gate.gate_number }}
-          <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.totalActive }}</span>
+          <Badge variant="secondary" class="ml-2 tabular-nums">{{ gate.totalActive }}</Badge>
         </TabsTrigger>
       </TabsList>
 
