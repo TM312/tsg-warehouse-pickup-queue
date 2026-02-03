@@ -17,18 +17,18 @@ Requirements for v2.2 Polish & Bug Fixes milestone.
 
 ### Queue Table Unification
 
-- [ ] **TBL-01**: QueueTable component supports `mode='sort'` with column sorting
-- [ ] **TBL-02**: QueueTable component supports `mode='drag'` with row reordering
-- [ ] **TBL-03**: Drag-and-drop uses drag handles (not entire row)
-- [ ] **TBL-04**: Keyboard arrow keys provide accessible reordering alternative
-- [ ] **TBL-05**: All Requests tab uses QueueTable with sort mode
-- [ ] **TBL-06**: Gate tabs use QueueTable with drag mode
-- [ ] **TBL-07**: Drag operations optimistically update UI before server response
+- [x] **TBL-01**: QueueTable component supports `mode='sort'` with column sorting
+- [x] **TBL-02**: QueueTable component supports `mode='drag'` with row reordering
+- [x] **TBL-03**: Drag-and-drop uses drag handles (not entire row)
+- [x] **TBL-04**: Keyboard arrow keys provide accessible reordering alternative
+- [x] **TBL-05**: All Requests tab uses QueueTable with sort mode
+- [x] **TBL-06**: Gate tabs use QueueTable with drag mode
+- [x] **TBL-07**: Drag operations optimistically update UI before server response
 
 ### Cleanup
 
 - [x] **CLN-01**: Remove refresh button from queue view
-- [ ] **CLN-02**: Remove deprecated GateQueueList component after migration
+- [x] **CLN-02**: Remove deprecated GateQueueList component after migration
 
 ## Future Requirements
 
@@ -51,15 +51,15 @@ None — this is a targeted polish milestone.
 | UI-03 | Phase 23 | Complete |
 | UI-04 | Phase 22 | Complete |
 | UI-05 | Phase 23 | Complete |
-| TBL-01 | Phase 24 | Pending |
-| TBL-02 | Phase 24 | Pending |
-| TBL-03 | Phase 24 | Pending |
-| TBL-04 | Phase 24 | Pending |
-| TBL-05 | Phase 24 | Pending |
-| TBL-06 | Phase 24 | Pending |
-| TBL-07 | Phase 24 | Pending |
+| TBL-01 | Phase 24 | Complete |
+| TBL-02 | Phase 24 | Complete |
+| TBL-03 | Phase 24 | Complete |
+| TBL-04 | Phase 24 | Complete |
+| TBL-05 | Phase 24 | Complete |
+| TBL-06 | Phase 24 | Complete |
+| TBL-07 | Phase 24 | Complete |
 | CLN-01 | Phase 22 | Complete |
-| CLN-02 | Phase 24 | Pending |
+| CLN-02 | Phase 24 | Complete |
 
 **Coverage:**
 - v2.2 requirements: 14 total
@@ -68,4 +68,4 @@ None — this is a targeted polish milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 — Phase 23 complete (UI-02, UI-03, UI-05)*
+*Last updated: 2026-02-03 — Phase 24 complete (TBL-01 through TBL-07, CLN-02) — v2.2 milestone complete*

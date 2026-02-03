@@ -15,7 +15,7 @@
 
 - [x] **Phase 22: Quick Wins** - External link styling, badge visibility, refresh button removal
 - [x] **Phase 23: Component Polish** - Sidebar NavUser layout, idle state display
-- [ ] **Phase 24: Unified Queue Table** - Single table component with sort and drag modes
+- [x] **Phase 24: Unified Queue Table** - Single table component with sort and drag modes
 
 ### Phase 22: Quick Wins
 
@@ -65,9 +65,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 24-01-PLAN.md — QueueTable component with dual mode support (sort/drag)
-- [ ] 24-02-PLAN.md — Keyboard accessibility for drag mode
-- [ ] 24-03-PLAN.md — Dashboard integration and deprecated component removal
+- [x] 24-01-PLAN.md — QueueTable component with dual mode support (sort/drag)
+- [x] 24-02-PLAN.md — Keyboard accessibility for drag mode
+- [x] 24-03-PLAN.md — Dashboard integration and deprecated component removal
 
 ## Progress
 
@@ -79,9 +79,9 @@ Plans:
 | 19-21 | v2.1 | 4/4 | Complete | 2026-02-03 |
 | 22. Quick Wins | v2.2 | 1/1 | Complete | 2026-02-03 |
 | 23. Component Polish | v2.2 | 1/1 | Complete | 2026-02-03 |
-| 24. Unified Queue Table | v2.2 | 0/3 | Not started | - |
+| 24. Unified Queue Table | v2.2 | 3/3 | Complete | 2026-02-03 |
 
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-03 — Phase 24 planned*
+*Last updated: 2026-02-03 — Phase 24 complete, v2.2 milestone complete*
