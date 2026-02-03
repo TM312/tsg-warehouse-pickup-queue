@@ -1,5 +1,33 @@
 # Project Milestones: Warehouse Pickup Queue System
 
+## v2.1 Dashboard Polish & Gates View (Shipped: 2026-02-03)
+
+**Delivered:** Clean dashboard UX with dedicated gates management page, table-based processing section, and consistent action button patterns.
+
+**Phases completed:** 19-21 (4 plans total)
+
+**Key accomplishments:**
+
+- useDashboardData composable extracting 5 computed properties, reducing index.vue from 410 to 285 lines
+- Dedicated /gates route with table, toggle switches, and navigation to gate operator views
+- Table-based processing section (ProcessingGatesTable) showing all active gates with idle state display
+- RequestActionButtons with dropdown pattern for processing orders (Complete primary + Return to Queue/Cancel)
+- Clean dashboard tabs (removed "Manage Gates"), added "Show only unassigned" toggle
+- Component renames for clarity (ProcessingGatesTable, RequestsTable, RequestActionButtons)
+
+**Stats:**
+
+- 30 commits
+- ~8,352 lines of code in staff app
+- 3 phases, 4 plans
+- 1 day (2026-02-03)
+
+**Git range:** `6100dd0` → `4ca46e4`
+
+**What's next:** Production deployment, consider v2.2 enhancements
+
+---
+
 ## v2.0 Architecture Overhaul (Shipped: 2026-02-03)
 
 **Delivered:** Well-structured staff application architecture with centralized types, Pinia state management, sidebar navigation, and dashboard visualization.

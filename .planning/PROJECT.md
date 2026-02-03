@@ -10,13 +10,15 @@ Customers always know their queue position and which gate to go to — no confus
 
 ## Current State
 
-**Version:** v2.0 shipped 2026-02-03
+**Version:** v2.1 shipped 2026-02-03
 **Codebase:** ~58,500 LOC (Vue, TypeScript, SQL, Python, Terraform)
 **Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Pinia, Unovis, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
 
 **What's working:**
 - Customer app: submission form, business hours check, real-time status tracking, hours display
-- Staff app: sidebar navigation, dashboard with KPIs and chart, queue management, gate management
+- Staff app: sidebar navigation, dashboard with KPIs and chart, queue management
+- Staff app: dedicated /gates page for gate management with table view
+- Staff app: ProcessingGatesTable showing all active gates with idle/busy state
 - Gate operator view: mobile-first /gate/[id] with processing workflow and gate navigation
 - Business hours: weekly schedule, closures, manual override
 - Real-time updates across all views via Supabase Realtime
@@ -107,17 +109,22 @@ Customers always know their queue position and which gate to go to — no confus
 - GATE-13: No scroll on mobile when content fits viewport
 - BUG-01: Show completed/cancelled toggle filters correctly
 
-### Active
-
-**v2.1 — Dashboard Polish & Gates View:**
+**v2.1 — shipped 2026-02-03:**
 - FIX-01: DataTable actions respect processing state (Complete + Return to Queue for processing orders)
 - FIX-02: Cancel/Return to Queue as secondary actions throughout
 - GATE-14: Gates overview page at /gates with table of all gates
 - GATE-15: Gates page links to individual gate operator views
 - GATE-16: Move "Manage gates" functionality from dashboard to /gates route
+- GATE-17: Staff can create/enable/disable gates from /gates page
 - DASH-06: Remove "Manage gates" tab from dashboard, keep queue filtering
 - DASH-07: "Now processing" section shows table with one row per active gate
+- DASH-08: Processing table shows order info or "Idle" state per gate
 - ARCH-10: Refactor index.vue for DRY principle and separation of concerns
+- ARCH-11: Clear separation of concerns with useDashboardData composable
+
+### Active
+
+(No active requirements — awaiting next milestone definition)
 
 ### Out of Scope
 
@@ -180,4 +187,4 @@ Customers always know their queue position and which gate to go to — no confus
 | svh unit for mobile viewport | Modern devices support, cleaner than fallbacks | Good |
 
 ---
-*Last updated: 2026-02-03 after v2.1 milestone started*
+*Last updated: 2026-02-03 after v2.1 milestone shipped*
