@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** v2.2 roadmap created, ready to plan Phase 22
+**Status:** Phase 22 Plan 01 complete
 
 ## Project Reference
 
@@ -21,14 +21,14 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 **Phase:** 22 of 24 (Quick Wins)
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-03 — Roadmap created for v2.2
+**Plan:** 01 of 01 complete
+**Status:** Phase 22 complete
+**Last activity:** 2026-02-03 — Completed 22-01-PLAN.md
 
 **Progress:**
 ```
-v2.2 Polish & Bug Fixes [░░░░░░░░░░] 0%
-Phase 22: Quick Wins - Ready to plan
+v2.2 Polish & Bug Fixes [███░░░░░░░] 33%
+Phase 22: Quick Wins - Complete (1/1 plans)
 Phase 23: Component Polish - Not started
 Phase 24: Unified Queue Table - Not started
 ```
@@ -63,20 +63,20 @@ None
 
 ### Last Session Summary
 
-v2.2 milestone started:
-- Research completed (v2.2-SUMMARY.md)
-- Requirements defined (14 requirements)
-- Roadmap created (3 phases: 22-24)
+Phase 22-01 completed:
+- External link icon added to Gates table Open button
+- Tab count badges updated to Badge component with secondary variant
+- Refresh button removed from dashboard
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
 - ~8,352 LOC in staff app
-- Phase 22 is quick wins: link button, badge visibility, refresh removal
+- Phase 22 complete - ready for Phase 23
 - Phase 23 is component polish: NavUser, idle state
 - Phase 24 is unified table: most complex, 8 requirements
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (v2.2 roadmap created)*
+*Last updated: 2026-02-03 (Phase 22-01 complete)*
