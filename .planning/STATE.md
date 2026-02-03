@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Phase 22 Plan 01 complete
+**Status:** Phase 23 Plan 01 complete
 
 ## Project Reference
 
@@ -21,15 +21,15 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 **Phase:** 23 of 24 (Component Polish)
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-03 — Phase 22 executed and verified
+**Plan:** 01 of 01 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-03 — Completed 23-01-PLAN.md
 
 **Progress:**
 ```
-v2.2 Polish & Bug Fixes [███░░░░░░░] 33%
+v2.2 Polish & Bug Fixes [██████░░░░] 67%
 Phase 22: Quick Wins - Complete (1/1 plans)
-Phase 23: Component Polish - Not started
+Phase 23: Component Polish - Complete (1/1 plans)
 Phase 24: Unified Queue Table - Not started
 ```
 
@@ -44,6 +44,10 @@ Phase 24: Unified Queue Table - Not started
 ### Key Decisions
 
 See .planning/PROJECT.md for consolidated key decisions across all milestones.
+
+**Phase 23 Decisions:**
+- Derive displayName from email username with title case conversion (prefer user_metadata.name if available)
+- Use colspan=3 for idle table rows to span Order/Company/Status columns
 
 ### Technical Debt
 
@@ -63,22 +67,21 @@ None
 
 ### Last Session Summary
 
-Phase 22 executed and verified:
-- Plan 22-01 completed (3 tasks, 4 commits)
-- ExternalLink icon added to Gates table Open button
-- Badge component used for tab counts with secondary variant
-- Refresh button removed from queue view
-- All 3 must-haves verified against codebase
+Phase 23 Plan 01 executed:
+- Task 1: NavUser stacked layout with right-side dropdown (dbfea85)
+- Task 2: ProcessingGatesTable muted idle rows with colspan (68cb35b)
+- Build verified, no TypeScript errors
+- All 5 success criteria met
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
 - ~8,352 LOC in staff app
-- Phase 22 complete - ready for Phase 23
-- Phase 23 is component polish: NavUser, idle state
+- Phase 23 complete - ready for Phase 24
 - Phase 24 is unified table: most complex, 8 requirements
+- Final phase in v2.2 Polish & Bug Fixes milestone
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 22 complete, verified)*
+*Last updated: 2026-02-03 (Phase 23 Plan 01 complete)*
