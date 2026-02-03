@@ -1,22 +1,32 @@
 <script setup lang="ts">
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import StatusBadge from './StatusBadge.vue'
 import { CheckCircle, RotateCcw } from 'lucide-vue-next'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
 
-interface ProcessingItem {
+interface ProcessingGateRow {
   id: string
-  sales_order_number: string
-  company_name: string | null
   gate_number: number
-  gate_id: string
-  processing_started_at: string
+  order: {
+    id: string
+    sales_order_number: string
+    company_name: string | null
+    processing_started_at: string
+    gate_id: string
+  } | null
 }
 
 const props = defineProps<{
-  items: ProcessingItem[]
+  gates: ProcessingGateRow[]
   loading: Record<string, boolean>
 }>()
 
@@ -31,64 +41,68 @@ const emit = defineEmits<{
   <div class="space-y-4">
     <div class="flex items-center gap-2">
       <h2 class="text-lg font-semibold">Now Processing</h2>
-      <Badge variant="secondary" class="text-xs">{{ items.length }}</Badge>
+      <Badge variant="secondary" class="text-xs">{{ gates.filter(g => g.order).length }}</Badge>
     </div>
 
-    <div v-if="items.length === 0" class="text-muted-foreground text-sm py-4">
-      No active processing
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Gate</TableHead>
+          <TableHead>Order</TableHead>
+          <TableHead>Company</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow
+          v-for="gate in gates"
+          :key="gate.id"
+          :class="{ 'cursor-pointer hover:bg-accent/50': gate.order }"
+          @click="gate.order && emit('rowClick', gate.order.id)"
+        >
+          <TableCell class="font-medium">Gate {{ gate.gate_number }}</TableCell>
 
-    <div v-else class="grid gap-4">
-      <Card
-        v-for="item in items"
-        :key="item.id"
-        class="cursor-pointer hover:bg-accent/50 transition-colors"
-        @click="emit('rowClick', item.id)"
-      >
-        <CardContent class="p-4">
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <!-- Gate Number -->
-            <div class="flex-shrink-0 w-24 text-center sm:text-left">
-              <p class="text-2xl font-bold text-primary">Gate {{ item.gate_number }}</p>
-            </div>
-
-            <!-- Order Info -->
-            <div class="flex-1 min-w-0">
-              <p class="font-medium truncate">{{ item.sales_order_number }}</p>
-              <p class="text-sm text-muted-foreground truncate">{{ item.company_name || 'N/A' }}</p>
-            </div>
-
-            <!-- Status Badge -->
-            <div class="flex-shrink-0">
+          <template v-if="gate.order">
+            <TableCell>{{ gate.order.sales_order_number }}</TableCell>
+            <TableCell>{{ gate.order.company_name || 'N/A' }}</TableCell>
+            <TableCell>
               <StatusBadge
                 :status="PICKUP_STATUS.PROCESSING"
-                :processing-started-at="item.processing_started_at"
+                :processing-started-at="gate.order.processing_started_at"
               />
-            </div>
+            </TableCell>
+            <TableCell>
+              <div class="flex gap-2" @click.stop>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  :disabled="loading[gate.order.id]"
+                  @click="emit('revert', gate.order.id)"
+                >
+                  <RotateCcw class="h-4 w-4 mr-1" />
+                  Return to Queue
+                </Button>
+                <Button
+                  size="sm"
+                  :disabled="loading[gate.order.id]"
+                  @click="emit('complete', gate.order.id, gate.order.gate_id)"
+                >
+                  <CheckCircle class="h-4 w-4 mr-1" />
+                  Complete
+                </Button>
+              </div>
+            </TableCell>
+          </template>
 
-            <!-- Actions -->
-            <div class="flex gap-2 flex-shrink-0" @click.stop>
-              <Button
-                variant="outline"
-                size="sm"
-                :disabled="loading[item.id]"
-                @click="emit('revert', item.id)"
-              >
-                <RotateCcw class="h-4 w-4 mr-1" />
-                Return to Queue
-              </Button>
-              <Button
-                size="sm"
-                :disabled="loading[item.id]"
-                @click="emit('complete', item.id, item.gate_id)"
-              >
-                <CheckCircle class="h-4 w-4 mr-1" />
-                Complete
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <template v-else>
+            <TableCell class="text-muted-foreground italic">Idle</TableCell>
+            <TableCell>—</TableCell>
+            <TableCell>—</TableCell>
+            <TableCell></TableCell>
+          </template>
+        </TableRow>
+      </TableBody>
+    </Table>
   </div>
 </template>
