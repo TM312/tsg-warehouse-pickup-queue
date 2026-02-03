@@ -1,5 +1,33 @@
 # Project Milestones: Warehouse Pickup Queue System
 
+## v2.2 Polish & Bug Fixes (Shipped: 2026-02-03)
+
+**Delivered:** Unified queue table component with dual mode support (sort/drag), keyboard accessibility, and UI polish including external link icons, badge visibility, and idle state improvements.
+
+**Phases completed:** 22-24 (5 plans total)
+
+**Key accomplishments:**
+
+- Unified QueueTable component replacing RequestsTable and GateQueueList with mode prop (sort/drag)
+- Keyboard accessibility for drag mode with arrow key reordering and aria-live screen reader support
+- External link icons on Gates table Open button, Badge components for tab queue counts
+- Stacked NavUser layout with name prominently displayed and smaller email below
+- ProcessingGatesTable idle rows showing clean "Idle" text without em-dashes
+- Deleted 198 lines of deprecated code (GateQueueList + RequestsTable)
+
+**Stats:**
+
+- 17 commits
+- ~8,808 lines of code in staff app
+- 3 phases, 5 plans
+- 1 day (2026-02-03)
+
+**Git range:** `feat(22-01)` → `docs(24-03)`
+
+**What's next:** Production deployment, consider v2.3 enhancements
+
+---
+
 ## v2.1 Dashboard Polish & Gates View (Shipped: 2026-02-03)
 
 **Delivered:** Clean dashboard UX with dedicated gates management page, table-based processing section, and consistent action button patterns.

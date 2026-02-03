@@ -10,8 +10,8 @@ Customers always know their queue position and which gate to go to — no confus
 
 ## Current State
 
-**Version:** v2.2 in progress (started 2026-02-03)
-**Codebase:** ~58,500 LOC (Vue, TypeScript, SQL, Python, Terraform)
+**Version:** v2.2 shipped (2026-02-03)
+**Codebase:** ~8,808 LOC staff app (Vue, TypeScript)
 **Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Pinia, Unovis, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
 
 **What's working:**
@@ -19,6 +19,8 @@ Customers always know their queue position and which gate to go to — no confus
 - Staff app: sidebar navigation, dashboard with KPIs and chart, queue management
 - Staff app: dedicated /gates page for gate management with table view
 - Staff app: ProcessingGatesTable showing all active gates with idle/busy state
+- Staff app: unified QueueTable component with sort mode (All Requests) and drag mode (Gate tabs)
+- Staff app: keyboard accessible queue reordering with screen reader support
 - Gate operator view: mobile-first /gate/[id] with processing workflow and gate navigation
 - Business hours: weekly schedule, closures, manual override
 - Real-time updates across all views via Supabase Realtime
@@ -122,15 +124,25 @@ Customers always know their queue position and which gate to go to — no confus
 - ARCH-10: Refactor index.vue for DRY principle and separation of concerns
 - ARCH-11: Clear separation of concerns with useDashboardData composable
 
+**v2.2 — shipped 2026-02-03:**
+- UI-01: Gates page "Open" button uses link variant with ExternalLink icon
+- UI-02: Sidebar footer uses two-line NavUser layout (name + smaller email)
+- UI-03: Sidebar dropdown positions correctly (bottom on mobile, right on desktop)
+- UI-04: Tab queue count badges use Badge variant="secondary" for visibility
+- UI-05: ProcessingGatesTable idle rows show only "Idle" text (no dashes/empty cells)
+- TBL-01: QueueTable component supports mode='sort' with column sorting
+- TBL-02: QueueTable component supports mode='drag' with row reordering
+- TBL-03: Drag-and-drop uses drag handles (not entire row)
+- TBL-04: Keyboard arrow keys provide accessible reordering alternative
+- TBL-05: All Requests tab uses QueueTable with sort mode
+- TBL-06: Gate tabs use QueueTable with drag mode
+- TBL-07: Drag operations optimistically update UI before server response
+- CLN-01: Remove refresh button from queue view
+- CLN-02: Remove deprecated GateQueueList component after migration
+
 ### Active
 
-**v2.2 — Polish & Bug Fixes (in progress):**
-- Gates page "Open" button as link with external arrow icon
-- Sidebar footer: smaller email text, proper popup sizing
-- Tab badge visibility: different background shade for queue counts
-- Unified table component for All Requests and Gate tabs with drag-and-drop reordering
-- Now Processing idle state: simplified row layout showing just "Idle"
-- Remove refresh button (trust realtime subscriptions)
+None — planning next milestone.
 
 ### Out of Scope
 
@@ -191,6 +203,12 @@ Customers always know their queue position and which gate to go to — no confus
 | Crossfade gate transitions | Simpler than slide, user preferred | Good |
 | Index-based x-axis for charts | Unovis requires numeric x values for categories | Good |
 | svh unit for mobile viewport | Modern devices support, cleaner than fallbacks | Good |
+| Dual mode QueueTable | Single component with mode prop (sort/drag) reduces duplication | Good |
+| Space to enter grabbed state | Prevents accidental reordering vs immediate arrow movement | Good |
+| Cmd/Ctrl modifiers for jump | Plain arrows move single step, modifiers jump to top/bottom | Good |
+| Escape reverts to original | Captures order at grab time, restores on cancel | Good |
+| displayName from email | Extract username, title case, prefer user_metadata.name if available | Good |
+| colspan for idle rows | Spans Order/Company/Status columns for clean "Idle" text | Good |
 
 ---
-*Last updated: 2026-02-03 after v2.2 milestone started*
+*Last updated: 2026-02-03 after v2.2 milestone complete*

@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Phase 24 complete - v2.2 milestone complete
+**Status:** v2.2 milestone complete - ready for next milestone
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** v2.2 Polish & Bug Fixes - COMPLETE
+**Current focus:** Planning next milestone
 
 ## Milestone History
 
@@ -20,17 +20,20 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** 24 of 24 (Unified Queue Table)
-**Plan:** 03 of 03 complete
-**Status:** Phase 24 complete - Milestone v2.2 complete
-**Last activity:** 2026-02-03 — Completed 24-03-PLAN.md
+**Phase:** Ready for next milestone
+**Plan:** Not started
+**Status:** v2.2 complete, planning next milestone
+**Last activity:** 2026-02-03 — v2.2 milestone archived
 
 **Progress:**
 ```
-v2.2 Polish & Bug Fixes [██████████] 100%
-Phase 22: Quick Wins - Complete (1/1 plans)
-Phase 23: Component Polish - Complete (1/1 plans)
-Phase 24: Unified Queue Table - Complete (3/3 plans)
+All milestones complete [██████████] 100%
+v1.0 MVP: 10 phases, 24 plans
+v1.1 Gate Operator: 3 phases, 7 plans
+v2.0 Architecture: 5 phases, 19 plans
+v2.1 Dashboard Polish: 3 phases, 4 plans
+v2.2 Polish & Bug Fixes: 3 phases, 5 plans
+Total: 24 phases, 59 plans
 ```
 
 ## Deferred Items
@@ -44,21 +47,6 @@ Phase 24: Unified Queue Table - Complete (3/3 plans)
 ### Key Decisions
 
 See .planning/PROJECT.md for consolidated key decisions across all milestones.
-
-**Phase 23 Decisions:**
-- Derive displayName from email username with title case conversion (prefer user_metadata.name if available)
-- Use colspan=3 for idle table rows to span Order/Company/Status columns
-
-**Phase 24 Decisions:**
-- Default sort: created_at descending (newest first)
-- Same columns in both modes for visual consistency
-- Drag mode headers visible but not clickable
-- Keep requestsTableColumns.ts for backward compatibility until CLN-02 cleanup
-- Space to enter grabbed state (not immediate arrow movement)
-- Cmd/Ctrl modifiers for jump to top/bottom
-- Escape reverts to original order captured at grab time
-- QueueTable columns prop made optional for drag mode
-- DragItem interface extends QueueItem for drag mode type safety
 
 ### Technical Debt
 
@@ -78,22 +66,20 @@ None
 
 ### Last Session Summary
 
-Phase 24 Plan 03 executed:
-- Plan 24-03 completed (3 tasks: 2 auto + 1 checkpoint)
-- Dashboard now uses QueueTable for All Requests (sort mode) and Gate tabs (drag mode)
-- Deprecated GateQueueList.vue (117 lines) and RequestsTable.vue (81 lines) deleted
-- User verified all functionality working correctly
-- v2.2 milestone complete
+v2.2 milestone completed and archived:
+- Milestone audit passed (14/14 requirements, 3/3 phases, 8/8 integrations, 4/4 flows)
+- Archives created: milestones/v2.2-ROADMAP.md, milestones/v2.2-REQUIREMENTS.md
+- PROJECT.md updated with validated requirements
+- Git tag v2.2 created
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- ~8,700 LOC in staff app (net -90 lines from deprecation cleanup)
-- Phase 24 complete - Unified QueueTable replacing two deprecated components
-- v2.2 Polish & Bug Fixes milestone complete
-- All planned phases (1-24) complete
+- ~8,808 LOC in staff app
+- All planned phases (1-24) complete across 5 milestones
+- Ready for next milestone planning with `/gsd:new-milestone`
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 24 Plan 03 complete - v2.2 milestone complete)*
+*Last updated: 2026-02-03 (v2.2 milestone archived)*
