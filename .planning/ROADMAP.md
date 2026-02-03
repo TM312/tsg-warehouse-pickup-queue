@@ -62,10 +62,12 @@ Plans:
 4. Keyboard arrow keys provide accessible reordering alternative
 5. Deprecated GateQueueList component is removed from codebase
 
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 24-01: TBD
+- [ ] 24-01-PLAN.md — QueueTable component with dual mode support (sort/drag)
+- [ ] 24-02-PLAN.md — Keyboard accessibility for drag mode
+- [ ] 24-03-PLAN.md — Dashboard integration and deprecated component removal
 
 ## Progress
 
@@ -77,9 +79,9 @@ Plans:
 | 19-21 | v2.1 | 4/4 | Complete | 2026-02-03 |
 | 22. Quick Wins | v2.2 | 1/1 | Complete | 2026-02-03 |
 | 23. Component Polish | v2.2 | 1/1 | Complete | 2026-02-03 |
-| 24. Unified Queue Table | v2.2 | 0/TBD | Not started | - |
+| 24. Unified Queue Table | v2.2 | 0/3 | Not started | - |
 
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-03 — Phase 23 complete*
+*Last updated: 2026-02-03 — Phase 24 planned*
