@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { VisXYContainer, VisGroupedBar, VisAxis, VisTooltip } from '@unovis/vue'
 import { GroupedBar } from '@unovis/ts'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ChartContainer, type ChartConfig } from '@/components/ui/chart'
 
 interface GateQueueData {
   gate: string
@@ -14,6 +15,16 @@ const props = defineProps<{
   data: GateQueueData[]
   loading?: boolean
 }>()
+
+// Chart config for color theming
+// Using a solid color that works with SVG (Unovis doesn't resolve CSS variables in SVG)
+// This blue matches the design system
+const chartConfig = {
+  count: {
+    label: 'Waiting',
+    color: '#3b82f6' // blue-500
+  }
+} satisfies ChartConfig
 
 // Accessor functions for Unovis
 const x = (d: GateQueueData) => d.gate
@@ -33,9 +44,6 @@ const tooltipTemplate = (d: GateQueueData) => {
   </div>`
 }
 
-// Chart color using CSS variable
-const barColor = 'hsl(var(--chart-1))'
-
 // Check if there's any data
 const hasData = computed(() => props.data.length > 0)
 
@@ -44,7 +52,7 @@ const skeletonHeights = ['40%', '65%', '50%', '75%']
 </script>
 
 <template>
-  <div class="w-full h-[300px]">
+  <ChartContainer :config="chartConfig" class="h-[300px] w-full">
     <!-- Loading state - only show on initial load (no data yet) -->
     <div v-if="loading && !hasData" class="flex items-end justify-around h-full p-4 gap-4">
       <Skeleton v-for="(height, i) in skeletonHeights" :key="i" class="flex-1" :style="{ height }" />
@@ -56,11 +64,11 @@ const skeletonHeights = ['40%', '65%', '50%', '75%']
     </div>
 
     <!-- Chart -->
-    <VisXYContainer v-else :data="data" :yDomain="yDomain" class="h-full">
+    <VisXYContainer v-else :data="data" :yDomain="yDomain">
       <VisGroupedBar
         :x="x"
         :y="y"
-        :color="barColor"
+        :color="chartConfig.count.color"
         :rounded-corners="4"
         :bar-padding="0.2"
       />
@@ -79,12 +87,5 @@ const skeletonHeights = ['40%', '65%', '50%', '75%']
       />
       <VisTooltip :triggers="{ [GroupedBar.selectors.bar]: tooltipTemplate }" />
     </VisXYContainer>
-  </div>
+  </ChartContainer>
 </template>
-
-<style scoped>
-/* Ensure Unovis container takes full height */
-:deep(.unovis-xy-container) {
-  height: 100%;
-}
-</style>
