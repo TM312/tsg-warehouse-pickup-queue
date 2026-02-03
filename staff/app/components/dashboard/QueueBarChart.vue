@@ -67,8 +67,8 @@ const skeletonHeights = ['40%', '65%', '50%', '75%']
     <VisXYContainer v-else :data="data" :yDomain="yDomain">
       <VisGroupedBar
         :x="x"
-        :y="y"
-        :color="chartConfig.count.color"
+        :y="[y]"
+        :color="[chartConfig.count.color]"
         :rounded-corners="4"
         :bar-padding="0.2"
       />
