@@ -38,12 +38,12 @@ Requirements for v2.0 Architecture Overhaul. Each maps to roadmap phases.
 
 ### Gate Operator Improvements
 
-- [ ] **GATE-12**: Prev/next gate navigation buttons (alphabetical order)
-- [ ] **GATE-13**: No scroll on mobile when content fits viewport
+- [x] **GATE-12**: Prev/next gate navigation buttons (alphabetical order)
+- [x] **GATE-13**: No scroll on mobile when content fits viewport
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: Show completed/cancelled toggle filters correctly
+- [x] **BUG-01**: Show completed/cancelled toggle filters correctly
 
 ## Future Requirements
 
@@ -92,9 +92,9 @@ Which phases cover which requirements.
 | DASH-03 | 17 | Complete |
 | DASH-04 | 17 | Complete |
 | DASH-05 | 17 | Complete |
-| GATE-12 | 18 | Pending |
-| GATE-13 | 18 | Pending |
-| BUG-01 | 18 | Pending |
+| GATE-12 | 18 | Complete |
+| GATE-13 | 18 | Complete |
+| BUG-01 | 18 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 23 total
@@ -103,4 +103,4 @@ Which phases cover which requirements.
 
 ---
 *Requirements defined: 2026-01-30*
-*Last updated: 2026-01-30 (traceability updated for v2.0 roadmap)*
+*Last updated: 2026-02-03 (Phase 18 complete - all v2.0 requirements done)*
