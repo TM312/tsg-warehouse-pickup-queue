@@ -18,11 +18,11 @@ Requirements for v2.0 Architecture Overhaul. Each maps to roadmap phases.
 
 ### Dashboard
 
-- [ ] **DASH-01**: Dashboard page serves as main index with overview
-- [ ] **DASH-02**: Bar chart visualization showing queue length per gate
-- [ ] **DASH-03**: KPI card: Total pickups completed today
-- [ ] **DASH-04**: KPI card: Average waiting time (queue to processing)
-- [ ] **DASH-05**: KPI card: Average processing time (processing to complete)
+- [x] **DASH-01**: Dashboard page serves as main index with overview
+- [x] **DASH-02**: Bar chart visualization showing queue length per gate
+- [x] **DASH-03**: KPI card: Total pickups completed today
+- [x] **DASH-04**: KPI card: Average waiting time (queue to processing)
+- [x] **DASH-05**: KPI card: Average processing time (processing to complete)
 
 ### Architecture
 
@@ -87,11 +87,11 @@ Which phases cover which requirements.
 | SIDE-04 | 16 | Complete |
 | SIDE-05 | 16 | Complete |
 | SIDE-06 | 16 | Complete |
-| DASH-01 | 17 | Pending |
-| DASH-02 | 17 | Pending |
-| DASH-03 | 17 | Pending |
-| DASH-04 | 17 | Pending |
-| DASH-05 | 17 | Pending |
+| DASH-01 | 17 | Complete |
+| DASH-02 | 17 | Complete |
+| DASH-03 | 17 | Complete |
+| DASH-04 | 17 | Complete |
+| DASH-05 | 17 | Complete |
 | GATE-12 | 18 | Pending |
 | GATE-13 | 18 | Pending |
 | BUG-01 | 18 | Pending |

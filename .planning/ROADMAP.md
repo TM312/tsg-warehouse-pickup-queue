@@ -15,7 +15,7 @@ The v2.0 Architecture Overhaul transforms the staff application from an organica
 - [x] **Phase 14: Type Foundation** - Centralized TypeScript types with as const pattern
 - [x] **Phase 15: Pinia Infrastructure** - State management with hybrid composables pattern
 - [x] **Phase 16: Sidebar Layout** - Navigation structure for staff application
-- [ ] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
+- [x] **Phase 17: Dashboard & Visualization** - Overview page with gate queue chart
 - [ ] **Phase 18: Gate Operator & Bug Fixes** - Navigation improvements and filter fix
 
 ## Phase Details
@@ -90,10 +90,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Install chart dependencies and SSR plugin
-- [ ] 17-02-PLAN.md — Create KPI composable and utilities
-- [ ] 17-03-PLAN.md — Create dashboard UI components
-- [ ] 17-04-PLAN.md — Integrate dashboard page
+- [x] 17-01-PLAN.md — Install chart dependencies and SSR plugin
+- [x] 17-02-PLAN.md — Create KPI composable and utilities
+- [x] 17-03-PLAN.md — Create dashboard UI components
+- [x] 17-04-PLAN.md — Integrate dashboard page
 
 ### Phase 18: Gate Operator & Bug Fixes
 
@@ -117,7 +117,7 @@ Plans:
 | 14. Type Foundation | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 16. Sidebar Layout | v2.0 | 4/4 | Complete | 2026-02-02 |
-| 17. Dashboard & Visualization | v2.0 | 0/4 | Not started | - |
+| 17. Dashboard & Visualization | v2.0 | 4/4 | Complete | 2026-02-03 |
 | 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
 
 ---
