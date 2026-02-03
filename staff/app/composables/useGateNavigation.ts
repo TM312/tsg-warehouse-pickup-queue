@@ -2,6 +2,21 @@ import type { Ref } from 'vue'
 import type { GateWithCount } from '#shared/types/gate'
 import { onKeyStroke } from '@vueuse/core'
 
+// Global navigation direction state - persists across page navigation
+// 'left' = going to prev gate, 'right' = going to next gate
+const gateNavDirection = ref<'left' | 'right' | null>(null)
+
+/**
+ * Get the current gate navigation direction (for page transitions).
+ * Returns null if no gate navigation in progress.
+ */
+export function useGateNavDirection() {
+  return {
+    direction: gateNavDirection,
+    clear: () => { gateNavDirection.value = null }
+  }
+}
+
 /**
  * Composable for gate navigation with keyboard shortcuts.
  * Provides prev/next gate logic and arrow key navigation.
@@ -38,12 +53,14 @@ export function useGateNavigation(currentGateId: Ref<string>) {
 
   function goToPrev() {
     if (prevGate.value) {
+      gateNavDirection.value = 'left'
       router.push(`/gate/${prevGate.value.id}`)
     }
   }
 
   function goToNext() {
     if (nextGate.value) {
+      gateNavDirection.value = 'right'
       router.push(`/gate/${nextGate.value.id}`)
     }
   }
