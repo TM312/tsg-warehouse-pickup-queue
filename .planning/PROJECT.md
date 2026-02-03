@@ -10,7 +10,7 @@ Customers always know their queue position and which gate to go to — no confus
 
 ## Current State
 
-**Version:** v2.1 shipped 2026-02-03
+**Version:** v2.2 in progress (started 2026-02-03)
 **Codebase:** ~58,500 LOC (Vue, TypeScript, SQL, Python, Terraform)
 **Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Pinia, Unovis, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
 
@@ -124,7 +124,13 @@ Customers always know their queue position and which gate to go to — no confus
 
 ### Active
 
-(No active requirements — awaiting next milestone definition)
+**v2.2 — Polish & Bug Fixes (in progress):**
+- Gates page "Open" button as link with external arrow icon
+- Sidebar footer: smaller email text, proper popup sizing
+- Tab badge visibility: different background shade for queue counts
+- Unified table component for All Requests and Gate tabs with drag-and-drop reordering
+- Now Processing idle state: simplified row layout showing just "Idle"
+- Remove refresh button (trust realtime subscriptions)
 
 ### Out of Scope
 
@@ -187,4 +193,4 @@ Customers always know their queue position and which gate to go to — no confus
 | svh unit for mobile viewport | Modern devices support, cleaner than fallbacks | Good |
 
 ---
-*Last updated: 2026-02-03 after v2.1 milestone shipped*
+*Last updated: 2026-02-03 after v2.2 milestone started*

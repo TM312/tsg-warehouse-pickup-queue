@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Ready for next milestone
+**Status:** Defining requirements for v2.2
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** Planning next milestone
+**Current focus:** v2.2 Polish & Bug Fixes
 
 ## Milestone History
 
@@ -16,13 +16,14 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 - v1.1 Gate Operator Experience — SHIPPED 2026-01-30 (Phases 11-13)
 - v2.0 Architecture Overhaul — SHIPPED 2026-02-03 (Phases 14-18)
 - v2.1 Dashboard Polish & Gates View — SHIPPED 2026-02-03 (Phases 19-21)
+- v2.2 Polish & Bug Fixes — IN PROGRESS (started 2026-02-03)
 
 ## Current Position
 
-**Phase:** None (between milestones)
-**Plan:** N/A
-**Status:** Ready to plan
-**Last activity:** 2026-02-03 — v2.1 milestone archived
+**Phase:** Not started (defining requirements)
+**Plan:** —
+**Status:** Defining requirements
+**Last activity:** 2026-02-03 — Milestone v2.2 started
 
 **Progress:**
 ```
