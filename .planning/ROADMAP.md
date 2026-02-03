@@ -105,10 +105,12 @@ Plans:
   2. Gate order follows alphabetical sorting (consistent ordering)
   3. Gate page does not scroll when content fits viewport on mobile
   4. Show completed/cancelled toggle correctly filters the queue table
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 18-01: TBD
+- [ ] 18-01-PLAN.md — Create gate navigation composable and button component
+- [ ] 18-02-PLAN.md — Fix filter toggle and mobile viewport bugs
+- [ ] 18-03-PLAN.md — Integrate navigation into gate page and verify
 
 ## Progress
 
@@ -118,7 +120,7 @@ Plans:
 | 15. Pinia Infrastructure | v2.0 | 4/4 | Complete | 2026-01-30 |
 | 16. Sidebar Layout | v2.0 | 4/4 | Complete | 2026-02-02 |
 | 17. Dashboard & Visualization | v2.0 | 4/4 | Complete | 2026-02-03 |
-| 18. Gate Operator & Bug Fixes | v2.0 | 0/TBD | Not started | - |
+| 18. Gate Operator & Bug Fixes | v2.0 | 0/3 | Not started | - |
 
 ---
 
