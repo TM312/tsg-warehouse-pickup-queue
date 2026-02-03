@@ -18,6 +18,7 @@ export interface ColumnCallbacks {
   onGateSelect: (requestId: string, gateId: string) => void
   onComplete: (requestId: string) => void
   onCancel: (requestId: string) => void
+  onRevert: (requestId: string) => void
 }
 
 export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupRequest>[] {
@@ -111,6 +112,7 @@ export function createColumns(callbacks: ColumnCallbacks): ColumnDef<PickupReque
           loading: callbacks.pendingIds[row.original.id] ?? false,
           onComplete: () => callbacks.onComplete(row.original.id),
           onCancel: () => callbacks.onCancel(row.original.id),
+          onRevert: () => callbacks.onRevert(row.original.id),
         })
       },
     },
