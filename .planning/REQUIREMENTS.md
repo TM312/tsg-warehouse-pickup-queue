@@ -42,23 +42,23 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-01 | TBD | Pending |
-| FIX-02 | TBD | Pending |
-| GATE-14 | TBD | Pending |
-| GATE-15 | TBD | Pending |
-| GATE-16 | TBD | Pending |
-| GATE-17 | TBD | Pending |
-| DASH-06 | TBD | Pending |
-| DASH-07 | TBD | Pending |
-| DASH-08 | TBD | Pending |
-| ARCH-10 | TBD | Pending |
-| ARCH-11 | TBD | Pending |
+| FIX-01 | Phase 21 | Pending |
+| FIX-02 | Phase 21 | Pending |
+| GATE-14 | Phase 20 | Pending |
+| GATE-15 | Phase 20 | Pending |
+| GATE-16 | Phase 20 | Pending |
+| GATE-17 | Phase 20 | Pending |
+| DASH-06 | Phase 21 | Pending |
+| DASH-07 | Phase 21 | Pending |
+| DASH-08 | Phase 21 | Pending |
+| ARCH-10 | Phase 19 | Pending |
+| ARCH-11 | Phase 19 | Pending |
 
 **Coverage:**
 - v2.1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11
+- Mapped to phases: 11
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after initial definition*
+*Last updated: 2026-02-03 — Roadmap created, traceability complete*

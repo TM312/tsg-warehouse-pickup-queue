@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** v2.1 DEFINING — Dashboard Polish & Gates View
+**Status:** v2.1 PLANNED — Dashboard Polish & Gates View
 
 ## Project Reference
 
@@ -18,18 +18,27 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** Not started (defining requirements)
-**Plan:** —
-**Status:** Defining requirements
-**Last activity:** 2026-02-03 — Milestone v2.1 started
+**Phase:** 19 - Dashboard Refactoring
+**Plan:** Not started
+**Status:** Ready to plan
+**Last activity:** 2026-02-03 — Roadmap created
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
-v2.1 Dashboard Polish & Gates View - DEFINING
+v2.1 Dashboard Polish & Gates View - IN PROGRESS
+  [>                   ] Phase 19/21
 ```
+
+## v2.1 Phase Overview
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Not started |
+| 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Not started |
+| 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | Not started |
 
 ## Deferred Items
 
@@ -50,7 +59,6 @@ See .planning/PROJECT.md for consolidated key decisions.
 | Generate database types with `supabase gen types typescript` | Low | v1-05 |
 | Pre-existing type errors in native-select component | Low | Unknown |
 | Pre-existing type errors in customer/server/ (missing database types) | Low | v1-05 |
-| /gates route in sidebar but no page exists | Low | 16-03 |
 
 ### Blockers
 
@@ -78,9 +86,11 @@ Completed v2.0 Architecture Overhaul milestone:
 - Dashboard at index.vue with 4 KPI cards and bar chart
 - Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
 - Pinia stores: useQueueStore, useGatesStore
-- Run `/gsd:new-milestone` to start next milestone planning
+- index.vue is 410 lines, needs refactoring (Phase 19)
+- /gates route exists in sidebar but page not implemented (Phase 20)
+- Next: `/gsd:plan-phase 19` to start Dashboard Refactoring
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (v2.1 milestone started)*
+*Last updated: 2026-02-03 (v2.1 roadmap created)*
