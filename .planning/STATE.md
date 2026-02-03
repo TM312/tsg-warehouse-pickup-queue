@@ -18,10 +18,10 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** 20 - Gates View (2 of 3 in v2.1)
-**Plan:** 01 of 01 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-03 — Completed 20-01-PLAN.md
+**Phase:** 21 - Dashboard Polish (3 of 3 in v2.1)
+**Plan:** 02 of 02 complete
+**Status:** In progress
+**Last activity:** 2026-02-03 — Completed 21-02-PLAN.md
 
 **Progress:**
 ```
@@ -29,7 +29,7 @@ v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
 v2.1 Dashboard Polish & Gates View - IN PROGRESS
-  [==============      ] Phases 19-20 complete, 21 remaining
+  [==================  ] Phases 19-20 complete, 21 plan 02 complete
 ```
 
 ## v2.1 Phase Overview
@@ -38,7 +38,7 @@ v2.1 Dashboard Polish & Gates View - IN PROGRESS
 |-------|------|--------------|--------|
 | 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Complete |
 | 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Complete |
-| 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | Not started |
+| 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | In progress (plan 02 complete) |
 
 ## Deferred Items
 
@@ -60,6 +60,7 @@ See .planning/PROJECT.md for consolidated key decisions.
 | DEC-20-01-01 | Table layout with 5 columns: Gate, Status, Queue, Processing, Actions | 20-01 |
 | DEC-20-01-02 | Check both IN_QUEUE and PROCESSING statuses before disabling gate | 20-01 |
 | DEC-20-01-03 | Processing order lookup uses computed Map for O(1) access | 20-01 |
+| DEC-21-02-01 | Use ref-controlled AlertDialog for Cancel action in dropdown | 21-02 |
 
 ### Technical Debt
 
@@ -78,12 +79,12 @@ None
 
 ### Last Session Summary
 
-Completed Phase 20 (Gates View):
-- 1 plan, 3 tasks
-- Created GatesTable component with 5-column table layout
-- Updated useGateManagement to check PROCESSING status
-- Created /gates page with gate management functionality
-- Requirements GATE-14, GATE-15, GATE-16, GATE-17 satisfied
+Completed Phase 21 Plan 02 (DataTable Action Buttons):
+- 3 tasks, 3 commits
+- ActionButtons conditionally renders dropdown for processing state
+- Processing orders: Complete as primary + dropdown with Return to Queue and Cancel
+- Non-processing orders: keep existing inline button pattern
+- Wired onRevert callback through columns.ts to index.vue
 
 ### Archived
 
@@ -94,13 +95,12 @@ Completed Phase 20 (Gates View):
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- Dashboard at index.vue (285 lines, well-organized with section comments)
-- /gates page now implemented with GatesTable component
-- GatesTable: Table with Gate, Status, Queue, Processing, Actions columns
-- useGateManagement: Checks both IN_QUEUE and PROCESSING before disable
-- Next: Phase 21 (Dashboard Polish) for final v2.1 requirements
+- Dashboard at index.vue with section comments for organization
+- ActionButtons: Conditional dropdown for processing state
+- Phase 21 plans complete, check if phase requirements (DASH-06, DASH-07, DASH-08, FIX-01, FIX-02) are satisfied
+- May need additional plans or phase can be marked complete
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 20 complete)*
+*Last updated: 2026-02-03 (Phase 21 plan 02 complete)*
