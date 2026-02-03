@@ -10,10 +10,10 @@ Requirements for v2.2 Polish & Bug Fixes milestone.
 ### UI Polish
 
 - [x] **UI-01**: Gates page "Open" button uses link variant with ExternalLink icon
-- [ ] **UI-02**: Sidebar footer uses two-line NavUser layout (name + smaller email)
-- [ ] **UI-03**: Sidebar dropdown positions correctly (bottom on mobile, right on desktop)
+- [x] **UI-02**: Sidebar footer uses two-line NavUser layout (name + smaller email)
+- [x] **UI-03**: Sidebar dropdown positions correctly (bottom on mobile, right on desktop)
 - [x] **UI-04**: Tab queue count badges use `Badge variant="secondary"` for visibility
-- [ ] **UI-05**: ProcessingGatesTable idle rows show only "Idle" text (no dashes/empty cells)
+- [x] **UI-05**: ProcessingGatesTable idle rows show only "Idle" text (no dashes/empty cells)
 
 ### Queue Table Unification
 
@@ -47,10 +47,10 @@ None — this is a targeted polish milestone.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | UI-01 | Phase 22 | Complete |
-| UI-02 | Phase 23 | Pending |
-| UI-03 | Phase 23 | Pending |
+| UI-02 | Phase 23 | Complete |
+| UI-03 | Phase 23 | Complete |
 | UI-04 | Phase 22 | Complete |
-| UI-05 | Phase 23 | Pending |
+| UI-05 | Phase 23 | Complete |
 | TBL-01 | Phase 24 | Pending |
 | TBL-02 | Phase 24 | Pending |
 | TBL-03 | Phase 24 | Pending |
@@ -68,4 +68,4 @@ None — this is a targeted polish milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 — Phase 22 complete (UI-01, UI-04, CLN-01)*
+*Last updated: 2026-02-03 — Phase 23 complete (UI-02, UI-03, UI-05)*
