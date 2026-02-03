@@ -60,6 +60,9 @@ See .planning/PROJECT.md for consolidated key decisions.
 | DEC-20-01-01 | Table layout with 5 columns: Gate, Status, Queue, Processing, Actions | 20-01 |
 | DEC-20-01-02 | Check both IN_QUEUE and PROCESSING statuses before disabling gate | 20-01 |
 | DEC-20-01-03 | Processing order lookup uses computed Map for O(1) access | 20-01 |
+| DEC-21-01-01 | Table layout for processing section with one row per active gate | 21-01 |
+| DEC-21-01-02 | Idle gates show "Idle" text in muted italic styling | 21-01 |
+| DEC-21-01-03 | O(1) processing order lookup using computed Map pattern | 21-01 |
 | DEC-21-02-01 | Use ref-controlled AlertDialog for Cancel action in dropdown | 21-02 |
 
 ### Technical Debt
