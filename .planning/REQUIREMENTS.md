@@ -9,10 +9,10 @@ Requirements for v2.2 Polish & Bug Fixes milestone.
 
 ### UI Polish
 
-- [ ] **UI-01**: Gates page "Open" button uses link variant with ExternalLink icon
+- [x] **UI-01**: Gates page "Open" button uses link variant with ExternalLink icon
 - [ ] **UI-02**: Sidebar footer uses two-line NavUser layout (name + smaller email)
 - [ ] **UI-03**: Sidebar dropdown positions correctly (bottom on mobile, right on desktop)
-- [ ] **UI-04**: Tab queue count badges use `Badge variant="secondary"` for visibility
+- [x] **UI-04**: Tab queue count badges use `Badge variant="secondary"` for visibility
 - [ ] **UI-05**: ProcessingGatesTable idle rows show only "Idle" text (no dashes/empty cells)
 
 ### Queue Table Unification
@@ -27,7 +27,7 @@ Requirements for v2.2 Polish & Bug Fixes milestone.
 
 ### Cleanup
 
-- [ ] **CLN-01**: Remove refresh button from queue view
+- [x] **CLN-01**: Remove refresh button from queue view
 - [ ] **CLN-02**: Remove deprecated GateQueueList component after migration
 
 ## Future Requirements
@@ -46,10 +46,10 @@ None — this is a targeted polish milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 22 | Pending |
+| UI-01 | Phase 22 | Complete |
 | UI-02 | Phase 23 | Pending |
 | UI-03 | Phase 23 | Pending |
-| UI-04 | Phase 22 | Pending |
+| UI-04 | Phase 22 | Complete |
 | UI-05 | Phase 23 | Pending |
 | TBL-01 | Phase 24 | Pending |
 | TBL-02 | Phase 24 | Pending |
@@ -58,7 +58,7 @@ None — this is a targeted polish milestone.
 | TBL-05 | Phase 24 | Pending |
 | TBL-06 | Phase 24 | Pending |
 | TBL-07 | Phase 24 | Pending |
-| CLN-01 | Phase 22 | Pending |
+| CLN-01 | Phase 22 | Complete |
 | CLN-02 | Phase 24 | Pending |
 
 **Coverage:**
@@ -68,4 +68,4 @@ None — this is a targeted polish milestone.
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after roadmap creation*
+*Last updated: 2026-02-03 — Phase 22 complete (UI-01, UI-04, CLN-01)*

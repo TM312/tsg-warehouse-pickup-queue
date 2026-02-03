@@ -13,7 +13,7 @@
 
 ### Phase Overview
 
-- [ ] **Phase 22: Quick Wins** - External link styling, badge visibility, refresh button removal
+- [x] **Phase 22: Quick Wins** - External link styling, badge visibility, refresh button removal
 - [ ] **Phase 23: Component Polish** - Sidebar NavUser layout, idle state display
 - [ ] **Phase 24: Unified Queue Table** - Single table component with sort and drag modes
 
@@ -31,7 +31,7 @@
 **Plans:** 1 plan
 
 Plans:
-- [ ] 22-01-PLAN.md — External link icon, badge visibility, refresh button removal
+- [x] 22-01-PLAN.md — External link icon, badge visibility, refresh button removal
 
 ### Phase 23: Component Polish
 
@@ -75,11 +75,11 @@ Plans:
 | 11-13 | v1.1 | 7/7 | Complete | 2026-01-30 |
 | 14-18 | v2.0 | 19/19 | Complete | 2026-02-03 |
 | 19-21 | v2.1 | 4/4 | Complete | 2026-02-03 |
-| 22. Quick Wins | v2.2 | 0/1 | Planned | - |
+| 22. Quick Wins | v2.2 | 1/1 | Complete | 2026-02-03 |
 | 23. Component Polish | v2.2 | 0/TBD | Not started | - |
 | 24. Unified Queue Table | v2.2 | 0/TBD | Not started | - |
 
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-03 — Phase 22 planned (1 plan)*
+*Last updated: 2026-02-03 — Phase 22 complete*
