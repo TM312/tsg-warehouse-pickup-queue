@@ -2,18 +2,18 @@ import type { Ref } from 'vue'
 import type { GateWithCount } from '#shared/types/gate'
 import { onKeyStroke } from '@vueuse/core'
 
-// Global navigation direction state - persists across page navigation
-// 'left' = going to prev gate, 'right' = going to next gate
-const gateNavDirection = ref<'left' | 'right' | null>(null)
+// Global navigation state - persists across page navigation
+// Simple boolean: are we navigating between gates?
+const isGateNavigation = ref(false)
 
 /**
- * Get the current gate navigation direction (for page transitions).
- * Returns null if no gate navigation in progress.
+ * Get the current gate navigation state (for page transitions).
+ * Returns boolean indicating if gate navigation is in progress.
  */
-export function useGateNavDirection() {
+export function useGateNavState() {
   return {
-    direction: gateNavDirection,
-    clear: () => { gateNavDirection.value = null }
+    isGateNav: isGateNavigation,
+    clear: () => { isGateNavigation.value = false }
   }
 }
 
@@ -53,14 +53,14 @@ export function useGateNavigation(currentGateId: Ref<string>) {
 
   function goToPrev() {
     if (prevGate.value) {
-      gateNavDirection.value = 'left'
+      isGateNavigation.value = true
       router.push(`/gate/${prevGate.value.id}`)
     }
   }
 
   function goToNext() {
     if (nextGate.value) {
-      gateNavDirection.value = 'right'
+      isGateNavigation.value = true
       router.push(`/gate/${nextGate.value.id}`)
     }
   }

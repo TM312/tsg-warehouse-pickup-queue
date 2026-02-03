@@ -4,7 +4,7 @@ import type { TransitionProps } from 'vue'
 
 const { fetchRequests, fetchGates, refresh } = useQueueActions()
 const { subscribe, unsubscribe } = useRealtimeQueue()
-const { direction, clear: clearNavDirection } = useGateNavDirection()
+const { isGateNav, clear: clearGateNav } = useGateNavState()
 
 // Fetch initial data and subscribe at app level
 onMounted(async () => {
@@ -18,13 +18,13 @@ onUnmounted(() => {
   unsubscribe()
 })
 
-// Dynamic page transition based on gate navigation direction
+// Quick crossfade transition for gate navigation
 const pageTransition = computed<TransitionProps | false>(() => {
-  if (!direction.value) return false
+  if (!isGateNav.value) return false
   return {
-    name: direction.value === 'right' ? 'slide-right' : 'slide-left',
+    name: 'gate-fade',
     mode: 'out-in' as const,
-    onAfterLeave: () => clearNavDirection()
+    onAfterLeave: () => clearGateNav()
   }
 })
 </script>
@@ -37,37 +37,14 @@ const pageTransition = computed<TransitionProps | false>(() => {
 </template>
 
 <style>
-/* Gate navigation transitions - slide in direction of navigation */
-
-/* Slide right (navigating to next gate): old slides left, new slides from right */
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.2s ease-out;
+/* Quick crossfade for gate navigation - fast enough that empty state is barely noticeable */
+.gate-fade-enter-active,
+.gate-fade-leave-active {
+  transition: opacity 0.15s ease;
 }
 
-.slide-right-enter-from {
+.gate-fade-enter-from,
+.gate-fade-leave-to {
   opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-/* Slide left (navigating to prev gate): old slides right, new slides from left */
-.slide-left-enter-active,
-.slide-left-leave-active {
-  transition: all 0.2s ease-out;
-}
-
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
 }
 </style>
