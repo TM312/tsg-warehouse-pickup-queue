@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // === Imports ===
-import { RefreshCw } from 'lucide-vue-next'
 import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -65,8 +64,6 @@ const sheetOpen = computed({
   get: () => selectedRequest.value !== null,
   set: (v) => { if (!v) selectedRequest.value = null }
 })
-
-const refreshing = computed(() => requestsLoading.value)
 
 // === Queue Action Handlers ===
 async function handleGateSelect(requestId: string, gateId: string) {
@@ -198,10 +195,6 @@ async function handleDetailCancel() {
       <div class="flex items-center gap-2">
         <ConnectionStatus :status="realtimeStatus" />
         <AddOrderDialog @create="handleCreateOrder" />
-        <Button variant="outline" size="sm" :disabled="refreshing" @click="refresh()">
-          <RefreshCw :class="['h-4 w-4 mr-2', { 'animate-spin': refreshing }]" />
-          Refresh
-        </Button>
       </div>
     </div>
 
