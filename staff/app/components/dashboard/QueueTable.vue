@@ -11,6 +11,7 @@ import { useSortable, moveArrayElement } from '@vueuse/integrations/useSortable'
 import type { SortableEvent } from 'sortablejs'
 import { GripVertical, Check, X, Flag } from 'lucide-vue-next'
 import { valueUpdater } from '@/lib/utils'
+import { useKeyboardReorder } from '@/composables/useKeyboardReorder'
 import {
   Table,
   TableBody,
@@ -88,6 +89,53 @@ useSortable(listRef, localItems, {
   }
 })
 
+// ============================================
+// KEYBOARD ACCESSIBILITY - Drag Mode
+// ============================================
+
+// Store original order for Escape cancellation
+const originalOrder = ref<string[]>([])
+
+const {
+  reorderState,
+  grabbedIndex,
+  announcement,
+  handleKeydown: keyboardHandler
+} = useKeyboardReorder({
+  items: localItems,
+  onReorder: (newOrder) => emit('reorder', newOrder)
+})
+
+function handleRowKeydown(e: KeyboardEvent, index: number) {
+  if (props.mode !== 'drag') return
+
+  // Capture original order when starting keyboard reorder
+  if (reorderState.value === 'idle' && e.key === ' ') {
+    originalOrder.value = localItems.value.map(i => i.id)
+  }
+
+  const newIndex = keyboardHandler(e, index)
+
+  // Handle Escape - restore original order
+  if (e.key === 'Escape' && originalOrder.value.length > 0) {
+    // Restore original order by matching IDs
+    localItems.value = originalOrder.value.map(id =>
+      localItems.value.find(item => item.id === id)!
+    )
+    originalOrder.value = []
+  }
+
+  // Refocus moved row
+  if (newIndex !== null && newIndex !== index) {
+    nextTick(() => {
+      const rows = listRef.value?.querySelectorAll('[tabindex="0"]')
+      if (rows && rows[newIndex]) {
+        (rows[newIndex] as HTMLElement).focus()
+      }
+    })
+  }
+}
+
 function handleRowClick(e: MouseEvent, item: TData) {
   // Don't open detail if clicking on buttons or drag handle
   const target = e.target as HTMLElement
@@ -144,6 +192,15 @@ function formatDate(dateString: string): string {
 
     <!-- Drag mode: table structure with drag handles and action buttons -->
     <div v-else>
+      <!-- Screen reader announcements for keyboard reordering -->
+      <div
+        aria-live="assertive"
+        aria-atomic="true"
+        class="sr-only"
+      >
+        {{ announcement }}
+      </div>
+
       <div v-if="localItems.length === 0" class="text-center py-8 text-muted-foreground">
         No customers in queue
       </div>
@@ -161,13 +218,24 @@ function formatDate(dateString: string): string {
           <div class="w-[180px]">Actions</div>
         </div>
 
-        <!-- Rows with drag handles -->
-        <div ref="listRef">
+        <!-- Rows with drag handles - keyboard accessible -->
+        <div
+          ref="listRef"
+          role="listbox"
+          aria-label="Reorderable queue"
+        >
           <div
-            v-for="item in localItems"
+            v-for="(item, index) in localItems"
             :key="item.id"
-            class="flex items-center gap-3 p-3 border-b hover:bg-muted/50 cursor-pointer transition-colors"
+            tabindex="0"
+            role="option"
+            :aria-selected="grabbedIndex === index"
+            :class="[
+              'flex items-center gap-3 p-3 border-b cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-inset',
+              grabbedIndex === index ? 'bg-accent' : 'hover:bg-muted/50'
+            ]"
             @click="(e) => handleRowClick(e, item)"
+            @keydown="(e) => handleRowKeydown(e, index)"
           >
             <div class="drag-handle cursor-grab active:cursor-grabbing">
               <GripVertical class="h-5 w-5 text-muted-foreground" />
