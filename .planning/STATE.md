@@ -1,14 +1,14 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** v2.0 SHIPPED — Ready for next milestone
+**Status:** v2.1 DEFINING — Dashboard Polish & Gates View
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Customers always know their queue position and which gate to go to
-**Current focus:** Planning next milestone
+**Current focus:** v2.1 Dashboard Polish & Gates View
 
 ## Milestone History
 
@@ -18,18 +18,17 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** Ready for next milestone
-**Plan:** N/A
-**Status:** Awaiting `/gsd:new-milestone`
-**Last activity:** 2026-02-03 — v2.0 milestone archived
+**Phase:** Not started (defining requirements)
+**Plan:** —
+**Status:** Defining requirements
+**Last activity:** 2026-02-03 — Milestone v2.1 started
 
 **Progress:**
 ```
 v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
-
-Next milestone: Run /gsd:new-milestone to define
+v2.1 Dashboard Polish & Gates View - DEFINING
 ```
 
 ## Deferred Items
@@ -84,4 +83,4 @@ Completed v2.0 Architecture Overhaul milestone:
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (v2.0 milestone archived)*
+*Last updated: 2026-02-03 (v2.1 milestone started)*

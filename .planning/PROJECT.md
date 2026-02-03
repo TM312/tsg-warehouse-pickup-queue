@@ -109,7 +109,15 @@ Customers always know their queue position and which gate to go to — no confus
 
 ### Active
 
-(No active requirements — define with /gsd:new-milestone)
+**v2.1 — Dashboard Polish & Gates View:**
+- FIX-01: DataTable actions respect processing state (Complete + Return to Queue for processing orders)
+- FIX-02: Cancel/Return to Queue as secondary actions throughout
+- GATE-14: Gates overview page at /gates with table of all gates
+- GATE-15: Gates page links to individual gate operator views
+- GATE-16: Move "Manage gates" functionality from dashboard to /gates route
+- DASH-06: Remove "Manage gates" tab from dashboard, keep queue filtering
+- DASH-07: "Now processing" section shows table with one row per active gate
+- ARCH-10: Refactor index.vue for DRY principle and separation of concerns
 
 ### Out of Scope
 
@@ -172,4 +180,4 @@ Customers always know their queue position and which gate to go to — no confus
 | svh unit for mobile viewport | Modern devices support, cleaner than fallbacks | Good |
 
 ---
-*Last updated: 2026-02-03 after v2.0 milestone*
+*Last updated: 2026-02-03 after v2.1 milestone started*
