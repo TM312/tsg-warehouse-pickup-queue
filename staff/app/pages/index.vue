@@ -10,12 +10,11 @@ import { createColumns } from '@/components/dashboard/columns'
 import RequestDetail from '@/components/dashboard/RequestDetail.vue'
 import GateQueueList from '@/components/dashboard/GateQueueList.vue'
 import NowProcessingSection from '@/components/dashboard/NowProcessingSection.vue'
-import GateManagement from '@/components/gates/GateManagement.vue'
 import AddOrderDialog from '@/components/dashboard/AddOrderDialog.vue'
 import ShowCompletedToggle from '@/components/dashboard/ShowCompletedToggle.vue'
+import ShowUnassignedToggle from '@/components/dashboard/ShowUnassignedToggle.vue'
 import ConnectionStatus from '@/components/ConnectionStatus.vue'
 import { useQueueActions } from '@/composables/useQueueActions'
-import { useGateManagement } from '@/composables/useGateManagement'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { useDashboardKpis } from '@/composables/useDashboardKpis'
 import { useDashboardData } from '@/composables/useDashboardData'
@@ -35,20 +34,20 @@ const client = useSupabaseClient()
 const queueStore = useQueueStore()
 const gatesStore = useGatesStore()
 const { requests, loading: requestsLoading } = storeToRefs(queueStore)
-const { gates: allGates, activeGates } = storeToRefs(gatesStore)
+const { activeGates } = storeToRefs(gatesStore)
 
 const { pending, assignGate, cancelRequest, completeRequest, reorderQueue, setPriority, clearPriority, moveToGate, revertToQueue, refresh } = useQueueActions()
-const { createGate, toggleGateActive } = useGateManagement()
 const { status: realtimeStatus } = useRealtimeQueue()
 
 const { loading: kpiLoading, completedCount, avgWaitTimeMinutes, avgProcessingTimeMinutes } = useDashboardKpis()
 
 // === Local UI State ===
 const showCompleted = ref(false)
+const showOnlyUnassigned = ref(false)
 const selectedRequest = ref<PickupRequest | null>(null)
 
 // === Dashboard-Specific Derived Data ===
-const { currentlyWaiting, chartData, processingItems, gatesWithQueues, filteredRequests } = useDashboardData(showCompleted)
+const { currentlyWaiting, chartData, processingItems, gatesWithQueues, filteredRequests, activeGatesForProcessing } = useDashboardData(showCompleted, showOnlyUnassigned)
 
 // === Column Configuration ===
 const columns = computed(() => createColumns({
@@ -57,6 +56,7 @@ const columns = computed(() => createColumns({
   onGateSelect: handleGateSelect,
   onComplete: handleComplete,
   onCancel: handleCancel,
+  onRevert: handleProcessingRevert,
 }))
 
 // === Sheet State ===
@@ -123,15 +123,6 @@ async function handleProcessingComplete(requestId: string, gateId: string) {
 async function handleProcessingRevert(requestId: string) {
   await revertToQueue(requestId)
   await refresh()
-}
-
-// === Gate Management Handlers ===
-async function handleCreateGate(gateNumber: number) {
-  await createGate(gateNumber)
-}
-
-async function handleToggleGateActive(gateId: string, isActive: boolean) {
-  await toggleGateActive(gateId, isActive)
 }
 
 // === Manual Order Creation ===
@@ -215,8 +206,8 @@ async function handleDetailCancel() {
 
     <!-- Now Processing Section -->
     <NowProcessingSection
-      v-if="processingItems.length > 0"
-      :items="processingItems"
+      v-if="activeGatesForProcessing.length > 0"
+      :gates="activeGatesForProcessing"
       :loading="pending"
       class="mb-6"
       @complete="handleProcessingComplete"
@@ -234,11 +225,11 @@ async function handleDetailCancel() {
           Gate {{ gate.gate_number }}
           <span class="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">{{ gate.totalActive }}</span>
         </TabsTrigger>
-        <TabsTrigger value="manage">Manage Gates</TabsTrigger>
       </TabsList>
 
       <TabsContent value="all" class="mt-4">
-        <div class="flex justify-end mb-4">
+        <div class="flex justify-end gap-4 mb-4">
+          <ShowUnassignedToggle v-model:showOnlyUnassigned="showOnlyUnassigned" />
           <ShowCompletedToggle v-model:showCompleted="showCompleted" />
         </div>
         <DataTable :columns="columns" :data="filteredRequests" @row-click="handleRowClick" />
@@ -255,10 +246,6 @@ async function handleDetailCancel() {
           @complete="handleComplete"
           @row-click="handleQueueRowClick"
         />
-      </TabsContent>
-
-      <TabsContent value="manage" class="mt-4">
-        <GateManagement :gates="allGates ?? []" @create="handleCreateGate" @toggle-active="handleToggleGateActive" />
       </TabsContent>
     </Tabs>
 
