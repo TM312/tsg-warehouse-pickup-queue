@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Defining requirements for v2.2
+**Status:** v2.2 roadmap created, ready to plan Phase 22
 
 ## Project Reference
 
@@ -20,19 +20,17 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** Not started (defining requirements)
-**Plan:** —
-**Status:** Defining requirements
-**Last activity:** 2026-02-03 — Milestone v2.2 started
+**Phase:** 22 of 24 (Quick Wins)
+**Plan:** Not started
+**Status:** Ready to plan
+**Last activity:** 2026-02-03 — Roadmap created for v2.2
 
 **Progress:**
 ```
-v1.0 MVP - SHIPPED (Phases 1-10)
-v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
-v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
-v2.1 Dashboard Polish & Gates View - SHIPPED (Phases 19-21)
-
-Next: /gsd:new-milestone to start v2.2 or v3.0
+v2.2 Polish & Bug Fixes [░░░░░░░░░░] 0%
+Phase 22: Quick Wins - Ready to plan
+Phase 23: Component Polish - Not started
+Phase 24: Unified Queue Table - Not started
 ```
 
 ## Deferred Items
@@ -65,30 +63,20 @@ None
 
 ### Last Session Summary
 
-Completed v2.1 milestone (Dashboard Polish & Gates View):
-- 3 phases, 4 plans
-- useDashboardData composable, /gates page, ProcessingGatesTable, RequestActionButtons
-- Component renames for clarity
-- All 11 requirements satisfied
-
-### Archived
-
-- milestones/v2.0-ROADMAP.md
-- milestones/v2.0-REQUIREMENTS.md
-- milestones/v2.0-MILESTONE-AUDIT.md
-- milestones/v2.1-ROADMAP.md
-- milestones/v2.1-REQUIREMENTS.md
-- milestones/v2.1-MILESTONE-AUDIT.md
+v2.2 milestone started:
+- Research completed (v2.2-SUMMARY.md)
+- Requirements defined (14 requirements)
+- Roadmap created (3 phases: 22-24)
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
 - ~8,352 LOC in staff app
-- Dashboard fully refactored with clean component naming
-- /gates page handles all gate management
-- Next phase will be 22 (continuing from v2.1)
+- Phase 22 is quick wins: link button, badge visibility, refresh removal
+- Phase 23 is component polish: NavUser, idle state
+- Phase 24 is unified table: most complex, 8 requirements
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (v2.1 milestone archived)*
+*Last updated: 2026-02-03 (v2.2 roadmap created)*

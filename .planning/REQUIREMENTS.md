@@ -46,26 +46,26 @@ None — this is a targeted polish milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| TBL-01 | TBD | Pending |
-| TBL-02 | TBD | Pending |
-| TBL-03 | TBD | Pending |
-| TBL-04 | TBD | Pending |
-| TBL-05 | TBD | Pending |
-| TBL-06 | TBD | Pending |
-| TBL-07 | TBD | Pending |
-| CLN-01 | TBD | Pending |
-| CLN-02 | TBD | Pending |
+| UI-01 | Phase 22 | Pending |
+| UI-02 | Phase 23 | Pending |
+| UI-03 | Phase 23 | Pending |
+| UI-04 | Phase 22 | Pending |
+| UI-05 | Phase 23 | Pending |
+| TBL-01 | Phase 24 | Pending |
+| TBL-02 | Phase 24 | Pending |
+| TBL-03 | Phase 24 | Pending |
+| TBL-04 | Phase 24 | Pending |
+| TBL-05 | Phase 24 | Pending |
+| TBL-06 | Phase 24 | Pending |
+| TBL-07 | Phase 24 | Pending |
+| CLN-01 | Phase 22 | Pending |
+| CLN-02 | Phase 24 | Pending |
 
 **Coverage:**
 - v2.2 requirements: 14 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 14
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after initial definition*
+*Last updated: 2026-02-03 after roadmap creation*
