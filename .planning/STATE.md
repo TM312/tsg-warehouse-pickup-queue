@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Phase 23 Plan 01 complete
+**Status:** Phase 24 Plan 01 complete
 
 ## Project Reference
 
@@ -21,16 +21,16 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 **Phase:** 24 of 24 (Unified Queue Table)
-**Plan:** Not started
-**Status:** Ready to discuss/plan
-**Last activity:** 2026-02-03 — Phase 23 executed and verified
+**Plan:** 01 of 01 complete
+**Status:** Phase 24 Plan 01 complete
+**Last activity:** 2026-02-03 — Completed 24-01-PLAN.md
 
 **Progress:**
 ```
-v2.2 Polish & Bug Fixes [██████░░░░] 67%
+v2.2 Polish & Bug Fixes [██████████] 100%
 Phase 22: Quick Wins - Complete (1/1 plans)
 Phase 23: Component Polish - Complete (1/1 plans)
-Phase 24: Unified Queue Table - Not started
+Phase 24: Unified Queue Table - Complete (1/1 plans)
 ```
 
 ## Deferred Items
@@ -48,6 +48,12 @@ See .planning/PROJECT.md for consolidated key decisions across all milestones.
 **Phase 23 Decisions:**
 - Derive displayName from email username with title case conversion (prefer user_metadata.name if available)
 - Use colspan=3 for idle table rows to span Order/Company/Status columns
+
+**Phase 24 Decisions:**
+- Default sort: created_at descending (newest first)
+- Same columns in both modes for visual consistency
+- Drag mode headers visible but not clickable
+- Keep requestsTableColumns.ts for backward compatibility until CLN-02 cleanup
 
 ### Technical Debt
 
@@ -67,21 +73,21 @@ None
 
 ### Last Session Summary
 
-Phase 23 executed and verified:
-- Plan 23-01 completed (2 tasks, 3 commits)
-- NavUser updated to stacked name/email layout with right-side dropdown
-- ProcessingGatesTable idle rows now muted with centered "Idle" text (no dashes)
-- All 4 must-haves verified against codebase
+Phase 24 Plan 01 executed:
+- Plan 24-01 completed (2 tasks, 2 commits)
+- QueueTable component created with dual mode support (sort/drag)
+- queueTableColumns.ts added with direction-aware sort headers
+- Sort mode defaults to created_at descending
+- Drag mode includes grip handles and action buttons (Priority, Complete)
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- ~8,352 LOC in staff app
-- Phase 23 complete - ready for Phase 24
-- Phase 24 is unified table: most complex, 8 requirements
-- Final phase in v2.2 Polish & Bug Fixes milestone
+- ~8,566 LOC in staff app (214 + 219 new lines)
+- Phase 24 Plan 01 complete - QueueTable ready for integration
+- v2.2 Polish & Bug Fixes milestone complete
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 23 complete, verified)*
+*Last updated: 2026-02-03 (Phase 24 Plan 01 complete)*
