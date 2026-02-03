@@ -57,11 +57,11 @@ Plans:
   3. Processing table shows order info when gate is busy, "Idle" when gate has no processing order
   4. Processing orders in DataTable show Complete + Return to Queue actions (not assign to gate)
   5. Cancel action appears as secondary (outline/ghost) throughout all order states
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 21-01: Update dashboard tabs and processing section
-- [ ] 21-02: Fix DataTable action states
+- [ ] 21-01-PLAN.md — Update dashboard tabs and processing section
+- [ ] 21-02-PLAN.md — Fix DataTable action button states
 
 ## Progress
 
