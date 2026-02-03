@@ -44,10 +44,10 @@ Plans:
 2. Sidebar dropdown menu positions correctly (bottom on mobile, right on desktop)
 3. ProcessingGatesTable idle rows display clean "Idle" text without dashes or empty cells
 
-**Plans:** TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 23-01: TBD
+- [ ] 23-01-PLAN.md — NavUser stacked layout with right-side dropdown, ProcessingGatesTable idle state cleanup
 
 ### Phase 24: Unified Queue Table
 
@@ -76,10 +76,10 @@ Plans:
 | 14-18 | v2.0 | 19/19 | Complete | 2026-02-03 |
 | 19-21 | v2.1 | 4/4 | Complete | 2026-02-03 |
 | 22. Quick Wins | v2.2 | 1/1 | Complete | 2026-02-03 |
-| 23. Component Polish | v2.2 | 0/TBD | Not started | - |
+| 23. Component Polish | v2.2 | 0/1 | Not started | - |
 | 24. Unified Queue Table | v2.2 | 0/TBD | Not started | - |
 
 ---
 
 *Roadmap created: 2026-01-28*
-*Last updated: 2026-02-03 — Phase 22 complete*
+*Last updated: 2026-02-03 — Phase 23 planned*
