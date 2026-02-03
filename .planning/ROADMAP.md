@@ -42,10 +42,10 @@ Plans:
   3. Each gate row links to the gate operator view (/gate/[id])
   4. Staff can create new gates from the /gates page
   5. Staff can enable/disable gates from the /gates page
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 20-01: Create gates overview page with table and management
+- [ ] 20-01-PLAN.md — Create gates page with table and management functionality
 
 ### Phase 21: Dashboard Polish
 **Goal**: Dashboard has clean UX with correct action states and processing display
