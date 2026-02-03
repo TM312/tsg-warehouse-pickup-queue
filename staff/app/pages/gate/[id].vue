@@ -7,6 +7,7 @@ import CurrentPickup from '@/components/gate/CurrentPickup.vue'
 import EmptyGateState from '@/components/gate/EmptyGateState.vue'
 import NextUpPreview from '@/components/gate/NextUpPreview.vue'
 import CompleteDialog from '@/components/gate/CompleteDialog.vue'
+import GateNavButtons from '@/components/gate/GateNavButtons.vue'
 import { useRealtimeQueue } from '@/composables/useRealtimeQueue'
 import { PICKUP_STATUS } from '#shared/types/pickup-request'
 import type { GateStatus } from '#shared/types/pickup-request'
@@ -189,7 +190,9 @@ watch(lastUpdated, () => {
     <template v-else-if="gate">
       <!-- Gate header -->
       <header class="bg-primary text-primary-foreground p-4">
-        <h1 class="text-2xl font-bold text-center">Gate {{ gate.gate_number }}</h1>
+        <div class="flex justify-center">
+          <GateNavButtons :current-gate="gate" />
+        </div>
         <p v-if="realtimeStatus !== 'connected'" class="text-xs text-amber-200 text-center mt-1">
           {{ realtimeStatus === 'connecting' ? 'Connecting...' : 'Reconnecting...' }}
         </p>
