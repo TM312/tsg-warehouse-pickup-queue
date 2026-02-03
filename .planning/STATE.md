@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** Phase 24 Plan 01 complete
+**Status:** Phase 24 Plan 02 complete
 
 ## Project Reference
 
@@ -21,16 +21,16 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 **Phase:** 24 of 24 (Unified Queue Table)
-**Plan:** 01 of 01 complete
-**Status:** Phase 24 Plan 01 complete
-**Last activity:** 2026-02-03 — Completed 24-01-PLAN.md
+**Plan:** 02 of 02 complete
+**Status:** Phase 24 complete
+**Last activity:** 2026-02-03 — Completed 24-02-PLAN.md
 
 **Progress:**
 ```
 v2.2 Polish & Bug Fixes [██████████] 100%
 Phase 22: Quick Wins - Complete (1/1 plans)
 Phase 23: Component Polish - Complete (1/1 plans)
-Phase 24: Unified Queue Table - Complete (1/1 plans)
+Phase 24: Unified Queue Table - Complete (2/2 plans)
 ```
 
 ## Deferred Items
@@ -54,6 +54,9 @@ See .planning/PROJECT.md for consolidated key decisions across all milestones.
 - Same columns in both modes for visual consistency
 - Drag mode headers visible but not clickable
 - Keep requestsTableColumns.ts for backward compatibility until CLN-02 cleanup
+- Space to enter grabbed state (not immediate arrow movement)
+- Cmd/Ctrl modifiers for jump to top/bottom
+- Escape reverts to original order captured at grab time
 
 ### Technical Debt
 
@@ -73,21 +76,22 @@ None
 
 ### Last Session Summary
 
-Phase 24 Plan 01 executed:
-- Plan 24-01 completed (2 tasks, 2 commits)
-- QueueTable component created with dual mode support (sort/drag)
-- queueTableColumns.ts added with direction-aware sort headers
-- Sort mode defaults to created_at descending
-- Drag mode includes grip handles and action buttons (Priority, Complete)
+Phase 24 Plan 02 executed:
+- Plan 24-02 completed (2 tasks, 2 commits)
+- useKeyboardReorder composable created with idle/grabbed state machine
+- QueueTable drag mode now keyboard accessible
+- Space to grab, arrows to move, Cmd/Ctrl+arrows for jump
+- aria-live region announces actions for screen readers
+- Focus management follows moved row
 
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- ~8,566 LOC in staff app (214 + 219 new lines)
-- Phase 24 Plan 01 complete - QueueTable ready for integration
-- v2.2 Polish & Bug Fixes milestone complete
+- ~8,746 LOC in staff app (+180 lines from 24-02)
+- Phase 24 complete - QueueTable has full accessibility
+- v2.2 Polish & Bug Fixes milestone in progress
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 24 Plan 01 complete)*
+*Last updated: 2026-02-03 (Phase 24 Plan 02 complete)*
