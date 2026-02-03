@@ -14,10 +14,10 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 
 ### Gates View
 
-- [ ] **GATE-14**: Gates overview page exists at /gates route
-- [ ] **GATE-15**: Gates page shows table with all gates and their status
-- [ ] **GATE-16**: Gates page provides links to individual gate operator views (/gate/[id])
-- [ ] **GATE-17**: "Manage gates" functionality (create/enable/disable) lives on /gates route
+- [x] **GATE-14**: Gates overview page exists at /gates route
+- [x] **GATE-15**: Gates page shows table with all gates and their status
+- [x] **GATE-16**: Gates page provides links to individual gate operator views (/gate/[id])
+- [x] **GATE-17**: "Manage gates" functionality (create/enable/disable) lives on /gates route
 
 ### Dashboard Improvements
 
@@ -44,10 +44,10 @@ Dashboard polish and gates view — fixing UX issues and completing the gates ma
 |-------------|-------|--------|
 | FIX-01 | Phase 21 | Pending |
 | FIX-02 | Phase 21 | Pending |
-| GATE-14 | Phase 20 | Pending |
-| GATE-15 | Phase 20 | Pending |
-| GATE-16 | Phase 20 | Pending |
-| GATE-17 | Phase 20 | Pending |
+| GATE-14 | Phase 20 | Complete |
+| GATE-15 | Phase 20 | Complete |
+| GATE-16 | Phase 20 | Complete |
+| GATE-17 | Phase 20 | Complete |
 | DASH-06 | Phase 21 | Pending |
 | DASH-07 | Phase 21 | Pending |
 | DASH-08 | Phase 21 | Pending |

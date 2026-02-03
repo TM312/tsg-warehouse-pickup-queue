@@ -13,7 +13,7 @@ Polish the dashboard experience by refactoring for maintainability, creating a d
 ## Phases
 
 - [x] **Phase 19: Dashboard Refactoring** - Extract components and reduce complexity in index.vue
-- [ ] **Phase 20: Gates View** - Create /gates route with table and management functionality
+- [x] **Phase 20: Gates View** - Create /gates route with table and management functionality
 - [ ] **Phase 21: Dashboard Polish** - Fix tabs, processing section, and action button states
 
 ## Phase Details
@@ -45,7 +45,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 20-01-PLAN.md — Create gates page with table and management functionality
+- [x] 20-01-PLAN.md — Create gates page with table and management functionality
 
 ### Phase 21: Dashboard Polish
 **Goal**: Dashboard has clean UX with correct action states and processing display
@@ -68,7 +68,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 19. Dashboard Refactoring | 1/1 | ✓ Complete | 2026-02-03 |
-| 20. Gates View | 0/1 | Not started | - |
+| 20. Gates View | 1/1 | ✓ Complete | 2026-02-03 |
 | 21. Dashboard Polish | 0/2 | Not started | - |
 
 ---
