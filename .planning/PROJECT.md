@@ -10,16 +10,17 @@ Customers always know their queue position and which gate to go to — no confus
 
 ## Current State
 
-**Version:** v1.1 shipped 2026-01-30 | v2.0 in progress
-**Codebase:** ~11,550 LOC (Vue, TypeScript, SQL, Python, Terraform)
-**Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
+**Version:** v2.0 shipped 2026-02-03
+**Codebase:** ~58,500 LOC (Vue, TypeScript, SQL, Python, Terraform)
+**Tech Stack:** Nuxt 4, Vue 3, TailwindCSS, shadcn-vue, Pinia, Unovis, Supabase (PostgreSQL, Auth, Realtime), AWS Lambda
 
 **What's working:**
 - Customer app: submission form, business hours check, real-time status tracking, hours display
-- Staff app: dashboard, queue management, gate management, drag-drop reordering
-- Gate operator view: mobile-first /gate/[id] with processing workflow
+- Staff app: sidebar navigation, dashboard with KPIs and chart, queue management, gate management
+- Gate operator view: mobile-first /gate/[id] with processing workflow and gate navigation
 - Business hours: weekly schedule, closures, manual override
 - Real-time updates across all views via Supabase Realtime
+- Centralized TypeScript types with Pinia state management
 - Rate limiting on customer submissions
 
 **What's pending:**
@@ -81,27 +82,34 @@ Customers always know their queue position and which gate to go to — no confus
 - HOUR-04: Hours changes take effect immediately
 - HOUR-05: Manual override toggle
 
-### Active
-
-**v2.0 Architecture Overhaul — in progress:**
-
-*UI/UX:*
+**v2.0 — shipped 2026-02-03:**
 - SIDE-01: Sidebar layout with shadcn-vue Sidebar component
 - SIDE-02: Navigation structure (Dashboard, Gates, Opening Schedule)
+- SIDE-03: Sidebar collapses to icon-only mode
+- SIDE-04: Sidebar shows mobile overlay on small screens
+- SIDE-05: Active route is visually highlighted in sidebar
+- SIDE-06: Gate operator routes have no sidebar (fullscreen layout)
 - DASH-01: Dashboard page with gate queue visualization (bar chart)
-- DASH-02: Queue overview showing current state across all gates
-- GATE-10: Prev/next gate navigation for operators (alphabetical order)
-- GATE-11: Fix mobile scroll issue on gate pages (no scroll when content fits)
+- DASH-02: Bar chart showing queue length per gate
+- DASH-03: KPI card: Total pickups completed today
+- DASH-04: KPI card: Average waiting time
+- DASH-05: KPI card: Average processing time
+- ARCH-01: Pinia state management with @pinia/nuxt
+- ARCH-02: Queue store manages shared queue state
+- ARCH-03: Gates store manages shared gate state
+- ARCH-04: Composables handle realtime subscriptions (hybrid pattern)
+- ARCH-05: Composables handle RPC/mutation calls (hybrid pattern)
+- ARCH-06: Centralized type definitions in shared/types/
+- ARCH-07: Request status uses typed constant (as const pattern)
+- ARCH-08: Gate status uses typed constant
+- ARCH-09: All magic strings replaced with typed constants
+- GATE-12: Prev/next gate navigation buttons (alphabetical order)
+- GATE-13: No scroll on mobile when content fits viewport
+- BUG-01: Show completed/cancelled toggle filters correctly
 
-*Architecture:*
-- ARCH-01: Pinia state management for shared state
-- ARCH-02: Composables for realtime/RPC logic (hybrid pattern)
-- ARCH-03: Centralized type definitions (enums for statuses, gate states, etc.)
-- ARCH-04: Replace magic strings with typed constants throughout codebase
-- ARCH-05: Separation of concerns (logic decoupled from UI)
+### Active
 
-*Bug Fixes:*
-- BUG-01: Show completed/cancelled toggle not filtering correctly
+(No active requirements — define with /gsd:new-milestone)
 
 ### Out of Scope
 
@@ -156,9 +164,12 @@ Customers always know their queue position and which gate to go to — no confus
 | Queue positions compact after completion | Auto-advance to next customer | Good |
 | 7-row list layout for weekly schedule | Simple, mobile-friendly | Good |
 | Priority-based hours check | Override > closures > weekly schedule | Good |
-| Hybrid Pinia + composables | Stores for state, composables for side effects | — Pending |
-| No sidebar on gate routes | Gate operators need simplified mobile view | — Pending |
-| Gate navigation alphabetical | Consistent ordering for prev/next buttons | — Pending |
+| Hybrid Pinia + composables | Stores for state, composables for side effects | Good |
+| No sidebar on gate routes | Gate operators need simplified mobile view | Good |
+| Gate navigation alphabetical | Consistent ordering for prev/next buttons | Good |
+| Crossfade gate transitions | Simpler than slide, user preferred | Good |
+| Index-based x-axis for charts | Unovis requires numeric x values for categories | Good |
+| svh unit for mobile viewport | Modern devices support, cleaner than fallbacks | Good |
 
 ---
-*Last updated: 2026-01-30 after starting v2.0 milestone*
+*Last updated: 2026-02-03 after v2.0 milestone*

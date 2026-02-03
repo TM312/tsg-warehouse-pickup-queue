@@ -1,5 +1,33 @@
 # Project Milestones: Warehouse Pickup Queue System
 
+## v2.0 Architecture Overhaul (Shipped: 2026-02-03)
+
+**Delivered:** Well-structured staff application architecture with centralized types, Pinia state management, sidebar navigation, and dashboard visualization.
+
+**Phases completed:** 14-18 (19 plans total)
+
+**Key accomplishments:**
+
+- Centralized TypeScript types with `as const` pattern eliminating magic strings throughout codebase
+- Pinia state management with hybrid composable pattern (stores for state, composables for side effects)
+- Sidebar navigation with collapsible layout (icon-only desktop, overlay mobile)
+- Dashboard with KPI cards (completed today, avg wait/processing time) and queue bar chart
+- Gate operator navigation with prev/next buttons, keyboard shortcuts, and crossfade transitions
+- Bug fixes: filter toggle, mobile viewport scrolling
+
+**Stats:**
+
+- 137 files created/modified
+- +12,370 lines of code (Vue, TypeScript)
+- 5 phases, 19 plans
+- 6 days from start to ship (2026-01-28 → 2026-02-03)
+
+**Git range:** `feat(14-01)` → `docs(18)`
+
+**What's next:** Production deployment, consider v2.1 enhancements (session persistence, real-time KPIs)
+
+---
+
 ## v1.1 Gate Operator Experience (Shipped: 2026-01-30)
 
 **Delivered:** Mobile-first gate operator view with explicit processing workflow and business hours management for supervisors.
