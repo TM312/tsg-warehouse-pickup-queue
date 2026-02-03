@@ -78,7 +78,7 @@ function handleToggle(gateId: string, checked: boolean) {
             <div class="flex items-center gap-3">
               <Switch
                 :checked="gate.is_active"
-                @update:checked="(checked) => handleToggle(gate.id, checked)"
+                @update:checked="(checked: boolean) => handleToggle(gate.id, checked)"
               />
               <Button variant="outline" size="sm" as-child>
                 <NuxtLink :to="`/gate/${gate.id}`">Open</NuxtLink>
