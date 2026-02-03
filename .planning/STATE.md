@@ -23,10 +23,10 @@ See: .planning/PROJECT.md (updated 2026-01-30)
 
 ## Current Position
 
-**Phase:** 17 of 18 (Dashboard & Visualization) - COMPLETE
-**Plan:** 04 of 04 complete
-**Status:** Phase verified, ready for Phase 18
-**Last activity:** 2026-02-03 - Completed Phase 17
+**Phase:** 18 of 18 (Gate Operator & Bug Fixes)
+**Plan:** 02 of 02 (18-01 pending, 18-02 complete)
+**Status:** In progress
+**Last activity:** 2026-02-03 - Completed 18-02-PLAN.md (bug fixes)
 
 **Progress:**
 ```
@@ -63,8 +63,12 @@ v2.0 decisions implemented (Phase 17):
 - Use tickFormat to map indices back to gate names for axis labels - 17-04
 - Solid hex colors for Unovis bars (CSS variables don't work in SVG) - 17-04
 
+v2.0 decisions implemented (Phase 18):
+- Use defineModel instead of props+emits for v-model components - 18-02
+- Use svh unit for mobile viewport (no fallback needed for modern devices) - 18-02
+
 v2.0 decisions pending implementation:
-- Gate navigation alphabetical: consistent ordering for prev/next buttons
+- Gate navigation alphabetical: consistent ordering for prev/next buttons (18-01)
 
 ### Technical Debt
 
@@ -83,18 +87,15 @@ None
 
 ### Last Session Summary
 
-Completed Phase 17: Dashboard & Visualization
-- 17-01: Installed chart dependencies (@unovis/vue, shadcn-vue chart) and SSR width plugin
-- 17-02: Created useDashboardKpis composable and formatDuration utility
-- 17-03: Created KpiCard and QueueBarChart components
-- 17-04: Integrated dashboard page with KPIs and chart (human verified)
+Completed Plan 18-02: Bug Fixes (BUG-01 and GATE-13)
+- Fixed ShowCompletedToggle v-model binding using defineModel pattern
+- Fixed mobile viewport scrolling with svh unit
 
-Phase verification passed (5/5 must-haves).
+Plan 18-01 (gate navigation) still pending.
 
 ### Next Actions
 
-1. `/gsd:discuss-phase 18` — gather context for Gate Operator & Bug Fixes
-2. `/gsd:plan-phase 18` — create execution plans
+1. Execute `/gsd:execute-phase 18` plan 18-01 for gate navigation
 
 ### Context for Next Session
 
@@ -102,9 +103,11 @@ Phase verification passed (5/5 must-haves).
 - Dashboard at index.vue with 4 KPI cards and bar chart
 - Chart components use Unovis with index-based x-axis for categories
 - useDashboardKpis provides 30s auto-refresh of KPI data
-- Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
+- Layouts: default.vue (sidebar), fullscreen.vue (gate operator with svh fix), auth.vue
 - Pinia stores: useQueueStore, useGatesStore
-- Phase 18 needs: prev/next gate navigation, mobile viewport fix, filter bug fix
+- BUG-01 fixed: Toggle filter works with defineModel
+- GATE-13 fixed: Mobile viewport uses svh
+- Phase 18 remaining: prev/next gate navigation (18-01)
 
 ---
 
