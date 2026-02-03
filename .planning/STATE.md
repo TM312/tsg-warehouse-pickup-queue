@@ -1,7 +1,7 @@
 # State: Warehouse Pickup Queue System
 
 **Session:** 2026-02-03
-**Status:** v2.1 PLANNED — Dashboard Polish & Gates View
+**Status:** v2.1 IN PROGRESS — Dashboard Polish & Gates View
 
 ## Project Reference
 
@@ -18,10 +18,10 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** 19 - Dashboard Refactoring
-**Plan:** Not started
-**Status:** Ready to plan
-**Last activity:** 2026-02-03 — Roadmap created
+**Phase:** 19 - Dashboard Refactoring (1 of 3 in v2.1)
+**Plan:** 01 of 01 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-03 — Completed 19-01-PLAN.md
 
 **Progress:**
 ```
@@ -29,14 +29,14 @@ v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
 v2.1 Dashboard Polish & Gates View - IN PROGRESS
-  [>                   ] Phase 19/21
+  [=======             ] Phase 19 complete, 20-21 remaining
 ```
 
 ## v2.1 Phase Overview
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Not started |
+| 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Complete |
 | 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Not started |
 | 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | Not started |
 
@@ -52,6 +52,12 @@ v2.1 Dashboard Polish & Gates View - IN PROGRESS
 
 See .planning/PROJECT.md for consolidated key decisions.
 
+| ID | Decision | Phase |
+|----|----------|-------|
+| DEC-19-01-01 | Extract dashboard computed properties to dedicated composable | 19-01 |
+| DEC-19-01-02 | Use section comments (// === Name ===) for code organization | 19-01 |
+| DEC-19-01-03 | Remove redundant gates alias, use activeGates directly | 19-01 |
+
 ### Technical Debt
 
 | Item | Priority | Introduced |
@@ -59,6 +65,7 @@ See .planning/PROJECT.md for consolidated key decisions.
 | Generate database types with `supabase gen types typescript` | Low | v1-05 |
 | Pre-existing type errors in native-select component | Low | Unknown |
 | Pre-existing type errors in customer/server/ (missing database types) | Low | v1-05 |
+| Pre-existing pinia import error in gate/[id].vue | Low | Unknown |
 
 ### Blockers
 
@@ -68,11 +75,12 @@ None
 
 ### Last Session Summary
 
-Completed v2.0 Architecture Overhaul milestone:
-- 5 phases (14-18), 19 plans
-- 23 requirements delivered
-- Centralized types, Pinia stores, sidebar navigation, dashboard visualization
-- Gate operator navigation and bug fixes
+Completed Phase 19 (Dashboard Refactoring):
+- 1 plan, 2 tasks
+- Created useDashboardData composable extracting 5 computed properties
+- Refactored index.vue from 410 to 285 lines (~30% reduction)
+- Added 14 section comments for code organization
+- Requirements ARCH-10, ARCH-11 satisfied
 
 ### Archived
 
@@ -83,14 +91,14 @@ Completed v2.0 Architecture Overhaul milestone:
 ### Context for Next Session
 
 - Staff app in `staff/` directory (Nuxt 4)
-- Dashboard at index.vue with 4 KPI cards and bar chart
+- Dashboard at index.vue (285 lines, well-organized with section comments)
+- New composable: useDashboardData.ts for dashboard-specific computed properties
 - Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
 - Pinia stores: useQueueStore, useGatesStore
-- index.vue is 410 lines, needs refactoring (Phase 19)
 - /gates route exists in sidebar but page not implemented (Phase 20)
-- Next: `/gsd:plan-phase 19` to start Dashboard Refactoring
+- Next: `/gsd:plan-phase 20` to start Gates View
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (v2.1 roadmap created)*
+*Last updated: 2026-02-03 (Phase 19 complete)*
