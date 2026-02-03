@@ -41,16 +41,16 @@ export function useGateManagement() {
   async function toggleGateActive(gateId: string, isActive: boolean): Promise<boolean> {
     pending.value = true
     try {
-      // If disabling, check for customers in queue
+      // If disabling, check for customers in queue or processing
       if (!isActive) {
         const { count } = await client
           .from('pickup_requests')
           .select('id', { count: 'exact', head: true })
           .eq('assigned_gate_id', gateId)
-          .eq('status', PICKUP_STATUS.IN_QUEUE)
+          .in('status', [PICKUP_STATUS.IN_QUEUE, PICKUP_STATUS.PROCESSING])
 
         if (count && count > 0) {
-          toast.error('Cannot disable gate with customers in queue')
+          toast.error(`Cannot disable gate with ${count} active order${count > 1 ? 's' : ''}. Reassign or complete them first.`)
           return false
         }
       }
