@@ -18,10 +18,10 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 
 ## Current Position
 
-**Phase:** 19 - Dashboard Refactoring (1 of 3 in v2.1)
+**Phase:** 20 - Gates View (2 of 3 in v2.1)
 **Plan:** 01 of 01 complete
 **Status:** Phase complete
-**Last activity:** 2026-02-03 — Completed 19-01-PLAN.md
+**Last activity:** 2026-02-03 — Completed 20-01-PLAN.md
 
 **Progress:**
 ```
@@ -29,7 +29,7 @@ v1.0 MVP - SHIPPED (Phases 1-10)
 v1.1 Gate Operator Experience - SHIPPED (Phases 11-13)
 v2.0 Architecture Overhaul - SHIPPED (Phases 14-18)
 v2.1 Dashboard Polish & Gates View - IN PROGRESS
-  [=======             ] Phase 19 complete, 20-21 remaining
+  [==============      ] Phases 19-20 complete, 21 remaining
 ```
 
 ## v2.1 Phase Overview
@@ -37,7 +37,7 @@ v2.1 Dashboard Polish & Gates View - IN PROGRESS
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
 | 19 | Dashboard Refactoring | ARCH-10, ARCH-11 | Complete |
-| 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Not started |
+| 20 | Gates View | GATE-14, GATE-15, GATE-16, GATE-17 | Complete |
 | 21 | Dashboard Polish | DASH-06, DASH-07, DASH-08, FIX-01, FIX-02 | Not started |
 
 ## Deferred Items
@@ -57,6 +57,9 @@ See .planning/PROJECT.md for consolidated key decisions.
 | DEC-19-01-01 | Extract dashboard computed properties to dedicated composable | 19-01 |
 | DEC-19-01-02 | Use section comments (// === Name ===) for code organization | 19-01 |
 | DEC-19-01-03 | Remove redundant gates alias, use activeGates directly | 19-01 |
+| DEC-20-01-01 | Table layout with 5 columns: Gate, Status, Queue, Processing, Actions | 20-01 |
+| DEC-20-01-02 | Check both IN_QUEUE and PROCESSING statuses before disabling gate | 20-01 |
+| DEC-20-01-03 | Processing order lookup uses computed Map for O(1) access | 20-01 |
 
 ### Technical Debt
 
@@ -75,12 +78,12 @@ None
 
 ### Last Session Summary
 
-Completed Phase 19 (Dashboard Refactoring):
-- 1 plan, 2 tasks
-- Created useDashboardData composable extracting 5 computed properties
-- Refactored index.vue from 410 to 285 lines (~30% reduction)
-- Added 14 section comments for code organization
-- Requirements ARCH-10, ARCH-11 satisfied
+Completed Phase 20 (Gates View):
+- 1 plan, 3 tasks
+- Created GatesTable component with 5-column table layout
+- Updated useGateManagement to check PROCESSING status
+- Created /gates page with gate management functionality
+- Requirements GATE-14, GATE-15, GATE-16, GATE-17 satisfied
 
 ### Archived
 
@@ -92,13 +95,12 @@ Completed Phase 19 (Dashboard Refactoring):
 
 - Staff app in `staff/` directory (Nuxt 4)
 - Dashboard at index.vue (285 lines, well-organized with section comments)
-- New composable: useDashboardData.ts for dashboard-specific computed properties
-- Layouts: default.vue (sidebar), fullscreen.vue (gate operator), auth.vue
-- Pinia stores: useQueueStore, useGatesStore
-- /gates route exists in sidebar but page not implemented (Phase 20)
-- Next: `/gsd:plan-phase 20` to start Gates View
+- /gates page now implemented with GatesTable component
+- GatesTable: Table with Gate, Status, Queue, Processing, Actions columns
+- useGateManagement: Checks both IN_QUEUE and PROCESSING before disable
+- Next: Phase 21 (Dashboard Polish) for final v2.1 requirements
 
 ---
 
 *State initialized: 2026-01-28*
-*Last updated: 2026-02-03 (Phase 19 complete)*
+*Last updated: 2026-02-03 (Phase 20 complete)*
