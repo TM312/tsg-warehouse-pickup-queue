@@ -66,14 +66,16 @@ const skeletonHeights = ['40%', '65%', '50%', '75%']
     <!-- Chart -->
     <VisXYContainer v-else :data="data" :yDomain="yDomain">
       <VisGroupedBar
-        :x="x"
-        :y="[y]"
+        :x="(_d: GateQueueData, i: number) => i"
+        :y="[(d: GateQueueData) => d.count]"
         :color="[chartConfig.count.color]"
         :rounded-corners="4"
         :bar-padding="0.2"
       />
       <VisAxis
         type="x"
+        :x="(_d: GateQueueData, i: number) => i"
+        :tick-format="(tick: number) => data[tick]?.gate ?? ''"
         :grid-line="false"
         :domain-line="false"
         :tick-line="false"
