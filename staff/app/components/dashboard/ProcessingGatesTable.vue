@@ -58,7 +58,9 @@ const emit = defineEmits<{
         <TableRow
           v-for="gate in gates"
           :key="gate.id"
-          :class="{ 'cursor-pointer hover:bg-accent/50': gate.order }"
+          :class="[
+            gate.order ? 'cursor-pointer hover:bg-accent/50' : 'opacity-60',
+          ]"
           @click="gate.order && emit('rowClick', gate.order.id)"
         >
           <TableCell class="font-medium">Gate {{ gate.gate_number }}</TableCell>
@@ -84,9 +86,9 @@ const emit = defineEmits<{
           </template>
 
           <template v-else>
-            <TableCell class="text-muted-foreground italic">Idle</TableCell>
-            <TableCell>—</TableCell>
-            <TableCell>—</TableCell>
+            <TableCell colspan="3" class="text-center text-muted-foreground italic">
+              Idle
+            </TableCell>
             <TableCell></TableCell>
           </template>
         </TableRow>
