@@ -13,7 +13,7 @@ endif
 # State file per environment
 STATE_FILE := terraform.$(ENV).tfstate
 
-.PHONY: help dev build preview lint format test clean \
+.PHONY: help setup start stop dev build preview lint format test clean \
         db-start db-stop db-reset db-migrate db-status db-seed db-create-test-user db-push db-pull \
         layer plan apply deploy logs verify status \
         release rollback health-check
@@ -28,6 +28,11 @@ export PROJECT_ROOT := $(PWD)
 help:
 	@echo "Warehouse Pickup Queue - Available Commands"
 	@echo "============================================"
+	@echo ""
+	@echo "QUICK START"
+	@echo "  make setup          - Install deps, start Supabase, seed DB, create test user"
+	@echo "  make start          - Start Supabase + both dev servers (Ctrl+C to stop)"
+	@echo "  make stop           - Stop all local services"
 	@echo ""
 	@echo "STAFF APP (Nuxt)"
 	@echo "  make dev            - Start staff app dev server"
@@ -68,6 +73,60 @@ help:
 	@echo "Current Configuration:"
 	@echo "  ENV=$(ENV)"
 	@echo "  State: infra/$(STATE_FILE)"
+
+# ============================================================================
+# QUICK START
+# ============================================================================
+
+# Install dependencies, start Supabase, seed database, create test user
+setup:
+	@echo "Installing staff app dependencies..."
+	@cd staff && pnpm install
+	@echo ""
+	@echo "Installing customer app dependencies..."
+	@cd customer && pnpm install
+	@echo ""
+	@echo "Starting local Supabase..."
+	@npx supabase start
+	@echo ""
+	@echo "Generating .env files from Supabase credentials..."
+	@ANON_KEY=$$(npx supabase status -o json | jq -r '.ANON_KEY') && \
+	echo "SUPABASE_URL=http://127.0.0.1:54321" > staff/.env && \
+	echo "SUPABASE_KEY=$$ANON_KEY" >> staff/.env && \
+	echo "SUPABASE_URL=http://127.0.0.1:54321" > customer/.env && \
+	echo "SUPABASE_KEY=$$ANON_KEY" >> customer/.env && \
+	echo "  staff/.env created" && \
+	echo "  customer/.env created"
+	@echo ""
+	@echo "Resetting database (migrations + seed)..."
+	@npx supabase db reset
+	@echo ""
+	@echo "Creating test user..."
+	@$(MAKE) db-create-test-user
+	@echo ""
+	@echo "Setup complete! Run 'make start' to launch all services."
+
+# Start Supabase + both dev servers (Ctrl+C to stop)
+start:
+	@npx supabase start
+	@echo ""
+	@echo "Starting dev servers..."
+	@echo "  Staff app:       http://localhost:3000"
+	@echo "  Customer app:    http://localhost:3001"
+	@echo "  Supabase Studio: http://127.0.0.1:54323"
+	@echo ""
+	@trap 'kill 0' EXIT; \
+	(cd staff && pnpm dev) & \
+	(cd customer && pnpm dev --port 3001) & \
+	wait
+
+# Stop all local services
+stop:
+	@echo "Stopping dev servers..."
+	@-pkill -f "nuxt dev" 2>/dev/null || true
+	@echo "Stopping local Supabase..."
+	@npx supabase stop
+	@echo "All services stopped."
 
 # ============================================================================
 # STAFF APP (Nuxt)
