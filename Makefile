@@ -31,7 +31,7 @@ help:
 	@echo ""
 	@echo "QUICK START"
 	@echo "  make setup          - Install deps, start Supabase, seed DB, create test user"
-	@echo "  make start          - Start Supabase + both dev servers (Ctrl+C to stop)"
+	@echo "  make start          - Start Supabase + all dev servers (Ctrl+C to stop)"
 	@echo "  make stop           - Stop all local services"
 	@echo ""
 	@echo "STAFF APP (Nuxt)"
@@ -86,6 +86,9 @@ setup:
 	@echo "Installing customer app dependencies..."
 	@cd customer && pnpm install
 	@echo ""
+	@echo "Installing playground app dependencies..."
+	@cd playground && pnpm install
+	@echo ""
 	@echo "Starting local Supabase..."
 	@npx supabase start
 	@echo ""
@@ -113,11 +116,13 @@ start:
 	@echo "Starting dev servers..."
 	@echo "  Staff app:       http://localhost:3000"
 	@echo "  Customer app:    http://localhost:3001"
+	@echo "  Playground app:  http://localhost:3002"
 	@echo "  Supabase Studio: http://127.0.0.1:54323"
 	@echo ""
 	@trap 'kill 0' EXIT; \
 	(cd staff && pnpm dev) & \
 	(cd customer && pnpm dev --port 3001) & \
+	(cd playground && pnpm dev) & \
 	wait
 
 # Stop all local services
@@ -321,6 +326,9 @@ clean:
 	@rm -rf staff/.nuxt/
 	@rm -rf staff/.output/
 	@rm -rf staff/node_modules/.cache/
+	@rm -rf playground/.nuxt/
+	@rm -rf playground/.output/
+	@rm -rf playground/node_modules/.cache/
 	@echo "✅ Clean complete"
 
 # Destroy infrastructure (dangerous!)
