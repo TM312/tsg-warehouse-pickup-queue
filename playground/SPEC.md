@@ -120,14 +120,13 @@ type PickupStatus = 'pending' | 'approved' | 'in_queue' | 'processing' | 'comple
 interface PickupRequest {
   id: string
   sales_order_number: string
-  company_name: string | null
-  customer_email: string
+  company_name: string
   status: PickupStatus
-  email_flagged: boolean
-  assigned_gate_id: string | null
-  queue_position: number | null
   is_priority: boolean
+  gate_id: string | null
+  queue_position: number | null
   processing_started_at: string | null
+  processing_started_sim_ms: number | null
   completed_at: string | null
   created_at: string
 }
@@ -169,9 +168,9 @@ Mirrors the real `useQueueActions` composable but operates entirely on Pinia sto
 
 | Action | Behavior |
 |--------|----------|
-| `submitOrder(orderNumber, email)` | Creates a `pending` request, adds to queue store |
+| `submitOrder(orderNumber, companyName?)` | Creates a `pending` request, adds to queue store |
 | `approveRequest(id)` | Transitions `pending` → `approved` |
-| `assignToGate(id, gateId)` | Transitions to `in_queue`, sets `assigned_gate_id`, computes `queue_position` |
+| `assignToGate(id, gateId)` | Transitions to `in_queue`, sets `gate_id`, computes `queue_position` |
 | `reorderQueue(gateId, orderedIds)` | Reassigns `queue_position` values for the given gate |
 | `setPriority(id, isPriority)` | Toggles `is_priority`, moves to front of gate queue |
 | `startProcessing(id)` | Transitions `in_queue` → `processing`, sets `processing_started_at` |
@@ -186,7 +185,7 @@ All actions validate the current status before transitioning (e.g., only `in_que
 ```typescript
 function computeNextPosition(requests: PickupRequest[], gateId: string): number {
   const gateQueue = requests
-    .filter(r => r.assigned_gate_id === gateId && r.status === PICKUP_STATUS.IN_QUEUE)
+    .filter(r => r.gate_id === gateId && r.status === PICKUP_STATUS.IN_QUEUE)
   return gateQueue.length + 1
 }
 ```
@@ -194,8 +193,9 @@ function computeNextPosition(requests: PickupRequest[], gateId: string): number 
 ### 3.5 Factory functions (`utils/factories.ts`)
 
 ```typescript
-function createPickupRequest(overrides?: Partial<PickupRequest>): PickupRequest
+function createPickupRequest(overrides?: Partial<PickupRequest>, rng?: () => number): PickupRequest
 function createGate(overrides?: Partial<Gate>): Gate
+function createScenarioOrder(orderNumber: string, overrides?: Partial<PickupRequest>, rng?: () => number): PickupRequest
 ```
 
 Used by tests, seed data, and scenario injection. All IDs are generated via `utils/id.ts` (crypto.randomUUID with optional deterministic seed for tests).
@@ -263,7 +263,7 @@ Rendered inside a `PhoneFrame` component (CSS-only phone bezel with rounded corn
 
 | Customer state | What's shown |
 |----------------|-------------|
-| No order yet | Order submission form (order number + email) |
+| No order yet | Order submission form (order number + company name) |
 | `pending` | "Waiting for approval…" with spinner |
 | `approved` | "Approved! Waiting for gate assignment…" |
 | `in_queue` | Gate number (large), queue position, estimated wait time, pulsing live dot |
@@ -272,7 +272,7 @@ Rendered inside a `PhoneFrame` component (CSS-only phone bezel with rounded corn
 | `cancelled` | "Request cancelled" with message |
 
 **Key components:**
-- `CustomerOrderForm.vue` — order number + email input, submit button
+- `CustomerOrderForm.vue` — order number + company name inputs, submit button
 - `CustomerStatusCard.vue` — displays current status with transitions
 - `CustomerQueuePosition.vue` — large gate number, position badge, wait estimate
 - `CustomerCompletedState.vue` — success animation
@@ -404,7 +404,7 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'submit',
     panel: 'customer',
     title: 'A customer submits a pickup request',
-    description: 'They enter their sales order number and email.',
+    description: 'They enter their sales order number and company name.',
     action: 'auto-submit',       // Auto-fills and submits the customer form
     highlightSelector: '[data-walkthrough="customer-form"]',
   },
@@ -614,7 +614,8 @@ playground/
 │   │   └── useWaitTimeEstimate.ts # Wait-time estimate from queue position + history
 │   ├── constants/
 │   │   ├── panels.ts              # PANEL_ID, PANEL_DEFINITIONS, BREAKPOINTS, SIMULATION_SPEEDS
-│   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, STATUS_VARIANT
+│   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, isActiveStatus()
+│   │   ├── status-ui.ts           # STATUS_VARIANT (badge variant + class per status)
 │   │   ├── transitions.ts         # VALID_TRANSITIONS map, isValidTransition()
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
@@ -837,7 +838,7 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 **Deliverables:**
 - `app/components/panels/CustomerPanel.vue` — orchestrates subcomponents based on selected request status
-- `app/components/customer/CustomerOrderForm.vue` — order number + email inputs, submit triggers `submitOrder`
+- `app/components/customer/CustomerOrderForm.vue` — order number + company name inputs, submit triggers `submitOrder`
 - `app/components/customer/CustomerStatusCard.vue` — status-dependent display with transitions
 - `app/components/customer/CustomerQueuePosition.vue` — large gate number, position, wait estimate
 - `app/components/customer/CustomerCompletedState.vue` — checkmark animation + "Pickup complete" message
@@ -848,8 +849,9 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - Wait estimate uses `useWaitTimeEstimate`.
 
 **Tests:**
-- `tests/components/CustomerPanel.test.ts` — renders form when no request selected, renders status when request exists.
-- `tests/components/CustomerOrderForm.test.ts` — emits submit with order number and email, validates required fields.
+- `tests/unit/components/CustomerPanel.test.ts` — renders form when no request selected, renders status when request exists.
+- `tests/unit/components/CustomerOrderForm.test.ts` — submits with order number and company name, validates required fields.
+- `tests/unit/components/CustomerStatusCard.test.ts` — renders correct sub-content for each status state.
 
 **Dependencies:** WP-4, WP-5.
 
@@ -976,11 +978,11 @@ WP-1  Project Scaffold
 | WP | Name | Files | Test files | Complexity |
 |----|------|-------|-----------|------------|
 | 1 | Scaffold | ~20 (mostly config + UI copies) | 0 | Low |
-| 2 | Types & Utils | ~12 | 5 | Low |
+| 2 | Types & Utils | 12 | 6 | Low |
 | 3 | Stores | 3 | 3 | Medium |
-| 4 | Simulation Engine | 4 | 4 | High |
-| 5 | Layout Shell | 5 | 2 | Medium |
-| 6 | Customer Panel | 5 | 2 | Medium |
+| 4 | Simulation Engine | 5 | 5 | High |
+| 5 | Layout Shell | 8 | 4 | Medium |
+| 6 | Customer Panel | 5 | 3 | Medium |
 | 7 | Staff Panel | 9 | 3 | High |
 | 8 | Analytics Panel | 5 | 2 | Medium |
 | 9 | Scenario System | 6 | 2 | Medium |
