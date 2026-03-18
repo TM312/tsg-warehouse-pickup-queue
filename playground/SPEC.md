@@ -582,8 +582,8 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | WP | Name | Status | Notes |
 |----|------|--------|-------|
 | 1 | Project Scaffold & Design Tokens | **Done** | All config, dependencies, shadcn-vue primitives, and design tokens in place |
-| 2 | Types, Constants & Utility Functions | Not started | Next up — no blockers |
-| 3 | Pinia Stores | Not started | Blocked by WP-2 |
+| 2 | Types, Constants & Utility Functions | **Done** | 12 source files, 6 test files (44 tests passing) |
+| 3 | Pinia Stores | Not started | Next up — no blockers |
 | 4 | Simulation Engine & Actions | Not started | Blocked by WP-3 |
 | 5 | Layout Shell & Panel Grid | Not started | No blockers (depends only on WP-1) |
 | 6 | Customer Panel | Not started | Blocked by WP-4, WP-5 |
@@ -600,18 +600,40 @@ playground/
 │   ├── app.vue                    # Root shell (NuxtLayout + Sonner toaster)
 │   ├── assets/css/tailwind.css    # Full design token system (oklch color space)
 │   ├── components/ui/             # 14 shadcn-vue suites (73 .vue files)
+│   ├── constants/
+│   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, STATUS_VARIANT
+│   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # Header + slot
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   └── pages/index.vue            # Placeholder heading
+│   ├── pages/index.vue            # Placeholder heading
+│   ├── types/
+│   │   ├── pickup-request.ts      # PickupRequest, PickupStatus (re-export)
+│   │   ├── gate.ts                # Gate, GateWithCount
+│   │   ├── simulation.ts          # SimulationSpeed, SimulationState, SimulationEvent
+│   │   └── scenario.ts            # Scenario, ScenarioStep, WalkthroughStep, SimulationActions
+│   └── utils/
+│       ├── id.ts                  # generateId() (crypto.randomUUID)
+│       ├── random.ts              # seededRandom(), pickRandom(), randomBetween()
+│       ├── formatDuration.ts      # formatDurationMs(), formatDurationMinutes()
+│       ├── factories.ts           # createPickupRequest(), createGate(), createScenarioOrder()
+│       └── queue.ts               # computeNextPosition(), recalculatePositions()
 ├── nuxt.config.ts                 # SSR off, modules: shadcn-nuxt + @pinia/nuxt
 ├── vitest.config.ts               # happy-dom, path aliases
 ├── components.json                # shadcn-vue new-york style, neutral base
 ├── tsconfig.json
 ├── package.json                   # Nuxt 4.3, Vue 3.5, Pinia, TanStack, Unovis, etc.
-└── tests/unit/                    # Empty — no tests yet
+└── tests/unit/
+    ├── utils.test.ts              # cn() + valueUpdater() tests (WP-1)
+    ├── constants/
+    │   └── status.test.ts         # Status grouping consistency, label/variant completeness
+    └── utils/
+        ├── factories.test.ts      # Factory defaults, overrides, scenario orders
+        ├── formatDuration.test.ts # Ms + minutes formatting, null/edge cases
+        ├── queue.test.ts          # Position calc: empty/occupied gates, priority, immutability
+        └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/types/`, `app/constants/`, `app/utils/`, `app/stores/`, `app/composables/`, `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
+**Not yet created:** `app/stores/`, `app/composables/`, `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
 
 ---
 
@@ -643,7 +665,9 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ---
 
-### WP-2: Types, Constants & Utility Functions
+### WP-2: Types, Constants & Utility Functions ✓
+
+**Status: Complete**
 
 **Scope:** Establish the type system, all constants, and pure utility functions.
 
@@ -651,21 +675,21 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - `app/types/pickup-request.ts` — `PickupRequest`, `PickupStatus`
 - `app/types/gate.ts` — `Gate`, `GateWithCount`
 - `app/types/simulation.ts` — `SimulationSpeed`, `SimulationState`, `SimulationEvent`
-- `app/types/scenario.ts` — `Scenario`, `ScenarioStep`, `WalkthroughStep`
-- `app/constants/status.ts` — `PICKUP_STATUS`, `ACTIVE_STATUSES`, `TERMINAL_STATUSES`, `GATE_STATUSES`, status label map, status variant map
-- `app/constants/defaults.ts` — `DEFAULT_GATES`, `DEFAULT_PROCESSING_DURATION_MS`, `DEFAULT_SIMULATION_SPEED`, `SEED_COMPANIES`, `SEED_ORDER_PREFIXES`
+- `app/types/scenario.ts` — `Scenario`, `ScenarioStep`, `WalkthroughStep`, `SimulationActions`
+- `app/constants/status.ts` — `PICKUP_STATUS`, `ACTIVE_STATUSES`, `TERMINAL_STATUSES`, `GATE_STATUSES`, `STATUS_LABELS`, `STATUS_VARIANT`, `isActiveStatus()`
+- `app/constants/defaults.ts` — `DEFAULT_GATES`, `DEFAULT_GATE_COUNT`, `DEFAULT_PROCESSING_DURATION_MS`, `DEFAULT_SIMULATION_SPEED`, `SEED_COMPANIES`, `SEED_ORDER_PREFIXES`
 - `app/utils/id.ts` — `generateId()`
 - `app/utils/random.ts` — `seededRandom()`, `pickRandom()`, `randomBetween()`
-- `app/utils/formatDuration.ts` — ported from staff app
+- `app/utils/formatDuration.ts` — `formatDurationMs()`, `formatDurationMinutes()` (ported from staff app)
 - `app/utils/factories.ts` — `createPickupRequest()`, `createGate()`, `createScenarioOrder()`
 - `app/utils/queue.ts` — `computeNextPosition()`, `recalculatePositions()`
 
-**Tests:**
-- `tests/unit/constants/status.test.ts` — ACTIVE + TERMINAL covers all statuses, no overlap.
-- `tests/unit/utils/factories.test.ts` — factories produce valid objects with correct defaults.
-- `tests/unit/utils/queue.test.ts` — position calculation for empty gate, occupied gate, with priority.
-- `tests/unit/utils/formatDuration.test.ts` — edge cases (0, seconds, minutes, hours).
-- `tests/unit/utils/random.test.ts` — seeded random produces deterministic output.
+**Tests:** 6 test files, 44 tests passing.
+- `tests/unit/constants/status.test.ts` — ACTIVE + TERMINAL covers all statuses, no overlap, label/variant completeness.
+- `tests/unit/utils/factories.test.ts` — factories produce valid objects with correct defaults, overrides applied.
+- `tests/unit/utils/queue.test.ts` — position calculation for empty gate, occupied gate, priority sorting, immutability.
+- `tests/unit/utils/formatDuration.test.ts` — ms + minutes formatting, null/undefined/zero edge cases.
+- `tests/unit/utils/random.test.ts` — seeded random determinism, pickRandom, randomBetween bounds.
 
 **Dependencies:** WP-1.
 
