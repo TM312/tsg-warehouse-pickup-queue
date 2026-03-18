@@ -39,6 +39,12 @@ describe('useSimulationActions', () => {
       expect(simulation.activityFeed).toHaveLength(1)
       expect(simulation.activityFeed[0].type).toBe('submit')
     })
+
+    it('records simulation elapsed time as event timestamp', () => {
+      simulation.tick(5000)
+      actions.submitOrder('SO-10004')
+      expect(simulation.activityFeed[0].timestamp).toBe(5000)
+    })
   })
 
   describe('approveRequest', () => {

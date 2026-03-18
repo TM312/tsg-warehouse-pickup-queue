@@ -18,7 +18,7 @@
         <PanelsStaffPanel />
       </template>
       <template #analytics>
-        <div class="p-4 text-sm text-muted-foreground">Analytics panel — coming in WP-8</div>
+        <PanelsAnalyticsPanel />
       </template>
     </LayoutPanelGrid>
   </div>

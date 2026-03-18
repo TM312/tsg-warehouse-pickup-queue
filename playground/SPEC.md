@@ -588,9 +588,9 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 5 | Layout Shell & Panel Grid | **Done** | 8 source files, 7 test files (31 tests passing, 182 total) |
 | 6 | Customer Panel | **Done** | 5 source files, 5 test files (29 tests passing, 211 total) |
 | 7 | Staff Panel | **Done** | 9 source files, 3 test files (18 tests passing, 229 total) |
-| 8 | Analytics Panel | Not started | No blockers (WP-5 complete) |
+| 8 | Analytics Panel | **Done** | 6 source files, 2 test files (9 tests passing, 265 total) |
 | 9 | Scenario System | Not started | No blockers |
-| 10 | Guided Walkthrough | Not started | Blocked by WP-6–9 |
+| 10 | Guided Walkthrough | Not started | Blocked by WP-9 |
 
 ### What exists today
 
@@ -608,7 +608,8 @@ playground/
 │   │   └── PhoneFrame.vue         # CSS-only phone bezel wrapper
 │   ├── components/panels/
 │   │   ├── CustomerPanel.vue      # Orchestrates customer subcomponents by selected request status
-│   │   └── StaffPanel.vue         # Orchestrates processing table + queue tabs
+│   │   ├── StaffPanel.vue         # Orchestrates processing table + queue tabs
+│   │   └── AnalyticsPanel.vue     # Orchestrates KPI grid + queue chart + activity feed
 │   ├── components/customer/
 │   │   ├── CustomerOrderForm.vue       # Order number + company name inputs, submit triggers submitOrder
 │   │   ├── CustomerStatusCard.vue      # Status-dependent display with transitions
@@ -629,7 +630,13 @@ playground/
 │   │   ├── useSimulation.ts       # Simulation clock lifecycle + auto-complete
 │   │   ├── useSimulationActions.ts # 9 queue actions (submit, approve, assign, etc.)
 │   │   └── useWaitTimeEstimate.ts # Wait-time estimate from queue position + history
+│   ├── components/analytics/
+│   │   ├── AnalyticsKpiGrid.vue       # 2×2 grid iterating KPI_DEFINITIONS with useDashboardData
+│   │   ├── AnalyticsKpiCard.vue       # Icon + label + value card with data-testid
+│   │   ├── AnalyticsQueueChart.vue    # Unovis horizontal bar chart (queue depth per gate)
+│   │   └── AnalyticsActivityFeed.vue  # Scrollable event list with typed icons via EVENT_TYPE_CONFIG
 │   ├── constants/
+│   │   ├── analytics.ts           # KPI_DEFINITIONS, EVENT_TYPE_CONFIG, DashboardData type
 │   │   ├── panels.ts              # PANEL_ID, PANEL_DEFINITIONS, BREAKPOINTS, SIMULATION_SPEEDS
 │   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, isActiveStatus()
 │   │   ├── status-ui.ts           # STATUS_VARIANT (badge variant + class per status)
@@ -637,7 +644,7 @@ playground/
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with CustomerPanel + StaffPanel
+│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with CustomerPanel + StaffPanel + AnalyticsPanel
 │   ├── stores/
 │   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
 │   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
@@ -678,7 +685,9 @@ playground/
     │   ├── CustomerCompletedState.test.ts # Completion state rendering
     │   ├── StaffPanel.test.ts         # Renders processing section and tabs
     │   ├── StaffAllRequestsTable.test.ts # Rows per request, gate dropdown triggers action
-    │   └── StaffGateQueue.test.ts     # Items in position order, priority items first
+    │   ├── StaffGateQueue.test.ts     # Items in position order, priority items first
+    │   ├── AnalyticsKpiGrid.test.ts     # 4 KPI cards, correct values, formatted times, null handling
+    │   └── AnalyticsActivityFeed.test.ts # Newest-first order, 20-event cap, empty state, label display
     ├── constants/
     │   ├── panels.test.ts         # PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS
     │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
@@ -695,7 +704,7 @@ playground/
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/components/{analytics,scenario}/`.
+**Not yet created:** `app/components/scenario/`.
 
 ---
 
@@ -922,20 +931,23 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ---
 
-### WP-8: Analytics Panel
+### WP-8: Analytics Panel ✓
+
+**Status: Complete**
 
 **Scope:** Live KPIs, queue depth chart, and activity feed.
 
 **Deliverables:**
+- `app/constants/analytics.ts` — `KPI_DEFINITIONS` array (data-driven KPI grid), `EVENT_TYPE_CONFIG` record (icon + color per event type), `DashboardData` type
 - `app/components/panels/AnalyticsPanel.vue` — orchestrates KPIs + chart + feed
-- `app/components/analytics/AnalyticsKpiGrid.vue` — 2×2 grid of KPI cards
+- `app/components/analytics/AnalyticsKpiGrid.vue` — 2×2 grid of KPI cards, iterates `KPI_DEFINITIONS` with formatted values from `useDashboardData`
 - `app/components/analytics/AnalyticsKpiCard.vue` — icon + label + value with `data-testid`
 - `app/components/analytics/AnalyticsQueueChart.vue` — Unovis horizontal bar chart (queue per gate)
-- `app/components/analytics/AnalyticsActivityFeed.vue` — scrollable event list from simulation store
+- `app/components/analytics/AnalyticsActivityFeed.vue` — scrollable event list from simulation store with typed icons via `EVENT_TYPE_CONFIG`
 
-**Tests:**
-- `tests/components/AnalyticsKpiGrid.test.ts` — renders 4 KPI cards with correct values from store.
-- `tests/components/AnalyticsActivityFeed.test.ts` — renders events in reverse chronological order, caps at 20.
+**Tests:** 2 test files, 9 tests passing (265 total).
+- `tests/unit/components/AnalyticsKpiGrid.test.ts` — renders 4 KPI cards, correct completed count, currently waiting count, formatted avg processing time, dashes for null values.
+- `tests/unit/components/AnalyticsActivityFeed.test.ts` — renders events in reverse chronological order, caps at 20, empty state, event label display.
 
 **Dependencies:** WP-4, WP-5.
 
