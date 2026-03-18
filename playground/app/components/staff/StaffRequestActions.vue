@@ -40,6 +40,7 @@ const canCancel = computed(() => isValidTransition(props.request.status, PICKUP_
       v-if="canComplete"
       size="sm"
       variant="outline"
+      data-walkthrough="complete-button"
       @click="actions.completeRequest(request.id)"
     >
       Complete

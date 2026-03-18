@@ -14,5 +14,8 @@
         <PanelsAnalyticsPanel />
       </template>
     </LayoutPanelGrid>
+
+    <ScenarioWalkthroughOverlay />
+    <ScenarioWalkthroughTooltip />
   </div>
 </template>

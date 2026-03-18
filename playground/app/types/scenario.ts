@@ -1,5 +1,6 @@
 import type { Component } from 'vue'
 import type { PickupRequest } from '@/types/pickup-request'
+import type { PanelId } from '@/constants/panels'
 
 export interface SimulationActions {
   submitOrder: (orderNumber: string, companyName?: string) => PickupRequest
@@ -12,6 +13,10 @@ export interface SimulationActions {
   cancelRequest: (id: string) => void
   moveToGate: (id: string, newGateId: string) => void
   deactivateGate: (gateId: string) => void
+}
+
+export interface WalkthroughContext {
+  requestId: string | null
 }
 
 export interface ScenarioStep {
@@ -30,9 +35,10 @@ export interface Scenario {
 
 export interface WalkthroughStep {
   id: string
-  panel: string
+  panel: PanelId
   title: string
   description: string
-  action?: (actions: SimulationActions) => void
+  action?: (actions: SimulationActions, context: WalkthroughContext) => void
   highlightSelector?: string
+  delayMs?: number
 }

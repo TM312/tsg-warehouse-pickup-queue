@@ -40,7 +40,7 @@ function handleChange(gateId: string) {
     data-testid="staff-gate-select"
     @update:model-value="handleChange"
   >
-    <SelectTrigger class="h-8 w-[120px]" data-testid="staff-gate-select">
+    <SelectTrigger class="h-8 w-[120px]" data-testid="staff-gate-select" data-walkthrough="gate-select">
       <SelectValue placeholder="Assign gate" />
     </SelectTrigger>
     <SelectContent>

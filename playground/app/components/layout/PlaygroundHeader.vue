@@ -3,8 +3,10 @@ import { Smartphone, HelpCircle } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useActivePanel } from '@/composables/useActivePanel'
+import { useGuidedWalkthrough } from '@/composables/useGuidedWalkthrough'
 
 const { breakpoint, customerOverlayOpen, toggleCustomerOverlay } = useActivePanel()
+const { start, isActive } = useGuidedWalkthrough()
 </script>
 
 <template>
@@ -22,6 +24,8 @@ const { breakpoint, customerOverlayOpen, toggleCustomerOverlay } = useActivePane
             variant="ghost"
             data-testid="tour-trigger"
             data-walkthrough="tour-trigger"
+            :disabled="isActive"
+            @click="start"
           >
             <HelpCircle class="size-4" />
             Take the Tour
