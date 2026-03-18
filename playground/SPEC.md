@@ -583,8 +583,8 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 |----|------|--------|-------|
 | 1 | Project Scaffold & Design Tokens | **Done** | All config, dependencies, shadcn-vue primitives, and design tokens in place |
 | 2 | Types, Constants & Utility Functions | **Done** | 12 source files, 6 test files (44 tests passing) |
-| 3 | Pinia Stores | Not started | Next up — no blockers |
-| 4 | Simulation Engine & Actions | Not started | Blocked by WP-3 |
+| 3 | Pinia Stores | **Done** | 3 stores, 3 test files (43 tests passing, 87 total) |
+| 4 | Simulation Engine & Actions | Not started | Next up — no blockers |
 | 5 | Layout Shell & Panel Grid | Not started | No blockers (depends only on WP-1) |
 | 6 | Customer Panel | Not started | Blocked by WP-4, WP-5 |
 | 7 | Staff Panel | Not started | Blocked by WP-4, WP-5 |
@@ -606,6 +606,10 @@ playground/
 │   ├── layouts/default.vue        # Header + slot
 │   ├── lib/utils.ts               # cn() + valueUpdater()
 │   ├── pages/index.vue            # Placeholder heading
+│   ├── stores/
+│   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
+│   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
+│   │   └── simulation.ts          # useSimulationStore — clock, speed, activity feed, reset
 │   ├── types/
 │   │   ├── pickup-request.ts      # PickupRequest, PickupStatus (re-export)
 │   │   ├── gate.ts                # Gate, GateWithCount
@@ -626,14 +630,19 @@ playground/
     ├── utils.test.ts              # cn() + valueUpdater() tests (WP-1)
     ├── constants/
     │   └── status.test.ts         # Status grouping consistency, label/variant completeness
+    ├── stores/
+    │   ├── queue.test.ts          # CRUD, status getters, requestById
+    │   ├── gates.test.ts          # Sorted getters, recountQueues accuracy
+    │   └── simulation.test.ts     # Tick/speed, event feed cap, reset
     └── utils/
         ├── factories.test.ts      # Factory defaults, overrides, scenario orders
         ├── formatDuration.test.ts # Ms + minutes formatting, null/edge cases
+        ├── id.test.ts             # UUID format, uniqueness
         ├── queue.test.ts          # Position calc: empty/occupied gates, priority, immutability
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/stores/`, `app/composables/`, `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
+**Not yet created:** `app/composables/`, `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
 
 ---
 
@@ -695,7 +704,9 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ---
 
-### WP-3: Pinia Stores
+### WP-3: Pinia Stores ✓
+
+**Status: Complete**
 
 **Scope:** Implement the three Pinia stores: queue, gates, simulation.
 
@@ -712,10 +723,10 @@ Each work package (WP) is a self-contained unit of work that can be developed an
   - State: `speed`, `isRunning`, `elapsedMs`, `selectedCustomerRequestId`, `autoProcessEnabled`, `activityFeed: SimulationEvent[]`
   - Actions: `setSpeed`, `toggleRunning`, `tick`, `selectCustomerRequest`, `addEvent`, `reset`
 
-**Tests:**
-- `tests/unit/stores/queue.test.ts` — add/update/remove, getter filtering by status, clear.
-- `tests/unit/stores/gates.test.ts` — sorted getters, recountQueues accuracy.
-- `tests/unit/stores/simulation.test.ts` — tick advances elapsed, speed changes, reset clears all state, event feed capping at 20.
+**Tests:** 3 test files, 43 tests passing.
+- `tests/unit/stores/queue.test.ts` — add/update/remove, getter filtering by status, requestById, clear.
+- `tests/unit/stores/gates.test.ts` — sorted getters, recountQueues accuracy (GATE_STATUSES only).
+- `tests/unit/stores/simulation.test.ts` — tick advances elapsed (deltaMs × speed), speed changes, reset clears all state, event feed capping at 20, addEvent id generation.
 
 **Dependencies:** WP-2.
 
