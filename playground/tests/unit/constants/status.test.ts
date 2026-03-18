@@ -5,10 +5,10 @@ import {
   TERMINAL_STATUSES,
   GATE_STATUSES,
   STATUS_LABELS,
-  STATUS_VARIANT,
   isActiveStatus,
   type PickupStatus,
 } from '@/constants/status'
+import { STATUS_VARIANT } from '@/constants/status-ui'
 
 const ALL_STATUSES = Object.values(PICKUP_STATUS) as PickupStatus[]
 
