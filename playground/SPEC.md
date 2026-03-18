@@ -585,10 +585,10 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 2 | Types, Constants & Utility Functions | **Done** | 12 source files, 6 test files (44 tests passing) |
 | 3 | Pinia Stores | **Done** | 3 stores, 3 test files (43 tests passing, 87 total) |
 | 4 | Simulation Engine & Actions | **Done** | 5 source files, 5 test files (64 tests passing, 151 total) |
-| 5 | Layout Shell & Panel Grid | Not started | No blockers (depends only on WP-1) |
-| 6 | Customer Panel | Not started | Blocked by WP-5 |
-| 7 | Staff Panel | Not started | Blocked by WP-5 |
-| 8 | Analytics Panel | Not started | Blocked by WP-5 |
+| 5 | Layout Shell & Panel Grid | **Done** | 8 source files, 4 test files (24 tests passing, 175 total) |
+| 6 | Customer Panel | Not started | No blockers (WP-5 complete) |
+| 7 | Staff Panel | Not started | No blockers (WP-5 complete) |
+| 8 | Analytics Panel | Not started | No blockers (WP-5 complete) |
 | 9 | Scenario System | Not started | No blockers |
 | 10 | Guided Walkthrough | Not started | Blocked by WP-6–9 |
 
@@ -600,18 +600,26 @@ playground/
 │   ├── app.vue                    # Root shell (NuxtLayout + Sonner toaster)
 │   ├── assets/css/tailwind.css    # Full design token system (oklch color space)
 │   ├── components/ui/             # 14 shadcn-vue suites (73 .vue files)
+│   ├── components/layout/
+│   │   ├── PlaygroundHeader.vue   # Header with sim controls, speed, reset, tour trigger
+│   │   ├── PanelGrid.vue          # Responsive 3-col → 2-col → tabbed layout
+│   │   ├── PanelHeader.vue        # Icon + title + description, reused by all panels
+│   │   ├── PanelTabBar.vue        # Mobile tab bar for switching panels
+│   │   └── PhoneFrame.vue         # CSS-only phone bezel wrapper
 │   ├── composables/
+│   │   ├── useActivePanel.ts      # Shared panel selection + breakpoint detection
 │   │   ├── useDashboardData.ts    # Derived analytics (completedCount, avgWait, chart data)
 │   │   ├── useSimulation.ts       # Simulation clock lifecycle + auto-complete
 │   │   ├── useSimulationActions.ts # 9 queue actions (submit, approve, assign, etc.)
 │   │   └── useWaitTimeEstimate.ts # Wait-time estimate from queue position + history
 │   ├── constants/
+│   │   ├── panels.ts              # PANEL_ID, PANEL_DEFINITIONS, BREAKPOINTS, SIMULATION_SPEEDS
 │   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, STATUS_VARIANT
 │   │   ├── transitions.ts         # VALID_TRANSITIONS map, isValidTransition()
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
-│   ├── layouts/default.vue        # Header + slot
+│   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   ├── pages/index.vue            # Placeholder heading
+│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with slot stubs
 │   ├── stores/
 │   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
 │   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
@@ -639,7 +647,12 @@ playground/
     │   ├── useSimulation.test.ts      # Clock ticks at each speed, auto-complete, pause/resume
     │   ├── useSimulationActions.test.ts # Status transitions, invalid transitions, positions, priority, gate transfer, events
     │   └── useWaitTimeEstimate.test.ts # Null with <3 completed, correct range, position scaling
+    ├── components/
+    │   ├── PanelGrid.test.ts      # Responsive rendering: desktop 3-col, tablet 2-col, mobile tabs
+    │   ├── PanelHeader.test.ts    # Renders icon, title, description, data-testid
+    │   └── PhoneFrame.test.ts     # Slot rendering, class merging, data-testid
     ├── constants/
+    │   ├── panels.test.ts         # PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS
     │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
     │   └── transitions.test.ts    # Transition map completeness, terminal states, isValidTransition
     ├── stores/
@@ -654,7 +667,7 @@ playground/
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
+**Not yet created:** `app/components/{panels,customer,staff,analytics,scenario}/`.
 
 ---
 
@@ -791,21 +804,28 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ---
 
-### WP-5: Layout Shell & Panel Grid
+### WP-5: Layout Shell & Panel Grid ✓
 
-**Scope:** The responsive 3-panel layout, panel headers, and phone frame.
+**Status: Complete**
+
+**Scope:** The responsive 3-panel layout, panel headers, phone frame, and shared panel state.
 
 **Deliverables:**
-- `app/pages/index.vue` — composes `PlaygroundHeader`, `ScenarioBar`, and `PanelGrid`
-- `app/components/layout/PlaygroundHeader.vue` — title, "Take the Tour" button, speed control, reset
-- `app/components/layout/PanelGrid.vue` — responsive CSS Grid (3-col → 2-col → tabs)
+- `app/constants/panels.ts` — `PANEL_ID`, `PanelId`, `PANEL_DEFINITIONS`, `BREAKPOINTS`, `SIMULATION_SPEEDS`
+- `app/composables/useActivePanel.ts` — shared reactive state for active panel selection and breakpoint detection (`'mobile' | 'tablet' | 'desktop'`)
+- `app/components/layout/PlaygroundHeader.vue` — title, "Take the Tour" placeholder, speed control (1x/2x/5x), play/pause, reset, customer overlay toggle (tablet)
+- `app/components/layout/PanelGrid.vue` — responsive CSS Grid: desktop `grid-cols-[280px_1fr_320px]`, tablet `grid-cols-[1fr_320px]` + floating customer overlay, mobile single-column + tab bar
 - `app/components/layout/PanelHeader.vue` — icon + title + description, reused by all panels
-- `app/components/layout/PhoneFrame.vue` — CSS-only phone bezel wrapper
-- `app/components/layout/PanelTabBar.vue` — mobile tab bar for switching panels
+- `app/components/layout/PhoneFrame.vue` — CSS-only phone bezel wrapper (desktop/tablet only)
+- `app/components/layout/PanelTabBar.vue` — mobile tab bar using shadcn Tabs for switching panels
+- `app/layouts/default.vue` — updated to use `PlaygroundHeader` + flex viewport shell
+- `app/pages/index.vue` — composes scenario bar placeholder + `PanelGrid` with named slot stubs for WP-6/7/8
 
-**Tests:**
-- `tests/components/PanelGrid.test.ts` — renders three slot areas.
-- `tests/components/PhoneFrame.test.ts` — renders slot content inside frame.
+**Tests:** 4 test files, 24 tests passing.
+- `tests/unit/constants/panels.test.ts` — PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS, BREAKPOINTS ordering.
+- `tests/unit/components/PanelGrid.test.ts` — desktop 3-col with PhoneFrame, tablet 2-col with overlay, mobile single-column with tab bar.
+- `tests/unit/components/PanelHeader.test.ts` — renders icon, title, description, data-testid.
+- `tests/unit/components/PhoneFrame.test.ts` — slot rendering, class merging, data-testid.
 
 **Dependencies:** WP-1.
 
