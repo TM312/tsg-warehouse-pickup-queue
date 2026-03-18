@@ -15,7 +15,7 @@ function syncGates() {
 
 function logEvent(label: string, type: SimulationEventType) {
   const simulation = useSimulationStore()
-  simulation.addEvent({ timestamp: Date.now(), label, type })
+  simulation.addEvent({ timestamp: simulation.elapsedMs, label, type })
 }
 
 function applyRecalculation(gateId: string) {
