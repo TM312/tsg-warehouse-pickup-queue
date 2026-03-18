@@ -3,7 +3,6 @@ import {
   PANEL_ID,
   PANEL_DEFINITIONS,
   BREAKPOINTS,
-  SIMULATION_SPEEDS,
 } from '@/constants/panels'
 
 describe('panel constants', () => {
@@ -25,10 +24,6 @@ describe('panel constants', () => {
       expect(def!.label.length).toBeGreaterThan(0)
       expect(def!.description.length).toBeGreaterThan(0)
     }
-  })
-
-  it('SIMULATION_SPEEDS matches [1, 2, 5]', () => {
-    expect([...SIMULATION_SPEEDS]).toEqual([1, 2, 5])
   })
 
   it('BREAKPOINTS.MOBILE < BREAKPOINTS.DESKTOP', () => {

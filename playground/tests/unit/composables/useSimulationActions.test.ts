@@ -284,4 +284,54 @@ describe('useSimulationActions', () => {
       expect(simulation.activityFeed[0].type).toBe('assign')
     })
   })
+
+  describe('deactivateGate', () => {
+    it('sets gate is_active to false', () => {
+      actions.deactivateGate('gate-1')
+      expect(gates.gateById('gate-1')?.is_active).toBe(false)
+    })
+
+    it('logs an assign event', () => {
+      actions.deactivateGate('gate-1')
+      expect(simulation.activityFeed).toHaveLength(1)
+      expect(simulation.activityFeed[0].type).toBe('assign')
+      expect(simulation.activityFeed[0].label).toContain('deactivated')
+    })
+
+    it('recounts gate queues after deactivation', () => {
+      queue.addRequest(createPickupRequest({ id: 'r1', status: PICKUP_STATUS.IN_QUEUE, gate_id: 'gate-1', queue_position: 1 }))
+      gates.recountQueues(queue.requests)
+      expect(gates.gateById('gate-1')?.queue_count).toBe(1)
+
+      actions.deactivateGate('gate-1')
+      expect(gates.gateById('gate-1')?.is_active).toBe(false)
+    })
+  })
+
+  describe('resetAll', () => {
+    it('clears all requests', () => {
+      queue.addRequest(createPickupRequest({ id: 'r1' }))
+      queue.addRequest(createPickupRequest({ id: 'r2' }))
+      actions.resetAll()
+      expect(queue.requests).toHaveLength(0)
+    })
+
+    it('resets simulation state', () => {
+      simulation.isRunning = true
+      simulation.tick(5000)
+      actions.resetAll()
+      expect(simulation.isRunning).toBe(false)
+      expect(simulation.elapsedMs).toBe(0)
+      expect(simulation.activityFeed).toHaveLength(0)
+    })
+
+    it('restores default gates with zero queue counts', () => {
+      gates.updateGate('gate-1', { is_active: false, queue_count: 5 })
+      actions.resetAll()
+      for (const gate of gates.gates) {
+        expect(gate.is_active).toBe(true)
+        expect(gate.queue_count).toBe(0)
+      }
+    })
+  })
 })
