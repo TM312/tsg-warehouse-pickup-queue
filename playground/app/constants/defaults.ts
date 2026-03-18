@@ -27,3 +27,5 @@ export const SEED_COMPANIES = [
 ]
 
 export const SEED_ORDER_PREFIXES = ['SO', 'PO', 'WO'] as const
+
+export const SIMULATION_SPEEDS = [1, 2, 5] as const

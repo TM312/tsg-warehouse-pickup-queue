@@ -589,8 +589,8 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 6 | Customer Panel | **Done** | 5 source files, 5 test files (29 tests passing, 211 total) |
 | 7 | Staff Panel | **Done** | 9 source files, 3 test files (18 tests passing, 229 total) |
 | 8 | Analytics Panel | **Done** | 6 source files, 2 test files (9 tests passing, 265 total) |
-| 9 | Scenario System | Not started | No blockers |
-| 10 | Guided Walkthrough | Not started | Blocked by WP-9 |
+| 9 | Scenario System | **Done** | 6 source files, 2 test files (23 tests passing, 288 total) |
+| 10 | Guided Walkthrough | Not started | No blockers |
 
 ### What exists today
 
@@ -624,9 +624,15 @@ playground/
 │   │   ├── StaffGateSelect.vue         # Gate assignment dropdown
 │   │   ├── StaffRequestActions.vue     # Contextual action buttons (approve, process, complete, cancel)
 │   │   └── columns.ts                 # TanStack column definitions
+│   ├── components/scenario/
+│   │   ├── ScenarioBar.vue            # Horizontal bar with scenario buttons + speed + reset
+│   │   ├── ScenarioButton.vue         # Button with icon, label, tooltip description
+│   │   ├── SimulationSpeedControl.vue # Segmented control for 1x/2x/5x
+│   │   └── ResetButton.vue            # Reset with confirmation
 │   ├── composables/
 │   │   ├── useActivePanel.ts      # Shared panel selection + breakpoint detection
 │   │   ├── useDashboardData.ts    # Derived analytics (completedCount, avgWait, chart data)
+│   │   ├── useScenarioRunner.ts   # Executes scenario steps with virtual time delays, manages running state
 │   │   ├── useSimulation.ts       # Simulation clock lifecycle + auto-complete
 │   │   ├── useSimulationActions.ts # 9 queue actions (submit, approve, assign, etc.)
 │   │   └── useWaitTimeEstimate.ts # Wait-time estimate from queue position + history
@@ -638,13 +644,14 @@ playground/
 │   ├── constants/
 │   │   ├── analytics.ts           # KPI_DEFINITIONS, EVENT_TYPE_CONFIG, DashboardData type
 │   │   ├── panels.ts              # PANEL_ID, PANEL_DEFINITIONS, BREAKPOINTS, SIMULATION_SPEEDS
+│   │   ├── scenarios.ts           # SCENARIO_ID, SCENARIOS array (4 predefined scenarios)
 │   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, isActiveStatus()
 │   │   ├── status-ui.ts           # STATUS_VARIANT (badge variant + class per status)
 │   │   ├── transitions.ts         # VALID_TRANSITIONS map, isValidTransition()
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with CustomerPanel + StaffPanel + AnalyticsPanel
+│   ├── pages/index.vue            # ScenarioBar + PanelGrid with CustomerPanel + StaffPanel + AnalyticsPanel
 │   ├── stores/
 │   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
 │   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
@@ -669,6 +676,7 @@ playground/
     ├── utils.test.ts              # cn() + valueUpdater() tests (WP-1)
     ├── composables/
     │   ├── useDashboardData.test.ts   # KPI computations, chart data, null handling
+    │   ├── useScenarioRunner.test.ts  # Step execution, delay timing, stop/cancel, concurrent protection, scenario integration
     │   ├── useSimulation.test.ts      # Clock ticks at each speed, auto-complete, pause/resume
     │   ├── useSimulationActions.test.ts # Status transitions, invalid transitions, positions, priority, gate transfer, events
     │   └── useWaitTimeEstimate.test.ts # Null with <3 completed, correct range, position scaling
@@ -690,6 +698,7 @@ playground/
     │   └── AnalyticsActivityFeed.test.ts # Newest-first order, 20-event cap, empty state, label display
     ├── constants/
     │   ├── panels.test.ts         # PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS
+    │   ├── scenarios.test.ts      # 4 scenarios, unique IDs, valid structure, non-empty steps
     │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
     │   └── transitions.test.ts    # Transition map completeness, terminal states, isValidTransition
     ├── stores/
@@ -703,8 +712,6 @@ playground/
         ├── queue.test.ts          # Position calc: empty/occupied gates, priority, immutability
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
-
-**Not yet created:** `app/components/scenario/`.
 
 ---
 

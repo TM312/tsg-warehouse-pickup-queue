@@ -3,6 +3,7 @@ import { useGatesStore } from '@/stores/gates'
 import { useSimulationStore } from '@/stores/simulation'
 import { PICKUP_STATUS, isActiveStatus } from '@/constants/status'
 import { isValidTransition } from '@/constants/transitions'
+import { DEFAULT_GATES } from '@/constants/defaults'
 import { createPickupRequest } from '@/utils/factories'
 import { computeNextPosition, recalculatePositions } from '@/utils/queue'
 import type { SimulationEventType } from '@/types/simulation'
@@ -140,6 +141,20 @@ export function useSimulationActions() {
     logEvent(`Moved ${request.sales_order_number} to Gate ${gate?.gate_number ?? newGateId}`, 'assign')
   }
 
+  function deactivateGate(gateId: string) {
+    gates.updateGate(gateId, { is_active: false })
+    syncGates()
+    const gate = gates.gateById(gateId)
+    logEvent(`Gate ${gate?.gate_number ?? gateId} deactivated`, 'assign')
+  }
+
+  function resetAll() {
+    const simulation = useSimulationStore()
+    simulation.reset()
+    queue.clear()
+    gates.setGates(DEFAULT_GATES.map((g) => ({ ...g, queue_count: 0 })))
+  }
+
   return {
     submitOrder,
     approveRequest,
@@ -150,5 +165,7 @@ export function useSimulationActions() {
     completeRequest,
     cancelRequest,
     moveToGate,
+    deactivateGate,
+    resetAll,
   }
 }

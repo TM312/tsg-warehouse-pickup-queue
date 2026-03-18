@@ -1,7 +1,17 @@
 import type { Component } from 'vue'
+import type { PickupRequest } from '@/types/pickup-request'
 
 export interface SimulationActions {
-  [key: string]: (...args: unknown[]) => unknown
+  submitOrder: (orderNumber: string, companyName?: string) => PickupRequest
+  approveRequest: (id: string) => void
+  assignToGate: (id: string, gateId: string) => void
+  reorderQueue: (gateId: string, orderedIds: string[]) => void
+  setPriority: (id: string, isPriority: boolean) => void
+  startProcessing: (id: string) => void
+  completeRequest: (id: string) => void
+  cancelRequest: (id: string) => void
+  moveToGate: (id: string, newGateId: string) => void
+  deactivateGate: (gateId: string) => void
 }
 
 export interface ScenarioStep {

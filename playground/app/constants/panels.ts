@@ -14,4 +14,3 @@ export const PANEL_DEFINITIONS: PanelDefinition[] = [
 ]
 
 export const BREAKPOINTS = { MOBILE: 768, DESKTOP: 1280 } as const
-export const SIMULATION_SPEEDS = [1, 2, 5] as const
