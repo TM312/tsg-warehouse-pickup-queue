@@ -585,9 +585,9 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 2 | Types, Constants & Utility Functions | **Done** | 12 source files, 6 test files (44 tests passing) |
 | 3 | Pinia Stores | **Done** | 3 stores, 3 test files (43 tests passing, 87 total) |
 | 4 | Simulation Engine & Actions | **Done** | 5 source files, 5 test files (64 tests passing, 151 total) |
-| 5 | Layout Shell & Panel Grid | **Done** | 8 source files, 4 test files (24 tests passing, 175 total) |
-| 6 | Customer Panel | Not started | No blockers (WP-5 complete) |
-| 7 | Staff Panel | Not started | No blockers (WP-5 complete) |
+| 5 | Layout Shell & Panel Grid | **Done** | 8 source files, 7 test files (31 tests passing, 182 total) |
+| 6 | Customer Panel | **Done** | 5 source files, 5 test files (29 tests passing, 211 total) |
+| 7 | Staff Panel | **Done** | 9 source files, 3 test files (18 tests passing, 229 total) |
 | 8 | Analytics Panel | Not started | No blockers (WP-5 complete) |
 | 9 | Scenario System | Not started | No blockers |
 | 10 | Guided Walkthrough | Not started | Blocked by WP-6–9 |
@@ -606,6 +606,23 @@ playground/
 │   │   ├── PanelHeader.vue        # Icon + title + description, reused by all panels
 │   │   ├── PanelTabBar.vue        # Mobile tab bar for switching panels
 │   │   └── PhoneFrame.vue         # CSS-only phone bezel wrapper
+│   ├── components/panels/
+│   │   ├── CustomerPanel.vue      # Orchestrates customer subcomponents by selected request status
+│   │   └── StaffPanel.vue         # Orchestrates processing table + queue tabs
+│   ├── components/customer/
+│   │   ├── CustomerOrderForm.vue       # Order number + company name inputs, submit triggers submitOrder
+│   │   ├── CustomerStatusCard.vue      # Status-dependent display with transitions
+│   │   ├── CustomerQueuePosition.vue   # Large gate number, position, wait estimate
+│   │   └── CustomerCompletedState.vue  # Checkmark animation + "Pickup complete" message
+│   ├── components/staff/
+│   │   ├── StaffProcessingTable.vue    # Now-processing rows per gate with elapsed timer
+│   │   ├── StaffQueueTabs.vue          # Tabs: All Requests + per-gate tabs
+│   │   ├── StaffAllRequestsTable.vue   # TanStack table with gate dropdown, status badge, actions
+│   │   ├── StaffGateQueue.vue          # Drag-and-drop queue with priority toggle + complete button
+│   │   ├── StaffStatusBadge.vue        # Status badge using STATUS_VARIANT constants
+│   │   ├── StaffGateSelect.vue         # Gate assignment dropdown
+│   │   ├── StaffRequestActions.vue     # Contextual action buttons (approve, process, complete, cancel)
+│   │   └── columns.ts                 # TanStack column definitions
 │   ├── composables/
 │   │   ├── useActivePanel.ts      # Shared panel selection + breakpoint detection
 │   │   ├── useDashboardData.ts    # Derived analytics (completedCount, avgWait, chart data)
@@ -620,7 +637,7 @@ playground/
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with slot stubs
+│   ├── pages/index.vue            # Scenario bar placeholder + PanelGrid with CustomerPanel + StaffPanel
 │   ├── stores/
 │   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
 │   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
@@ -649,9 +666,19 @@ playground/
     │   ├── useSimulationActions.test.ts # Status transitions, invalid transitions, positions, priority, gate transfer, events
     │   └── useWaitTimeEstimate.test.ts # Null with <3 completed, correct range, position scaling
     ├── components/
-    │   ├── PanelGrid.test.ts      # Responsive rendering: desktop 3-col, tablet 2-col, mobile tabs
-    │   ├── PanelHeader.test.ts    # Renders icon, title, description, data-testid
-    │   └── PhoneFrame.test.ts     # Slot rendering, class merging, data-testid
+    │   ├── PanelGrid.test.ts          # Responsive rendering: desktop 3-col, tablet 2-col, mobile tabs
+    │   ├── PanelHeader.test.ts        # Renders icon, title, description, data-testid
+    │   ├── PanelTabBar.test.ts        # Mobile tab switching, active panel state
+    │   ├── PhoneFrame.test.ts         # Slot rendering, class merging, data-testid
+    │   ├── PlaygroundHeader.test.ts   # Reset clears stores, sim controls
+    │   ├── CustomerPanel.test.ts      # Form when no request, status card when selected
+    │   ├── CustomerOrderForm.test.ts  # Submit, validation, form clearing
+    │   ├── CustomerStatusCard.test.ts # Correct sub-content per status
+    │   ├── CustomerQueuePosition.test.ts # Gate number, position, wait estimate display
+    │   ├── CustomerCompletedState.test.ts # Completion state rendering
+    │   ├── StaffPanel.test.ts         # Renders processing section and tabs
+    │   ├── StaffAllRequestsTable.test.ts # Rows per request, gate dropdown triggers action
+    │   └── StaffGateQueue.test.ts     # Items in position order, priority items first
     ├── constants/
     │   ├── panels.test.ts         # PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS
     │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
@@ -668,7 +695,7 @@ playground/
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/components/{panels,customer,staff,analytics,scenario}/`.
+**Not yet created:** `app/components/{analytics,scenario}/`.
 
 ---
 
@@ -822,17 +849,21 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - `app/layouts/default.vue` — updated to use `PlaygroundHeader` + flex viewport shell
 - `app/pages/index.vue` — composes scenario bar placeholder + `PanelGrid` with named slot stubs for WP-6/7/8
 
-**Tests:** 4 test files, 24 tests passing.
+**Tests:** 7 test files, 31 tests passing.
 - `tests/unit/constants/panels.test.ts` — PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS, BREAKPOINTS ordering.
 - `tests/unit/components/PanelGrid.test.ts` — desktop 3-col with PhoneFrame, tablet 2-col with overlay, mobile single-column with tab bar.
 - `tests/unit/components/PanelHeader.test.ts` — renders icon, title, description, data-testid.
+- `tests/unit/components/PanelTabBar.test.ts` — mobile tab switching, active panel state.
 - `tests/unit/components/PhoneFrame.test.ts` — slot rendering, class merging, data-testid.
+- `tests/unit/components/PlaygroundHeader.test.ts` — reset clears stores, simulation controls.
 
 **Dependencies:** WP-1.
 
 ---
 
-### WP-6: Customer Panel
+### WP-6: Customer Panel ✓
+
+**Status: Complete**
 
 **Scope:** The customer-facing view rendered inside the phone frame.
 
@@ -848,16 +879,20 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - Otherwise, show `CustomerStatusCard` which switches sub-content based on `request.status`.
 - Wait estimate uses `useWaitTimeEstimate`.
 
-**Tests:**
+**Tests:** 5 test files, 29 tests passing.
 - `tests/unit/components/CustomerPanel.test.ts` — renders form when no request selected, renders status when request exists.
-- `tests/unit/components/CustomerOrderForm.test.ts` — submits with order number and company name, validates required fields.
+- `tests/unit/components/CustomerOrderForm.test.ts` — submits with order number and company name, validates required fields, clears form after submit.
 - `tests/unit/components/CustomerStatusCard.test.ts` — renders correct sub-content for each status state.
+- `tests/unit/components/CustomerQueuePosition.test.ts` — gate number, position badge, wait estimate display.
+- `tests/unit/components/CustomerCompletedState.test.ts` — completion state rendering.
 
 **Dependencies:** WP-4, WP-5.
 
 ---
 
-### WP-7: Staff Panel
+### WP-7: Staff Panel ✓
+
+**Status: Complete**
 
 **Scope:** The staff dashboard with queue table, gate tabs, and processing view.
 
@@ -866,11 +901,11 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - `app/components/staff/StaffProcessingTable.vue` — now-processing rows per gate with elapsed timer
 - `app/components/staff/StaffQueueTabs.vue` — Tabs container: All Requests + per-gate tabs
 - `app/components/staff/StaffAllRequestsTable.vue` — TanStack table with gate dropdown, status badge, actions
-- `app/components/staff/StaffGateQueue.vue` — drag-and-drop list with priority toggle + complete button
-- `app/components/staff/StaffStatusBadge.vue` — ported from production `StatusBadge.vue`
-- `app/components/staff/StaffGateSelect.vue` — gate assignment dropdown
-- `app/components/staff/StaffRequestActions.vue` — action buttons (approve, complete, cancel)
-- `app/components/staff/columns.ts` — TanStack column definitions (ported pattern from production)
+- `app/components/staff/StaffGateQueue.vue` — drag-and-drop list (SortableJS) with priority toggle + complete button
+- `app/components/staff/StaffStatusBadge.vue` — status badge using STATUS_VARIANT constants
+- `app/components/staff/StaffGateSelect.vue` — gate assignment dropdown (assignToGate for approved, moveToGate for in_queue)
+- `app/components/staff/StaffRequestActions.vue` — contextual action buttons (approve, start processing, complete, cancel)
+- `app/components/staff/columns.ts` — TanStack column definitions
 
 **Behavior:**
 - Gate dropdown triggers `assignToGate` → customer panel + analytics update.
@@ -878,10 +913,10 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - Complete button triggers `startProcessing` or `completeRequest` depending on current status.
 - Priority star toggles `setPriority`.
 
-**Tests:**
-- `tests/components/StaffPanel.test.ts` — renders processing section and tabs.
-- `tests/components/StaffAllRequestsTable.test.ts` — renders rows for each request, gate dropdown triggers action.
-- `tests/components/StaffGateQueue.test.ts` — renders items in position order, priority items first.
+**Tests:** 3 test files, 18 tests passing.
+- `tests/unit/components/StaffPanel.test.ts` — renders processing section and tabs.
+- `tests/unit/components/StaffAllRequestsTable.test.ts` — renders rows for each request, gate dropdown triggers action.
+- `tests/unit/components/StaffGateQueue.test.ts` — renders items in position order, priority items first.
 
 **Dependencies:** WP-4, WP-5.
 

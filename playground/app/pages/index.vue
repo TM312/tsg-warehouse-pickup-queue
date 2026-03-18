@@ -15,7 +15,7 @@
         <PanelsCustomerPanel />
       </template>
       <template #staff>
-        <div class="p-4 text-sm text-muted-foreground">Staff dashboard — coming in WP-7</div>
+        <PanelsStaffPanel />
       </template>
       <template #analytics>
         <div class="p-4 text-sm text-muted-foreground">Analytics panel — coming in WP-8</div>
