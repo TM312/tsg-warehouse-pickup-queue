@@ -6,13 +6,13 @@
       data-testid="scenario-bar"
       data-walkthrough="scenario-bar"
     >
-      Scenario bar — coming in WP-6
+      Scenario bar — coming in WP-9
     </div>
 
     <!-- Panel grid -->
     <LayoutPanelGrid class="min-h-0 flex-1">
       <template #customer>
-        <div class="p-4 text-sm text-muted-foreground">Customer panel — coming in WP-6</div>
+        <PanelsCustomerPanel />
       </template>
       <template #staff>
         <div class="p-4 text-sm text-muted-foreground">Staff dashboard — coming in WP-7</div>
