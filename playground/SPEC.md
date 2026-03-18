@@ -399,51 +399,88 @@ An optional overlay for first-time visitors that highlights the cross-panel caus
 
 ```typescript
 // constants/walkthrough.ts
+import { PANEL_ID } from '@/constants/panels'
+import { DEFAULT_GATES } from '@/constants/defaults'
+import type { SimulationActions, WalkthroughContext } from '@/types/scenario'
+
+export const WALKTHROUGH_STEP_ID = {
+  SUBMIT: 'submit',
+  STAFF_SEES: 'staff-sees',
+  ASSIGN_GATE: 'assign-gate',
+  CUSTOMER_UPDATES: 'customer-updates',
+  COMPLETE: 'complete',
+  ANALYTICS: 'analytics',
+} as const
+
+export const WALKTHROUGH_SELECTOR = {
+  CUSTOMER_FORM: '[data-walkthrough="customer-form"]',
+  ALL_REQUESTS_TABLE: '[data-walkthrough="all-requests-table"]',
+  GATE_SELECT: '[data-walkthrough="gate-select"]',
+  CUSTOMER_STATUS: '[data-walkthrough="customer-status"]',
+  COMPLETE_BUTTON: '[data-walkthrough="complete-button"]',
+  KPI_GRID: '[data-walkthrough="kpi-grid"]',
+} as const
+
 const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
-    id: 'submit',
-    panel: 'customer',
+    id: WALKTHROUGH_STEP_ID.SUBMIT,
+    panel: PANEL_ID.CUSTOMER,
     title: 'A customer submits a pickup request',
     description: 'They enter their sales order number and company name.',
-    action: 'auto-submit',       // Auto-fills and submits the customer form
-    highlightSelector: '[data-walkthrough="customer-form"]',
+    action: (actions: SimulationActions, ctx: WalkthroughContext) => {
+      const r = actions.submitOrder('WT-0001', 'Walkthrough Demo')
+      actions.approveRequest(r.id)
+      ctx.requestId = r.id
+    },
+    highlightSelector: WALKTHROUGH_SELECTOR.CUSTOMER_FORM,
+    delayMs: 1200,   // Show form before auto-submit fires
   },
   {
-    id: 'staff-sees',
-    panel: 'staff',
+    id: WALKTHROUGH_STEP_ID.STAFF_SEES,
+    panel: PANEL_ID.STAFF,
     title: 'Staff sees the new request',
     description: 'It appears in the queue as "Pending".',
-    highlightSelector: '[data-walkthrough="all-requests-table"]',
+    highlightSelector: WALKTHROUGH_SELECTOR.ALL_REQUESTS_TABLE,
   },
   {
-    id: 'assign-gate',
-    panel: 'staff',
+    id: WALKTHROUGH_STEP_ID.ASSIGN_GATE,
+    panel: PANEL_ID.STAFF,
     title: 'Staff assigns a gate',
     description: 'Select a gate from the dropdown. Watch the customer view update.',
-    action: 'auto-assign-gate',
-    highlightSelector: '[data-walkthrough="gate-select"]',
+    action: (actions: SimulationActions, ctx: WalkthroughContext) => {
+      if (ctx.requestId) actions.assignToGate(ctx.requestId, DEFAULT_GATES[0].id)
+    },
+    highlightSelector: WALKTHROUGH_SELECTOR.GATE_SELECT,
+    delayMs: 800,
   },
   {
-    id: 'customer-updates',
-    panel: 'customer',
+    id: WALKTHROUGH_STEP_ID.CUSTOMER_UPDATES,
+    panel: PANEL_ID.CUSTOMER,
     title: 'Customer sees their position',
     description: 'Real-time gate assignment, queue position, and estimated wait time.',
-    highlightSelector: '[data-walkthrough="customer-status"]',
+    highlightSelector: WALKTHROUGH_SELECTOR.CUSTOMER_STATUS,
   },
   {
-    id: 'complete',
-    panel: 'staff',
-    title: 'Staff completes the pickup',
-    description: 'Click "Complete" and watch the analytics update.',
-    action: 'auto-complete',
-    highlightSelector: '[data-walkthrough="complete-button"]',
+    id: WALKTHROUGH_STEP_ID.COMPLETE,
+    panel: PANEL_ID.STAFF,
+    title: 'Staff processes and completes the pickup',
+    description: 'The request is started, then completed — watch the analytics update.',
+    action: (actions: SimulationActions, ctx: WalkthroughContext) => {
+      if (ctx.requestId) actions.startProcessing(ctx.requestId)
+    },
+    highlightSelector: WALKTHROUGH_SELECTOR.COMPLETE_BUTTON,
+    delayMs: 800,
   },
   {
-    id: 'analytics',
-    panel: 'analytics',
+    id: WALKTHROUGH_STEP_ID.ANALYTICS,
+    panel: PANEL_ID.ANALYTICS,
     title: 'Analytics reflect every action',
     description: 'KPIs, queue depth, and the activity feed update in real-time.',
-    highlightSelector: '[data-walkthrough="kpi-grid"]',
+    action: (actions: SimulationActions, ctx: WalkthroughContext) => {
+      if (ctx.requestId) actions.completeRequest(ctx.requestId)
+    },
+    highlightSelector: WALKTHROUGH_SELECTOR.KPI_GRID,
+    delayMs: 800,
   },
 ]
 ```
@@ -452,16 +489,27 @@ const WALKTHROUGH_STEPS: WalkthroughStep[] = [
 
 ```typescript
 // composables/useGuidedWalkthrough.ts
-interface WalkthroughState {
-  isActive: boolean
-  currentStepIndex: number
-  currentStep: WalkthroughStep | null
-}
+// Module-level singleton state (same pattern as useActivePanel)
 
 function useGuidedWalkthrough() {
-  // Returns: { state, start, next, previous, skip, isComplete }
+  // Returns:
+  //   isActive: Ref<boolean>
+  //   currentStepIndex: Ref<number>
+  //   currentStep: ComputedRef<WalkthroughStep | null>
+  //   totalSteps: number
+  //   highlightRect: Ref<{ x, y, width, height }>
+  //   start(): void    — resets simulation, activates walkthrough, executes step 0
+  //   next(): void     — advances step (or finishes on last)
+  //   previous(): void — goes back (no action re-execution)
+  //   skip(): void     — ends walkthrough
 }
 ```
+
+**Auto-action execution:** Steps with `action` + `delayMs` wait before executing so the user sees the highlighted element before it changes. Steps without `delayMs` execute immediately on entry.
+
+**Panel switching:** On mobile, calls `setActivePanel(step.panel)`. On tablet, also toggles the customer overlay when switching to/from the customer panel. On desktop, no-op (all panels visible).
+
+**Highlight rect:** Computed from `document.querySelector(currentStep.highlightSelector)?.getBoundingClientRect()`, updated on step change (`nextTick`), scroll, and resize via `ResizeObserver`.
 
 ### 7.3 UI
 
@@ -590,7 +638,7 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 7 | Staff Panel | **Done** | 9 source files, 3 test files (18 tests passing, 229 total) |
 | 8 | Analytics Panel | **Done** | 6 source files, 2 test files (9 tests passing, 265 total) |
 | 9 | Scenario System | **Done** | 6 source files, 2 test files (23 tests passing, 288 total) |
-| 10 | Guided Walkthrough | Not started | No blockers |
+| 10 | Guided Walkthrough | **In progress** | All dependencies met; types updated, `data-walkthrough` attrs added, integration points wired |
 
 ### What exists today
 
@@ -601,7 +649,7 @@ playground/
 │   ├── assets/css/tailwind.css    # Full design token system (oklch color space)
 │   ├── components/ui/             # 14 shadcn-vue suites (73 .vue files)
 │   ├── components/layout/
-│   │   ├── PlaygroundHeader.vue   # Header with sim controls, speed, reset, tour trigger
+│   │   ├── PlaygroundHeader.vue   # Header with tour trigger (wired to useGuidedWalkthrough) + customer toggle
 │   │   ├── PanelGrid.vue          # Responsive 3-col → 2-col → tabbed layout
 │   │   ├── PanelHeader.vue        # Icon + title + description, reused by all panels
 │   │   ├── PanelTabBar.vue        # Mobile tab bar for switching panels
@@ -628,10 +676,13 @@ playground/
 │   │   ├── ScenarioBar.vue            # Horizontal bar with scenario buttons + speed + reset
 │   │   ├── ScenarioButton.vue         # Button with icon, label, tooltip description
 │   │   ├── SimulationSpeedControl.vue # Segmented control for 1x/2x/5x
-│   │   └── ResetButton.vue            # Reset with confirmation
+│   │   ├── ResetButton.vue            # Reset with confirmation
+│   │   ├── WalkthroughOverlay.vue     # [WP-10] Dimmed backdrop with SVG mask cutout for highlight
+│   │   └── WalkthroughTooltip.vue     # [WP-10] Positioned tooltip with step content + nav buttons
 │   ├── composables/
 │   │   ├── useActivePanel.ts      # Shared panel selection + breakpoint detection
 │   │   ├── useDashboardData.ts    # Derived analytics (completedCount, avgWait, chart data)
+│   │   ├── useGuidedWalkthrough.ts # [WP-10] Stepper state, auto-actions, panel switching, highlight rect
 │   │   ├── useScenarioRunner.ts   # Executes scenario steps with virtual time delays, manages running state
 │   │   ├── useSimulation.ts       # Simulation clock lifecycle + auto-complete
 │   │   ├── useSimulationActions.ts # 9 queue actions (submit, approve, assign, etc.)
@@ -648,10 +699,11 @@ playground/
 │   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, isActiveStatus()
 │   │   ├── status-ui.ts           # STATUS_VARIANT (badge variant + class per status)
 │   │   ├── transitions.ts         # VALID_TRANSITIONS map, isValidTransition()
-│   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
+│   │   ├── defaults.ts            # DEFAULT_GATES, processing duration, seed data
+│   │   └── walkthrough.ts         # [WP-10] WALKTHROUGH_STEP_ID, WALKTHROUGH_SELECTOR, WALKTHROUGH_STEPS
 │   ├── layouts/default.vue        # PlaygroundHeader + flex viewport shell
 │   ├── lib/utils.ts               # cn() + valueUpdater()
-│   ├── pages/index.vue            # ScenarioBar + PanelGrid with CustomerPanel + StaffPanel + AnalyticsPanel
+│   ├── pages/index.vue            # ScenarioBar + PanelGrid + WalkthroughOverlay + WalkthroughTooltip
 │   ├── stores/
 │   │   ├── queue.ts               # useQueueStore — requests state, status getters, CRUD actions
 │   │   ├── gates.ts               # useGatesStore — gates state, activeGates, recountQueues
@@ -660,7 +712,7 @@ playground/
 │   │   ├── pickup-request.ts      # PickupRequest, PickupStatus (re-export)
 │   │   ├── gate.ts                # Gate, GateWithCount
 │   │   ├── simulation.ts          # SimulationSpeed, SimulationState, SimulationEvent
-│   │   └── scenario.ts            # Scenario, ScenarioStep, WalkthroughStep, SimulationActions
+│   │   └── scenario.ts            # Scenario, ScenarioStep, WalkthroughStep, WalkthroughContext, SimulationActions
 │   └── utils/
 │       ├── id.ts                  # generateId() (crypto.randomUUID)
 │       ├── random.ts              # seededRandom(), pickRandom(), randomBetween()
@@ -676,6 +728,7 @@ playground/
     ├── utils.test.ts              # cn() + valueUpdater() tests (WP-1)
     ├── composables/
     │   ├── useDashboardData.test.ts   # KPI computations, chart data, null handling
+    │   ├── useGuidedWalkthrough.test.ts # [WP-10] Step navigation, auto-action execution, completion state
     │   ├── useScenarioRunner.test.ts  # Step execution, delay timing, stop/cancel, concurrent protection, scenario integration
     │   ├── useSimulation.test.ts      # Clock ticks at each speed, auto-complete, pause/resume
     │   ├── useSimulationActions.test.ts # Status transitions, invalid transitions, positions, priority, gate transfer, events
@@ -700,7 +753,8 @@ playground/
     │   ├── panels.test.ts         # PANEL_ID keys, PANEL_DEFINITIONS coverage, SIMULATION_SPEEDS
     │   ├── scenarios.test.ts      # 4 scenarios, unique IDs, valid structure, non-empty steps
     │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
-    │   └── transitions.test.ts    # Transition map completeness, terminal states, isValidTransition
+    │   ├── transitions.test.ts    # Transition map completeness, terminal states, isValidTransition
+    │   └── walkthrough.test.ts    # [WP-10] All steps have required fields, valid panel references, unique IDs
     ├── stores/
     │   ├── queue.test.ts          # CRUD, status getters, requestById
     │   ├── gates.test.ts          # Sorted getters, recountQueues accuracy
@@ -753,7 +807,7 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 - `app/types/pickup-request.ts` — `PickupRequest`, `PickupStatus`
 - `app/types/gate.ts` — `Gate`, `GateWithCount`
 - `app/types/simulation.ts` — `SimulationSpeed`, `SimulationState`, `SimulationEvent`
-- `app/types/scenario.ts` — `Scenario`, `ScenarioStep`, `WalkthroughStep`, `SimulationActions`
+- `app/types/scenario.ts` — `Scenario`, `ScenarioStep`, `WalkthroughStep`, `WalkthroughContext`, `SimulationActions`
 - `app/constants/status.ts` — `PICKUP_STATUS`, `ACTIVE_STATUSES`, `TERMINAL_STATUSES`, `GATE_STATUSES`, `STATUS_LABELS`, `STATUS_VARIANT`, `isActiveStatus()`
 - `app/constants/defaults.ts` — `DEFAULT_GATES`, `DEFAULT_GATE_COUNT`, `DEFAULT_PROCESSING_DURATION_MS`, `DEFAULT_SIMULATION_SPEED`, `SEED_COMPANIES`, `SEED_ORDER_PREFIXES`
 - `app/utils/id.ts` — `generateId()`
@@ -982,19 +1036,35 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ### WP-10: Guided Walkthrough
 
+**Status: In progress**
+
 **Scope:** The optional step-by-step overlay that demonstrates the cause-and-effect flow.
 
-**Deliverables:**
-- `app/constants/walkthrough.ts` — `WALKTHROUGH_STEPS` array
-- `app/composables/useGuidedWalkthrough.ts` — stepper state, auto-actions per step
-- `app/components/scenario/WalkthroughOverlay.vue` — dimmed backdrop with highlight cutout
-- `app/components/scenario/WalkthroughTooltip.vue` — positioned tooltip with step content + navigation
+**Completed so far:**
+- `app/types/scenario.ts` — Updated: `WalkthroughStep.panel` now uses `PanelId` (not `string`), added `WalkthroughContext` interface, added `delayMs?` field, action signature takes `(SimulationActions, WalkthroughContext)`
+- `app/components/staff/StaffGateSelect.vue` — Added `data-walkthrough="gate-select"` to SelectTrigger
+- `app/components/staff/StaffRequestActions.vue` — Added `data-walkthrough="complete-button"` to Complete button
+- `app/components/analytics/AnalyticsKpiGrid.vue` — Added `data-walkthrough="kpi-grid"` to root div
+- `app/components/layout/PlaygroundHeader.vue` — Wired `@click="start"` and `:disabled="isActive"` on tour button via `useGuidedWalkthrough`
+- `app/pages/index.vue` — Mounted `<ScenarioWalkthroughOverlay />` and `<ScenarioWalkthroughTooltip />`
+
+**Remaining deliverables:**
+- `app/constants/walkthrough.ts` — `WALKTHROUGH_STEP_ID`, `WALKTHROUGH_SELECTOR`, `WALKTHROUGH_STEPS` array (6 steps with auto-actions + `delayMs`)
+- `app/composables/useGuidedWalkthrough.ts` — Singleton composable: stepper state, auto-actions with delay, panel switching, highlight rect calculation
+- `app/components/scenario/WalkthroughOverlay.vue` — Teleported SVG mask overlay (z-50) with animated cutout at `highlightRect`
+- `app/components/scenario/WalkthroughTooltip.vue` — Teleported Card (z-51) with step counter, title, description, Back/Next/Skip buttons
+
+**Design decisions:**
+- Steps with `delayMs` show the highlight before the auto-action fires (e.g. 1200ms for form submission), giving users time to read
+- Step 5 (`complete`) only calls `startProcessing` so the Complete button is visible; step 6 (`analytics`) calls `completeRequest` before highlighting KPIs
+- Highlight rect is shared via the composable (single DOM query source), updated on step change + scroll + resize
+- Panel switching uses `useActivePanel`: on mobile switches active tab, on tablet toggles customer overlay as needed
 
 **Tests:**
-- `tests/unit/composables/useGuidedWalkthrough.test.ts` — step navigation (next, previous, skip), auto-action execution, completion state.
-- `tests/unit/constants/walkthrough.test.ts` — all steps have required fields, valid panel references.
+- `tests/unit/composables/useGuidedWalkthrough.test.ts` — initial state, start (resets sim, executes step 0), next/previous/skip navigation, action execution, completion state, full 6-step flow
+- `tests/unit/constants/walkthrough.test.ts` — 6 steps, unique IDs match `WALKTHROUGH_STEP_ID`, valid `PanelId` panels, required fields, action types
 
-**Dependencies:** WP-6, WP-7, WP-8, WP-9.
+**Dependencies:** WP-6, WP-7, WP-8, WP-9 (all complete).
 
 ---
 

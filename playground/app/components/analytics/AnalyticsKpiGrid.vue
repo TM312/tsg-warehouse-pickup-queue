@@ -6,7 +6,7 @@ const dashboard = useDashboardData()
 </script>
 
 <template>
-  <div data-testid="analytics-kpi-grid" class="grid grid-cols-2 gap-3">
+  <div data-testid="analytics-kpi-grid" data-walkthrough="kpi-grid" class="grid grid-cols-2 gap-3">
     <AnalyticsKpiCard
       v-for="kpi in KPI_DEFINITIONS"
       :key="kpi.id"
