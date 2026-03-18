@@ -1,7 +1,41 @@
 import { describe, expect, it } from 'vitest'
-import { computeNextPosition, recalculatePositions } from '@/utils/queue'
+import { computeNextPosition, getProcessingDuration, recalculatePositions } from '@/utils/queue'
 import { createPickupRequest } from '@/utils/factories'
 import { PICKUP_STATUS } from '@/constants/status'
+
+describe('getProcessingDuration', () => {
+  it('returns duration in ms for completed request', () => {
+    const request = createPickupRequest({
+      processing_started_at: '2026-01-01T00:00:00Z',
+      completed_at: '2026-01-01T00:02:00Z',
+    })
+    expect(getProcessingDuration(request)).toBe(120000)
+  })
+
+  it('returns null when processing_started_at is null', () => {
+    const request = createPickupRequest({
+      processing_started_at: null,
+      completed_at: '2026-01-01T00:02:00Z',
+    })
+    expect(getProcessingDuration(request)).toBeNull()
+  })
+
+  it('returns null when completed_at is null', () => {
+    const request = createPickupRequest({
+      processing_started_at: '2026-01-01T00:00:00Z',
+      completed_at: null,
+    })
+    expect(getProcessingDuration(request)).toBeNull()
+  })
+
+  it('returns null for zero or negative duration', () => {
+    const request = createPickupRequest({
+      processing_started_at: '2026-01-01T00:02:00Z',
+      completed_at: '2026-01-01T00:00:00Z',
+    })
+    expect(getProcessingDuration(request)).toBeNull()
+  })
+})
 
 describe('computeNextPosition', () => {
   it('returns 1 for empty gate', () => {

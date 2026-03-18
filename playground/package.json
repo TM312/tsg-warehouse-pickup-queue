@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.563.0",
     "nuxt": "^4.3.0",
+    "pinia": "^3.0.4",
     "reka-ui": "^2.7.0",
     "shadcn-nuxt": "^2.4.3",
     "sortablejs": "^1.15.6",

@@ -18,6 +18,7 @@ export function createPickupRequest(
     gate_id: null,
     queue_position: null,
     processing_started_at: null,
+    processing_started_sim_ms: null,
     completed_at: null,
     created_at: new Date().toISOString(),
     ...overrides,

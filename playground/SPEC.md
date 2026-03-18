@@ -584,12 +584,12 @@ expect(request.status).toBe(PICKUP_STATUS.IN_QUEUE)
 | 1 | Project Scaffold & Design Tokens | **Done** | All config, dependencies, shadcn-vue primitives, and design tokens in place |
 | 2 | Types, Constants & Utility Functions | **Done** | 12 source files, 6 test files (44 tests passing) |
 | 3 | Pinia Stores | **Done** | 3 stores, 3 test files (43 tests passing, 87 total) |
-| 4 | Simulation Engine & Actions | Not started | Next up — no blockers |
+| 4 | Simulation Engine & Actions | **Done** | 5 source files, 5 test files (64 tests passing, 151 total) |
 | 5 | Layout Shell & Panel Grid | Not started | No blockers (depends only on WP-1) |
-| 6 | Customer Panel | Not started | Blocked by WP-4, WP-5 |
-| 7 | Staff Panel | Not started | Blocked by WP-4, WP-5 |
-| 8 | Analytics Panel | Not started | Blocked by WP-4, WP-5 |
-| 9 | Scenario System | Not started | Blocked by WP-4 |
+| 6 | Customer Panel | Not started | Blocked by WP-5 |
+| 7 | Staff Panel | Not started | Blocked by WP-5 |
+| 8 | Analytics Panel | Not started | Blocked by WP-5 |
+| 9 | Scenario System | Not started | No blockers |
 | 10 | Guided Walkthrough | Not started | Blocked by WP-6–9 |
 
 ### What exists today
@@ -600,8 +600,14 @@ playground/
 │   ├── app.vue                    # Root shell (NuxtLayout + Sonner toaster)
 │   ├── assets/css/tailwind.css    # Full design token system (oklch color space)
 │   ├── components/ui/             # 14 shadcn-vue suites (73 .vue files)
+│   ├── composables/
+│   │   ├── useDashboardData.ts    # Derived analytics (completedCount, avgWait, chart data)
+│   │   ├── useSimulation.ts       # Simulation clock lifecycle + auto-complete
+│   │   ├── useSimulationActions.ts # 9 queue actions (submit, approve, assign, etc.)
+│   │   └── useWaitTimeEstimate.ts # Wait-time estimate from queue position + history
 │   ├── constants/
 │   │   ├── status.ts              # PICKUP_STATUS, groupings, STATUS_LABELS, STATUS_VARIANT
+│   │   ├── transitions.ts         # VALID_TRANSITIONS map, isValidTransition()
 │   │   └── defaults.ts            # DEFAULT_GATES, processing duration, seed data
 │   ├── layouts/default.vue        # Header + slot
 │   ├── lib/utils.ts               # cn() + valueUpdater()
@@ -628,8 +634,14 @@ playground/
 ├── package.json                   # Nuxt 4.3, Vue 3.5, Pinia, TanStack, Unovis, etc.
 └── tests/unit/
     ├── utils.test.ts              # cn() + valueUpdater() tests (WP-1)
+    ├── composables/
+    │   ├── useDashboardData.test.ts   # KPI computations, chart data, null handling
+    │   ├── useSimulation.test.ts      # Clock ticks at each speed, auto-complete, pause/resume
+    │   ├── useSimulationActions.test.ts # Status transitions, invalid transitions, positions, priority, gate transfer, events
+    │   └── useWaitTimeEstimate.test.ts # Null with <3 completed, correct range, position scaling
     ├── constants/
-    │   └── status.test.ts         # Status grouping consistency, label/variant completeness
+    │   ├── status.test.ts         # Status grouping consistency, label/variant completeness
+    │   └── transitions.test.ts    # Transition map completeness, terminal states, isValidTransition
     ├── stores/
     │   ├── queue.test.ts          # CRUD, status getters, requestById
     │   ├── gates.test.ts          # Sorted getters, recountQueues accuracy
@@ -642,7 +654,7 @@ playground/
         └── random.test.ts         # Seeded determinism, pickRandom, randomBetween bounds
 ```
 
-**Not yet created:** `app/composables/`, `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
+**Not yet created:** `app/components/{panels,layout,customer,staff,analytics,scenario}/`.
 
 ---
 
@@ -732,27 +744,31 @@ Each work package (WP) is a self-contained unit of work that can be developed an
 
 ---
 
-### WP-4: Simulation Engine & Actions Composable
+### WP-4: Simulation Engine & Actions Composable ✓
+
+**Status: Complete**
 
 **Scope:** The core business logic — simulation clock, all queue actions, and auto-processing.
 
 **Deliverables:**
-- `composables/useSimulation.ts`
+- `app/constants/transitions.ts` — `VALID_TRANSITIONS` map, `isValidTransition()` helper
+- `app/composables/useSimulation.ts`
   - Starts/stops the simulation clock interval.
   - On each tick: advances `elapsedMs`, checks for auto-completable processing items.
   - Respects `speed` (1x/2x/5x).
   - Uses `vi.useFakeTimers()` in tests.
-- `composables/useSimulationActions.ts`
+- `app/composables/useSimulationActions.ts`
   - Every action from section 3.3: `submitOrder`, `approveRequest`, `assignToGate`, `reorderQueue`, `setPriority`, `startProcessing`, `completeRequest`, `cancelRequest`, `moveToGate`.
-  - Each action validates current status before transitioning.
+  - Each action validates current status before transitioning via `VALID_TRANSITIONS`.
   - Each action logs to `simulation.addEvent()`.
   - Each action updates gate queue counts via `gates.recountQueues()`.
-- `composables/useWaitTimeEstimate.ts`
-  - Ported from customer app. Takes `queuePosition` and completed requests, returns `{ min, max }` in ms.
-- `composables/useDashboardData.ts`
-  - Ported from staff app. Returns `completedCount`, `avgWaitTime`, `avgProcessingTime`, `currentlyWaiting`, `chartData`, `processingGateRows`.
+- `app/composables/useWaitTimeEstimate.ts`
+  - Takes `queuePosition` and completed requests, returns `{ min, max }` in ms.
+- `app/composables/useDashboardData.ts`
+  - Returns `completedCount`, `avgWaitTime`, `avgProcessingTime`, `currentlyWaiting`, `chartData`, `processingGateRows`.
 
-**Tests:**
+**Tests:** 5 test files, 64 tests passing (151 total).
+- `tests/unit/constants/transitions.test.ts` — transition map completeness, terminal states empty, isValidTransition correctness.
 - `tests/unit/composables/useSimulationActions.test.ts`
   - **Status transitions:** every valid transition produces correct next state.
   - **Invalid transitions:** attempting to complete a pending request is a no-op.

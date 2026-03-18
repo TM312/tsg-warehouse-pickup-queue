@@ -1,6 +1,13 @@
 import { PICKUP_STATUS } from '@/constants/status'
 import type { PickupRequest } from '@/types/pickup-request'
 
+export function getProcessingDuration(request: PickupRequest): number | null {
+  if (!request.processing_started_at || !request.completed_at) return null
+  const duration =
+    new Date(request.completed_at).getTime() - new Date(request.processing_started_at).getTime()
+  return duration > 0 ? duration : null
+}
+
 function isQueuedAtGate(request: PickupRequest, gateId: string): boolean {
   return request.gate_id === gateId && request.status === PICKUP_STATUS.IN_QUEUE
 }
