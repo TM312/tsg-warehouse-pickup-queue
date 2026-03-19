@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useGatesStore } from '@/stores/gates'
+import { useGateStatuses } from '@/composables/useGateStatus'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import StaffAllRequestsTable from './StaffAllRequestsTable.vue'
 import StaffGateQueue from './StaffGateQueue.vue'
+import GateStatusDot from './GateStatusDot.vue'
 
 const gates = useGatesStore()
+const { statusOf } = useGateStatuses()
 </script>
 
 <template>
@@ -16,7 +19,11 @@ const gates = useGatesStore()
         :key="gate.id"
         :value="gate.id"
       >
-        Gate {{ gate.gate_number }}
+        <span class="inline-flex items-center gap-1.5">
+          <GateStatusDot :status="statusOf(gate.id)" />
+          Gate {{ gate.gate_number }}
+          <span class="text-muted-foreground">({{ gate.queue_count }})</span>
+        </span>
       </TabsTrigger>
     </TabsList>
 

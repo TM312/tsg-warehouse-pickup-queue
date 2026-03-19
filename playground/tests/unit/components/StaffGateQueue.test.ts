@@ -5,9 +5,10 @@ import { h, markRaw } from 'vue'
 import StaffGateQueue from '@/components/staff/StaffGateQueue.vue'
 import { useQueueStore } from '@/stores/queue'
 import { useGatesStore } from '@/stores/gates'
+import { useSimulationStore } from '@/stores/simulation'
 import { createPickupRequest } from '@/utils/factories'
 import { PICKUP_STATUS } from '@/constants/status'
-import { DEFAULT_GATES } from '@/constants/defaults'
+import { DEFAULT_GATES, DEFAULT_PROCESSING_DURATION_MS } from '@/constants/defaults'
 
 const stubComponent = (name: string) =>
   markRaw({ name, render: () => h('div', { 'data-testid': name }) })
@@ -15,6 +16,13 @@ const stubComponent = (name: string) =>
 const stubs = {
   StaffStatusBadge: stubComponent('staff-status-badge'),
   StaffRequestActions: stubComponent('staff-request-actions'),
+  ProcessingProgressBar: markRaw({
+    name: 'ProcessingProgressBar',
+    props: ['progress'],
+    setup(props: { progress: number }) {
+      return () => h('div', { 'data-testid': 'processing-progress-bar', 'data-progress': props.progress })
+    },
+  }),
 }
 
 const GATE_ID = DEFAULT_GATES[0].id
@@ -157,5 +165,67 @@ describe('StaffGateQueue', () => {
       global: { stubs },
     })
     expect(wrapper.find('[data-testid="staff-gate-queue"]').exists()).toBe(true)
+  })
+
+  it('renders progress bar in "Now Processing" section', () => {
+    seedGates()
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'rp',
+      sales_order_number: 'SO-PROC',
+      status: PICKUP_STATUS.PROCESSING,
+      gate_id: GATE_ID,
+      processing_started_at: new Date().toISOString(),
+      processing_started_sim_ms: 0,
+    }))
+
+    const wrapper = mount(StaffGateQueue, {
+      props: { gateId: GATE_ID },
+      global: { stubs },
+    })
+
+    expect(wrapper.find('[data-testid="processing-progress-bar"]').exists()).toBe(true)
+  })
+
+  it('passes correct progress value to progress bar', () => {
+    seedGates()
+    const simulation = useSimulationStore()
+    simulation.elapsedMs = DEFAULT_PROCESSING_DURATION_MS / 2
+
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'rp',
+      sales_order_number: 'SO-PROC',
+      status: PICKUP_STATUS.PROCESSING,
+      gate_id: GATE_ID,
+      processing_started_at: new Date().toISOString(),
+      processing_started_sim_ms: 0,
+    }))
+
+    const wrapper = mount(StaffGateQueue, {
+      props: { gateId: GATE_ID },
+      global: { stubs },
+    })
+
+    const bar = wrapper.find('[data-testid="processing-progress-bar"]')
+    expect(bar.attributes('data-progress')).toBe('0.5')
+  })
+
+  it('does not render progress bar when no processing item', () => {
+    seedGates()
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'r1',
+      status: PICKUP_STATUS.IN_QUEUE,
+      gate_id: GATE_ID,
+      queue_position: 1,
+    }))
+
+    const wrapper = mount(StaffGateQueue, {
+      props: { gateId: GATE_ID },
+      global: { stubs },
+    })
+
+    expect(wrapper.find('[data-testid="processing-progress-bar"]').exists()).toBe(false)
   })
 })

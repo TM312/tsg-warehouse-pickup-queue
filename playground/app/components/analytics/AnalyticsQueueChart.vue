@@ -5,10 +5,13 @@ import { VisArea } from '@unovis/vue'
 import { VisAxis } from '@unovis/vue'
 import { CurveType } from '@unovis/ts'
 import { useQueueHistory } from '@/composables/useQueueHistory'
+import { useGateStatuses } from '@/composables/useGateStatus'
 import { resolveGateColors, formatTimeMs } from '@/utils/chart'
 import { CHART_HEIGHT_PX } from '@/constants/chart'
+import GateStatusDot from '@/components/staff/GateStatusDot.vue'
 
 const { history, gateIds, gateLabels } = useQueueHistory()
+const { statusOf } = useGateStatuses()
 
 const hasEnoughData = computed(() => history.value.length >= 2)
 
@@ -40,7 +43,7 @@ const xAccessor = (d: ChartDatum) => d.x
 const legendItems = computed(() =>
   gateIds.value.map((id, i) => {
     const c = colors.value
-    return { label: gateLabels.value[id] ?? id, color: c[i % c.length] }
+    return { id, label: gateLabels.value[id] ?? id, color: c[i % c.length] }
   }),
 )
 </script>
@@ -52,6 +55,7 @@ const legendItems = computed(() =>
     <template v-if="hasEnoughData">
       <div class="flex gap-3 mb-1">
         <div v-for="item in legendItems" :key="item.label" class="flex items-center gap-1 text-xs text-muted-foreground">
+          <GateStatusDot :status="statusOf(item.id)" size="sm" />
           <span class="inline-block h-2 w-2 rounded-full" :style="{ backgroundColor: item.color }" />
           {{ item.label }}
         </div>
