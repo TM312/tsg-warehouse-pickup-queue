@@ -2,14 +2,13 @@
 import { Play, Pause } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Separator } from '@/components/ui/separator'
 import { computed } from 'vue'
 import { SCENARIOS } from '@/constants/scenarios'
 import { useScenarioRunner } from '@/composables/useScenarioRunner'
 import { useSimulation } from '@/composables/useSimulation'
 import { useSimulationStore } from '@/stores/simulation'
 import { formatElapsedTime } from '@/utils/formatDuration'
-import ScenarioButton from './ScenarioButton.vue'
+import ScenarioCard from './ScenarioCard.vue'
 import ScenarioProgressBar from './ScenarioProgressBar.vue'
 import SimulationSpeedControl from './SimulationSpeedControl.vue'
 import ResetButton from './ResetButton.vue'
@@ -35,19 +34,21 @@ function handleScenarioClick(scenario: Scenario) {
     data-testid="scenario-bar"
     data-walkthrough="scenario-bar"
   >
-    <div class="flex shrink-0 items-center gap-2 border-b px-4 py-2">
+    <!-- Row 1: Scrollable card strip -->
+    <div class="flex gap-2 overflow-x-auto px-4 py-2 border-b snap-x snap-mandatory" data-testid="scenario-card-strip">
+      <ScenarioCard
+        v-for="scenario in SCENARIOS"
+        :key="scenario.id"
+        :scenario="scenario"
+        :disabled="isRunning"
+        :active="activeScenarioId === scenario.id"
+        @run="handleScenarioClick(scenario)"
+      />
+    </div>
+
+    <!-- Row 2: Simulation controls -->
+    <div class="flex shrink-0 items-center gap-2 border-b px-4 py-1.5">
       <TooltipProvider :delay-duration="300">
-        <ScenarioButton
-          v-for="scenario in SCENARIOS"
-          :key="scenario.id"
-          :scenario="scenario"
-          :disabled="isRunning"
-          :active="activeScenarioId === scenario.id"
-          @run="handleScenarioClick(scenario)"
-        />
-
-        <Separator orientation="vertical" class="mx-1 h-6" />
-
         <SimulationSpeedControl />
 
         <!-- Play/Pause -->
@@ -85,3 +86,14 @@ function handleScenarioClick(scenario: Scenario) {
     />
   </div>
 </template>
+
+<style scoped>
+.snap-x {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-x::-webkit-scrollbar {
+  display: none;
+}
+</style>
