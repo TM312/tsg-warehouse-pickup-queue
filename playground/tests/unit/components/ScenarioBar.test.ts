@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { setActivePinia, createPinia } from 'pinia'
 import ScenarioBar from '@/components/scenario/ScenarioBar.vue'
 import { SCENARIOS } from '@/constants/scenarios'
@@ -10,8 +11,17 @@ vi.mock('@/composables/useSimulation', () => ({
   useSimulation: () => ({ toggle: vi.fn() }),
 }))
 
+const mockIsMuted = ref(false)
+vi.mock('@/composables/useSimulationToasts', () => ({
+  useSimulationToasts: () => ({
+    isMuted: mockIsMuted,
+    toggleMute: () => { mockIsMuted.value = !mockIsMuted.value },
+  }),
+}))
+
 beforeEach(() => {
   setActivePinia(createPinia())
+  mockIsMuted.value = false
 })
 
 describe('ScenarioBar', () => {
@@ -65,5 +75,22 @@ describe('ScenarioBar', () => {
       const expected = ms === 0 ? 'Instant' : formatDurationMs(ms)
       expect(wrapper.text()).toContain(expected)
     }
+  })
+
+  it('renders mute toggle button', () => {
+    const wrapper = mount(ScenarioBar)
+    expect(wrapper.find('[data-testid="toast-mute-toggle"]').exists()).toBe(true)
+  })
+
+  it('toggles icon on click', async () => {
+    const wrapper = mount(ScenarioBar)
+    const btn = wrapper.find('[data-testid="toast-mute-toggle"]')
+    const htmlBefore = btn.html()
+
+    await btn.trigger('click')
+    await wrapper.vm.$nextTick()
+
+    const htmlAfter = btn.html()
+    expect(htmlAfter).not.toBe(htmlBefore)
   })
 })

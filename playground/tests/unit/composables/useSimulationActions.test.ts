@@ -1,5 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
+
+vi.mock('@/composables/useSimulationToasts', () => ({
+  useSimulationToasts: () => ({
+    notifySubmit: vi.fn(),
+    notifyApprove: vi.fn(),
+    notifyStartProcessing: vi.fn(),
+    notifyComplete: vi.fn(),
+    notifyGateOffline: vi.fn(),
+  }),
+}))
 import { useQueueStore } from '@/stores/queue'
 import { useGatesStore } from '@/stores/gates'
 import { useSimulationStore } from '@/stores/simulation'
