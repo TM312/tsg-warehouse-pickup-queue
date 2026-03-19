@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { PANEL_ID } from '@/constants/panels'
+import { AUTOPLAY_PANEL_STAGGER_MS } from '@/constants/autoplay'
 import { useActivePanel } from '@/composables/useActivePanel'
 
+const props = withDefaults(defineProps<{ introAnimate?: boolean }>(), { introAnimate: false })
+
 const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActivePanel()
+
+function panelStaggerStyle(index: number) {
+  if (!props.introAnimate) return undefined
+  return { animationDelay: `${index * AUTOPLAY_PANEL_STAGGER_MS}ms` }
+}
 </script>
 
 <template>
@@ -12,15 +20,27 @@ const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActi
       v-if="breakpoint === 'desktop'"
       class="grid h-full grid-cols-[280px_1fr_320px] gap-4 p-4"
     >
-      <div data-testid="panel-col-customer" class="flex items-start justify-center">
+      <div
+        data-testid="panel-col-customer"
+        :class="['flex items-start justify-center', { 'panel-intro-animate': introAnimate }]"
+        :style="panelStaggerStyle(0)"
+      >
         <LayoutPhoneFrame>
           <slot name="customer" />
         </LayoutPhoneFrame>
       </div>
-      <div data-testid="panel-col-staff" class="min-h-0 overflow-y-auto rounded-lg border bg-card">
+      <div
+        data-testid="panel-col-staff"
+        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :style="panelStaggerStyle(1)"
+      >
         <slot name="staff" />
       </div>
-      <div data-testid="panel-col-analytics" class="min-h-0 overflow-y-auto rounded-lg border bg-card">
+      <div
+        data-testid="panel-col-analytics"
+        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :style="panelStaggerStyle(2)"
+      >
         <slot name="analytics" />
       </div>
     </div>
@@ -30,10 +50,18 @@ const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActi
       v-else-if="breakpoint === 'tablet'"
       class="grid h-full grid-cols-[1fr_320px] gap-4 p-4"
     >
-      <div data-testid="panel-col-staff" class="min-h-0 overflow-y-auto rounded-lg border bg-card">
+      <div
+        data-testid="panel-col-staff"
+        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :style="panelStaggerStyle(0)"
+      >
         <slot name="staff" />
       </div>
-      <div data-testid="panel-col-analytics" class="min-h-0 overflow-y-auto rounded-lg border bg-card">
+      <div
+        data-testid="panel-col-analytics"
+        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :style="panelStaggerStyle(1)"
+      >
         <slot name="analytics" />
       </div>
 
@@ -75,3 +103,28 @@ const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActi
     </div>
   </div>
 </template>
+
+<style scoped>
+@keyframes panel-intro {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-intro-animate {
+  opacity: 0;
+  animation: panel-intro 400ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-intro-animate {
+    animation: none;
+    opacity: 1;
+  }
+}
+</style>

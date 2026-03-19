@@ -22,9 +22,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ## Work Packages
 
-### WP-1: Auto-Play & First Load Experience
+### WP-1: Auto-Play & First Load Experience ✅
 
 **Goal:** Eliminate the empty state. Visitors see a running simulation immediately.
+
+**Status:** Implemented
 
 **Scope:**
 - On first page load, automatically start the "Morning Rush" scenario after a brief delay (~500ms)
@@ -33,18 +35,23 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - If the user has already visited (localStorage flag), skip auto-play and show the scenario bar in its default state
 - Ensure the customer panel auto-selects the first submitted order so it's not showing the empty form
 
-**Components affected:**
-- `app/pages/index.vue` — trigger auto-play on mount
-- `app/composables/useScenarioRunner.ts` — support auto-start mode
-- `app/components/layout/PanelGrid.vue` — intro animation
-- `app/stores/simulation.ts` — auto-select first customer request
+**Implementation details:**
+- New: `app/constants/autoplay.ts` — named constants for delay (500ms), panel stagger (150ms), animation duration (400ms), toast duration (8s), and `STORAGE_KEY.HAS_VISITED` localStorage key
+- New: `app/composables/useAutoPlay.ts` — orchestrates first-visit detection (localStorage), delayed Morning Rush auto-start via `useScenarioRunner`, auto-selection of first customer request, Sonner toast with "Start Tour" CTA linking to `useGuidedWalkthrough().start()`, and cleanup on unmount
+- Modified: `app/pages/index.vue` — added `<script setup>` wiring `useAutoPlay` via `onMounted`/`onUnmounted`, passes `introAnimate` prop to PanelGrid
+- Modified: `app/components/layout/PanelGrid.vue` — added `introAnimate` prop, CSS `@keyframes panel-intro` (fade+slide-up, 400ms ease-out) with staggered `animation-delay` per panel column, respects `prefers-reduced-motion`
+- No changes needed to `useScenarioRunner.ts` or `simulation.ts` — existing public APIs were sufficient
+
+**Test coverage:**
+- `tests/unit/composables/useAutoPlay.test.ts` — 16 tests covering first-visit detection, return-visit skip, walkthrough-active guard, scenario trigger timing, customer request auto-selection, localStorage read/write error handling, toast emission, cleanup/idempotency
+- `tests/unit/constants/autoplay.test.ts` — 5 constant value assertions
 
 **Acceptance criteria:**
-- [ ] Fresh page load shows simulation running within 1 second
-- [ ] Panels animate in on first load
-- [ ] Customer panel shows a live order status (not the empty form)
-- [ ] Return visitors see default state (no auto-play)
-- [ ] User can still reset and explore manually
+- [x] Fresh page load shows simulation running within 1 second
+- [x] Panels animate in on first load
+- [x] Customer panel shows a live order status (not the empty form)
+- [x] Return visitors see default state (no auto-play)
+- [x] User can still reset and explore manually
 
 ---
 
