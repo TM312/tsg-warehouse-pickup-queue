@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calcProcessingProgress } from '@/utils/processing'
+import { calcProcessingProgress, formatProcessingElapsed } from '@/utils/processing'
 import { DEFAULT_PROCESSING_DURATION_MS } from '@/constants/defaults'
 
 describe('calcProcessingProgress', () => {
@@ -32,5 +32,23 @@ describe('calcProcessingProgress', () => {
     const start = 10_000
     const elapsed = start + DEFAULT_PROCESSING_DURATION_MS / 2
     expect(calcProcessingProgress(start, elapsed)).toBe(0.5)
+  })
+})
+
+describe('formatProcessingElapsed', () => {
+  it('returns "--" when processingStartedSimMs is null', () => {
+    expect(formatProcessingElapsed(null, 10_000)).toBe('--')
+  })
+
+  it('returns "--" when processingStartedSimMs is undefined', () => {
+    expect(formatProcessingElapsed(undefined, 10_000)).toBe('--')
+  })
+
+  it('formats elapsed time correctly', () => {
+    expect(formatProcessingElapsed(0, 65_000)).toBe('1m')
+  })
+
+  it('clamps negative elapsed to 0s', () => {
+    expect(formatProcessingElapsed(10_000, 5_000)).toBe('0s')
   })
 })

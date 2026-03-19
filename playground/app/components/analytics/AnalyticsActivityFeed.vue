@@ -2,13 +2,13 @@
 import { computed } from 'vue'
 import { useSimulationStore } from '@/stores/simulation'
 import { EVENT_TYPE_CONFIG } from '@/constants/analytics'
-import { ANIMATION } from '@/constants/animations'
+import { ANIMATION, cssMs } from '@/constants/animations'
 import { HIGHLIGHT_TARGET } from '@/constants/highlights'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 import { formatDurationMs } from '@/utils/formatDuration'
 
 const simulation = useSimulationStore()
-const enterMs = `${ANIMATION.FEED_ITEM_ENTER_MS}ms`
+const enterMs = cssMs(ANIMATION.FEED_ITEM_ENTER_MS)
 const { isHighlighted } = useCrossPanelHighlight()
 const feedHighlighted = computed(() => isHighlighted(HIGHLIGHT_TARGET.ACTIVITY_FEED))
 

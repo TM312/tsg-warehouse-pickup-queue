@@ -1,4 +1,4 @@
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, onScopeDispose } from 'vue'
 import { toast } from 'vue-sonner'
 import { AUTOPLAY_DELAY_MS, AUTOPLAY_TOAST_DURATION_MS, STORAGE_KEY } from '@/constants/autoplay'
 import { SCENARIOS, SCENARIO_ID } from '@/constants/scenarios'
@@ -103,6 +103,8 @@ export function useAutoPlay() {
       introComplete.value = true
     }, AUTOPLAY_DELAY_MS)
   }
+
+  onScopeDispose(cleanup)
 
   return { isFirstVisit, panelsReady, introComplete, initialize, cleanup }
 }

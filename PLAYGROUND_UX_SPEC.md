@@ -261,9 +261,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ---
 
-### WP-7: Customer Panel Polish
+### WP-7: Customer Panel Polish ✅
 
 **Goal:** The phone mockup is the visual hero — make it feel like a real app on a real phone.
+
+**Status:** Implemented
 
 **Scope:**
 - **Phone status bar:** Add a fake iOS status bar inside the phone frame (time centered, signal + wifi + battery on right). Static content, just visual fidelity.
@@ -273,20 +275,33 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - **Processing state improvement:** Show elapsed time and a circular progress indicator instead of just a spinner.
 - **Form UX:** Auto-focus the order number input when the form appears. Add a subtle success state (brief green border flash) after submission before switching to status view.
 
-**Components affected:**
-- `app/components/layout/PhoneFrame.vue` — status bar, home indicator
-- `app/components/customer/CustomerCompletedState.vue` — confetti, "submit another" button
-- `app/components/customer/CustomerStatusCard.vue` — processing elapsed time + progress
-- `app/components/customer/CustomerOrderForm.vue` — auto-focus, success flash
-- New: `app/components/customer/CustomerConfetti.vue` (or CSS in CompletedState)
+**Implementation details:**
+- New: `app/constants/phone.ts` — named constants for `PHONE_STATUS_BAR_TIME` ('9:41', classic iOS demo time) and `HOME_INDICATOR_WIDTH_PX` (100)
+- New: `app/components/customer/ConfettiBurst.vue` — CSS-only confetti animation with 12 particles at varied angles (-70° to 70°), staggered delays (0–120ms), and five colors (green-400, amber-400, sky-400, rose-400, emerald-500). Uses `@keyframes confetti-burst` (translate + rotate + scale + opacity over `CONFETTI_DURATION_MS` 1500ms). Hidden when `prefers-reduced-motion: reduce`
+- New: `app/components/customer/CustomerProcessingState.vue` — SVG circular progress indicator (80×80px) with `stroke-dasharray`/`stroke-dashoffset` technique, amber-500 progress arc, elapsed time in mm:ss format at center via `formatElapsedTime()`. Uses `calcProcessingProgress()` utility for progress calculation, `ANIMATION.CIRCULAR_PROGRESS_TRANSITION_MS` (300ms) for smooth transitions, full ARIA progressbar attributes
+- Modified: `app/components/layout/PhoneFrame.vue` — added iOS-style status bar with `PHONE_STATUS_BAR_TIME` display, inline SVG icons for signal bars (4 rectangles), wifi arc, and battery indicator. Added home indicator bar at bottom using `HOME_INDICATOR_WIDTH_PX` constant
+- Modified: `app/components/customer/CustomerCompletedState.vue` — integrated `<ConfettiBurst />` component, added "Submit Another Order" outline button that calls `simulation.selectCustomerRequest(null)` to reset to form view
+- Modified: `app/components/customer/CustomerStatusCard.vue` — added `<CustomerProcessingState />` component for PROCESSING status (replacing plain spinner), status rendering now shows distinct sub-components per state (PENDING → spinner, APPROVED → text, IN_QUEUE → queue position, PROCESSING → circular progress, COMPLETED → completed state, CANCELLED → text)
+- Modified: `app/components/customer/CustomerOrderForm.vue` — added auto-focus on order number input via `nextTick()` on mount, added success flash animation (`ring-2 ring-green-500/50`) after submission lasting `ANIMATION.SUCCESS_FLASH_MS` (800ms) before selecting the new request, flash skipped when `prefers-reduced-motion` is active, flash timeout cleaned up on unmount
+- Modified: `app/constants/animations.ts` — added `CONFETTI_DURATION_MS: 1500`, `SUCCESS_FLASH_MS: 800`, `CIRCULAR_PROGRESS_TRANSITION_MS: 300` to `ANIMATION` object
+
+**Test coverage:**
+- `tests/unit/components/ConfettiBurst.test.ts` — 3 tests covering element existence, 12-particle count, and CSS animation variable presence
+- `tests/unit/components/CustomerProcessingState.test.ts` — 4 tests covering 50% progress calculation, elapsed time formatting, progress clamping at 100%, and ARIA accessibility attributes
+- `tests/unit/components/CustomerCompletedState.test.ts` — 8 tests covering heading text, sales order display, icon, confetti burst rendering, "Submit Another Order" button existence/text, and button click resetting selection to null
+- `tests/unit/components/CustomerOrderForm.test.ts` — 8 tests covering input rendering, disabled submit when empty, submission flow with flash timeout, form clearing, success flash class application/removal, auto-focus on mount, and flash timeout cleanup on unmount
+- `tests/unit/components/CustomerStatusCard.test.ts` — 8 tests covering all status state renders (PENDING, APPROVED, IN_QUEUE, PROCESSING, COMPLETED, CANCELLED), CustomerProcessingState component rendering, and status badge display
+- `tests/unit/components/PhoneFrame.test.ts` — 5 tests covering slot rendering, custom class merging, status bar time display (9:41), home indicator element presence, and frame chrome
+- `tests/unit/constants/phone.test.ts` — 2 tests covering status bar time and home indicator width constant values
+- `tests/unit/constants/animations.test.ts` — updated to cover new animation constants
 
 **Acceptance criteria:**
-- [ ] Phone frame has iOS-style status bar and home indicator
-- [ ] Confetti plays on completion (brief, tasteful, CSS-only)
-- [ ] "Submit another order" button works and returns to form
-- [ ] Processing state shows elapsed time
-- [ ] Order form auto-focuses on mount
-- [ ] All additions fit within 280px phone width
+- [x] Phone frame has iOS-style status bar and home indicator
+- [x] Confetti plays on completion (brief, tasteful, CSS-only)
+- [x] "Submit another order" button works and returns to form
+- [x] Processing state shows elapsed time
+- [x] Order form auto-focuses on mount
+- [x] All additions fit within 280px phone width
 
 ---
 

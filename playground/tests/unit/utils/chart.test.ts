@@ -19,6 +19,16 @@ describe('resolveGateColors', () => {
     expect(colors).toEqual([...GATE_CHART_COLORS.dark])
   })
 
+  it('returns light colors when isDark is explicitly false', () => {
+    const colors = resolveGateColors(false)
+    expect(colors).toEqual([...GATE_CHART_COLORS.light])
+  })
+
+  it('returns dark colors when isDark is explicitly true', () => {
+    const colors = resolveGateColors(true)
+    expect(colors).toEqual([...GATE_CHART_COLORS.dark])
+  })
+
   it('returns a new array each call (not a reference to the constant)', () => {
     const a = resolveGateColors()
     const b = resolveGateColors()
@@ -46,5 +56,9 @@ describe('formatTimeMs', () => {
 
   it('truncates sub-second precision', () => {
     expect(formatTimeMs(61_999)).toBe('1:01')
+  })
+
+  it('clamps negative input to 0:00', () => {
+    expect(formatTimeMs(-5000)).toBe('0:00')
   })
 })

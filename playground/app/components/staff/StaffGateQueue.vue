@@ -3,11 +3,10 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import Sortable from 'sortablejs'
 import { Star } from 'lucide-vue-next'
 import { PICKUP_STATUS } from '@/constants/status'
-import { ANIMATION } from '@/constants/animations'
+import { ANIMATION, cssMs } from '@/constants/animations'
 import { useQueueStore } from '@/stores/queue'
-import { useSimulationStore } from '@/stores/simulation'
-import { calcProcessingProgress } from '@/utils/processing'
 import { useSimulationActions } from '@/composables/useSimulationActions'
+import { useProcessingProgress } from '@/composables/useProcessingProgress'
 import { Button } from '@/components/ui/button'
 import StaffStatusBadge from './StaffStatusBadge.vue'
 import StaffRequestActions from './StaffRequestActions.vue'
@@ -18,10 +17,9 @@ const props = defineProps<{
 }>()
 
 const queue = useQueueStore()
-const simulation = useSimulationStore()
 const actions = useSimulationActions()
-const enterMs = `${ANIMATION.QUEUE_ITEM_ENTER_MS}ms`
-const leaveMs = `${ANIMATION.QUEUE_ITEM_LEAVE_MS}ms`
+const enterMs = cssMs(ANIMATION.QUEUE_ITEM_ENTER_MS)
+const leaveMs = cssMs(ANIMATION.QUEUE_ITEM_LEAVE_MS)
 const listRef = ref<InstanceType<typeof TransitionGroup> | null>(null)
 let sortableInstance: Sortable | null = null
 
@@ -35,15 +33,13 @@ const queueItems = computed(() =>
     .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0)),
 )
 
-const processingProgress = computed(() =>
-  calcProcessingProgress(processingItem.value?.processing_started_sim_ms, simulation.elapsedMs),
-)
+const { progress: processingProgress } = useProcessingProgress(processingItem)
 
 onMounted(() => {
   const el = listRef.value?.$el as HTMLElement | undefined
   if (!el) return
   sortableInstance = Sortable.create(el, {
-    animation: 150,
+    animation: ANIMATION.SORTABLE_REORDER_MS,
     onEnd: () => {
       const container = listRef.value?.$el as HTMLElement | undefined
       if (!container) return

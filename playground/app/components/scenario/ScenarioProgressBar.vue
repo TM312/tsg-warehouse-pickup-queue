@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ANIMATION } from '@/constants/animations'
+import { ANIMATION, cssMs } from '@/constants/animations'
 import type { ScenarioStep } from '@/types/scenario'
 
 const props = defineProps<{
@@ -14,6 +14,8 @@ const progressPercent = computed(() => {
   if (props.totalSteps === 0) return 0
   return (props.currentStep / props.totalSteps) * 100
 })
+
+const slideDuration = cssMs(ANIMATION.PROGRESS_SLIDE_MS)
 
 const stepMarkers = computed(() => {
   if (props.steps.length <= 1) return []
@@ -39,7 +41,7 @@ const stepMarkers = computed(() => {
       <!-- Fill -->
       <div
         class="absolute inset-y-0 left-0 bg-primary transition-[width] ease-out"
-        :style="{ width: `${progressPercent}%`, transitionDuration: `${ANIMATION.PROGRESS_BAR_TRANSITION_MS}ms` }"
+        :style="{ width: `${progressPercent}%`, transitionDuration: cssMs(ANIMATION.PROGRESS_BAR_TRANSITION_MS) }"
         role="progressbar"
         :aria-valuenow="currentStep"
         :aria-valuemin="0"
@@ -59,7 +61,7 @@ const stepMarkers = computed(() => {
 <style scoped>
 .progress-slide-enter-active,
 .progress-slide-leave-active {
-  transition: opacity 200ms ease, max-height 200ms ease;
+  transition: opacity v-bind(slideDuration) ease, max-height v-bind(slideDuration) ease;
   max-height: 4px;
   overflow: hidden;
 }

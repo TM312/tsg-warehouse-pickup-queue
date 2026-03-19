@@ -3,12 +3,12 @@ import { computed } from 'vue'
 import { Loader2 } from 'lucide-vue-next'
 import { PICKUP_STATUS, STATUS_LABELS } from '@/constants/status'
 import { STATUS_VARIANT } from '@/constants/status-ui'
-import { ANIMATION } from '@/constants/animations'
+import { ANIMATION, cssMs } from '@/constants/animations'
 import { HIGHLIGHT_TARGET } from '@/constants/highlights'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 import type { PickupRequest } from '@/types/pickup-request'
 
-const crossfadeMs = `${ANIMATION.STATUS_CROSSFADE_MS}ms`
+const crossfadeMs = cssMs(ANIMATION.STATUS_CROSSFADE_MS)
 
 const { isHighlighted } = useCrossPanelHighlight()
 const highlighted = computed(() => isHighlighted(HIGHLIGHT_TARGET.CUSTOMER_STATUS))
@@ -47,10 +47,7 @@ defineProps<{
         <CustomerQueuePosition v-else-if="request.status === PICKUP_STATUS.IN_QUEUE" :request="request" />
 
         <!-- Processing -->
-        <div v-else-if="request.status === PICKUP_STATUS.PROCESSING" class="flex flex-col items-center gap-3 py-6">
-          <Loader2 class="size-8 animate-spin text-amber-500" />
-          <p class="text-sm font-medium">Your order is being loaded!</p>
-        </div>
+        <CustomerProcessingState v-else-if="request.status === PICKUP_STATUS.PROCESSING" :request="request" />
 
         <!-- Completed -->
         <CustomerCompletedState v-else-if="request.status === PICKUP_STATUS.COMPLETED" :request="request" />
