@@ -9,6 +9,7 @@ import { computeNextPosition, recalculatePositions } from '@/utils/queue'
 import type { SimulationEventType } from '@/types/simulation'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 import { useQueueHistory } from '@/composables/useQueueHistory'
+import { useSimulationToasts } from '@/composables/useSimulationToasts'
 
 function syncGates() {
   const queue = useQueueStore()
@@ -32,6 +33,7 @@ export function useSimulationActions() {
   const gates = useGatesStore()
   const { highlight, resetAll: resetHighlights } = useCrossPanelHighlight()
   const { reset: resetQueueHistory } = useQueueHistory()
+  const { notifySubmit, notifyApprove, notifyStartProcessing, notifyComplete, notifyGateOffline } = useSimulationToasts()
 
   function submitOrder(orderNumber: string, companyName?: string) {
     const overrides: Record<string, string> = { sales_order_number: orderNumber }
@@ -40,6 +42,7 @@ export function useSimulationActions() {
     queue.addRequest(request)
     syncGates()
     logEvent(`Submitted ${orderNumber}`, 'submit')
+    notifySubmit(orderNumber)
     return request
   }
 
@@ -50,6 +53,7 @@ export function useSimulationActions() {
     queue.updateRequest(id, { status: PICKUP_STATUS.APPROVED })
     syncGates()
     logEvent(`Approved ${request.sales_order_number}`, 'approve')
+    notifyApprove(request.sales_order_number)
     highlight('approve')
   }
 
@@ -103,6 +107,8 @@ export function useSimulationActions() {
     if (gateId) applyRecalculation(gateId)
     syncGates()
     logEvent(`Started processing ${request.sales_order_number}`, 'start_processing')
+    const processingGate = gates.gateById(gateId ?? '')
+    notifyStartProcessing(processingGate?.gate_number ?? 0, request.sales_order_number)
     highlight('start_processing')
   }
 
@@ -116,6 +122,7 @@ export function useSimulationActions() {
     })
     syncGates()
     logEvent(`Completed ${request.sales_order_number}`, 'complete')
+    notifyComplete(request.sales_order_number)
     highlight('complete')
   }
 
@@ -154,6 +161,7 @@ export function useSimulationActions() {
     syncGates()
     const gate = gates.gateById(gateId)
     logEvent(`Gate ${gate?.gate_number ?? gateId} deactivated`, 'assign')
+    notifyGateOffline(gate?.gate_number ?? 0)
   }
 
   function resetAll() {

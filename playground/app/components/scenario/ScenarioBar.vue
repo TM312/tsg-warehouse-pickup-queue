@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Play, Pause } from 'lucide-vue-next'
+import { Play, Pause, Bell, BellOff } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { computed } from 'vue'
@@ -12,11 +12,13 @@ import ScenarioCard from './ScenarioCard.vue'
 import ScenarioProgressBar from './ScenarioProgressBar.vue'
 import SimulationSpeedControl from './SimulationSpeedControl.vue'
 import ResetButton from './ResetButton.vue'
+import { useSimulationToasts } from '@/composables/useSimulationToasts'
 import type { Scenario } from '@/types/scenario'
 
 const simulation = useSimulationStore()
 const { toggle } = useSimulation()
 const { runScenario, stopScenario, isRunning, activeScenarioId, currentStepIndex, totalSteps, activeScenario } = useScenarioRunner()
+const { isMuted, toggleMute } = useSimulationToasts()
 
 const elapsedDisplay = computed(() => formatElapsedTime(simulation.elapsedMs))
 
@@ -68,6 +70,22 @@ function handleScenarioClick(scenario: Scenario) {
         </Tooltip>
 
         <ResetButton :on-before-reset="stopScenario" />
+
+        <!-- Toast mute toggle -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button
+              size="icon-sm"
+              variant="outline"
+              data-testid="toast-mute-toggle"
+              @click="toggleMute()"
+            >
+              <BellOff v-if="isMuted" class="size-4" />
+              <Bell v-else class="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{{ isMuted ? 'Unmute notifications' : 'Mute notifications' }}</TooltipContent>
+        </Tooltip>
 
         <span
           class="ml-auto font-mono text-sm tabular-nums text-muted-foreground"

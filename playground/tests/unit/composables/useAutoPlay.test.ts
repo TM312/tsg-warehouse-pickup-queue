@@ -9,7 +9,14 @@ import { useSimulationStore } from '@/stores/simulation'
 import { useQueueStore } from '@/stores/queue'
 import { AUTOPLAY_DELAY_MS, STORAGE_KEY } from '@/constants/autoplay'
 
-vi.mock('vue-sonner', () => ({ toast: vi.fn() }))
+const { mockToastFn } = vi.hoisted(() => ({
+  mockToastFn: Object.assign(vi.fn(), {
+    info: vi.fn(),
+    success: vi.fn(),
+    warning: vi.fn(),
+  }),
+}))
+vi.mock('vue-sonner', () => ({ toast: mockToastFn }))
 vi.mock('@vueuse/core', () => ({
   useMediaQuery: vi.fn(() => ({ value: true })),
 }))
