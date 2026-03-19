@@ -40,6 +40,8 @@ describe('useScenarioRunner', () => {
   })
 
   afterEach(() => {
+    const { stopScenario } = useScenarioRunner()
+    stopScenario()
     vi.useRealTimers()
   })
 
@@ -432,6 +434,60 @@ describe('useScenarioRunner', () => {
       vi.advanceTimersByTime(5000)
       // Only scenario2 steps should have run
       expect(scenario2.steps[0].action).toHaveBeenCalled()
+    })
+  })
+
+  describe('singleton behavior', () => {
+    it('shares isRunning state across multiple call sites', () => {
+      const instance1 = useScenarioRunner()
+      const instance2 = useScenarioRunner()
+
+      expect(instance1.isRunning).toBe(instance2.isRunning)
+    })
+
+    it('reflects running state started from another call site', () => {
+      const instance1 = useScenarioRunner()
+      const instance2 = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      instance1.runScenario(scenario)
+
+      expect(instance2.isRunning.value).toBe(true)
+      expect(instance2.activeScenarioId.value).toBe('test-scenario')
+    })
+
+    it('prevents concurrent scenario launch from a second call site', () => {
+      const instance1 = useScenarioRunner()
+      const instance2 = useScenarioRunner()
+      const scenario1 = createTestScenario({ id: 'scenario-1' })
+      const scenario2 = createTestScenario({ id: 'scenario-2' })
+
+      instance1.runScenario(scenario1)
+      vi.advanceTimersByTime(0)
+      expect(scenario1.steps[0].action).toHaveBeenCalledTimes(1)
+
+      // Running from a second call site stops the first scenario
+      instance2.runScenario(scenario2)
+      expect(instance1.isRunning.value).toBe(true)
+      expect(instance1.activeScenarioId.value).toBe('scenario-2')
+
+      // Scenario 1's remaining steps should not execute
+      vi.advanceTimersByTime(5000)
+      expect(scenario1.steps[1].action).not.toHaveBeenCalled()
+      expect(scenario2.steps[2].action).toHaveBeenCalledTimes(1)
+    })
+
+    it('stop from one call site is visible to all', () => {
+      const instance1 = useScenarioRunner()
+      const instance2 = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      instance1.runScenario(scenario)
+      expect(instance2.isRunning.value).toBe(true)
+
+      instance2.stopScenario()
+      expect(instance1.isRunning.value).toBe(false)
+      expect(instance1.activeScenarioId.value).toBeNull()
     })
   })
 

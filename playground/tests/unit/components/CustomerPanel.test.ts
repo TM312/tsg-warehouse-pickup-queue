@@ -14,6 +14,14 @@ const stubs = {
   LayoutPanelHeader: stubComponent('panel-header'),
   CustomerOrderForm: stubComponent('customer-order-form'),
   CustomerStatusCard: stubComponent('customer-status-card'),
+  EmptyState: markRaw({
+    name: 'EmptyState',
+    props: ['icon', 'heading', 'subtext'],
+    setup(_: unknown, { slots }: { slots: Record<string, () => unknown> }) {
+      return () => h('div', { 'data-testid': 'empty-state' }, slots.default?.())
+    },
+  }),
+  Button: stubComponent('button-stub'),
 }
 
 beforeEach(() => {
@@ -47,5 +55,24 @@ describe('CustomerPanel', () => {
   it('has data-testid="customer-panel"', () => {
     const wrapper = mount(CustomerPanel, { global: { stubs } })
     expect(wrapper.find('[data-testid="customer-panel"]').exists()).toBe(true)
+  })
+
+  it('shows empty state when no requests exist and no request selected', () => {
+    const wrapper = mount(CustomerPanel, { global: { stubs } })
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true)
+  })
+
+  it('empty state disappears when a request is added to queue', () => {
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({ sales_order_number: 'SO-200' }))
+
+    const wrapper = mount(CustomerPanel, { global: { stubs } })
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
+  })
+
+  it('form still renders alongside empty state when no requests exist', () => {
+    const wrapper = mount(CustomerPanel, { global: { stubs } })
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="customer-order-form"]').exists()).toBe(true)
   })
 })

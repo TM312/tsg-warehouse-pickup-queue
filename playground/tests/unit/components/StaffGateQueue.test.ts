@@ -16,6 +16,13 @@ const stubComponent = (name: string) =>
 const stubs = {
   StaffStatusBadge: stubComponent('staff-status-badge'),
   StaffRequestActions: stubComponent('staff-request-actions'),
+  EmptyState: markRaw({
+    name: 'EmptyState',
+    props: ['icon', 'heading', 'subtext'],
+    setup(_: unknown, { slots }: { slots: Record<string, () => unknown> }) {
+      return () => h('div', { 'data-testid': 'empty-state' }, slots.default?.())
+    },
+  }),
   ProcessingProgressBar: markRaw({
     name: 'ProcessingProgressBar',
     props: ['progress'],
@@ -95,7 +102,7 @@ describe('StaffGateQueue', () => {
       props: { gateId: GATE_ID },
       global: { stubs },
     })
-    expect(wrapper.text()).toContain('No items in this gate')
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true)
   })
 
   it('renders "Now Processing" section when a processing item exists at the gate', () => {
@@ -155,7 +162,7 @@ describe('StaffGateQueue', () => {
       global: { stubs },
     })
 
-    expect(wrapper.text()).not.toContain('No items in this gate')
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
   })
 
   it('has data-testid="staff-gate-queue"', () => {
