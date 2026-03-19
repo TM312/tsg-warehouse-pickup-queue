@@ -1,21 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { ref } from 'vue'
-
-const mockDesktop = ref(false)
-const mockMobile = ref(false)
+import { setBreakpoint, useMediaQueryMock } from '../../helpers/breakpoint-mock'
 
 vi.mock('@vueuse/core', () => ({
-  useMediaQuery: (query: string) => {
-    if (query.includes('min-width')) return mockDesktop
-    if (query.includes('max-width')) return mockMobile
-    return ref(false)
-  },
+  useMediaQuery: useMediaQueryMock,
 }))
-
-function setBreakpoint(bp: 'desktop' | 'tablet' | 'mobile') {
-  mockDesktop.value = bp === 'desktop'
-  mockMobile.value = bp === 'mobile'
-}
 
 // Re-import fresh module for each test to reset module-level refs
 let useActivePanel: typeof import('@/composables/useActivePanel').useActivePanel

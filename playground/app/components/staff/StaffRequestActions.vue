@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { PICKUP_STATUS } from '@/constants/status'
 import { isValidTransition } from '@/constants/transitions'
+import { RESPONSIVE } from '@/constants/responsive'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { Button } from '@/components/ui/button'
 import type { PickupRequest } from '@/types/pickup-request'
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const actions = useSimulationActions()
+const tapTarget = `${RESPONSIVE.TAP_TARGET_MIN_PX}px`
 
 const canApprove = computed(() => isValidTransition(props.request.status, PICKUP_STATUS.APPROVED))
 const canStartProcessing = computed(() => isValidTransition(props.request.status, PICKUP_STATUS.PROCESSING))
@@ -56,3 +58,11 @@ const canCancel = computed(() => isValidTransition(props.request.status, PICKUP_
     </Button>
   </div>
 </template>
+
+<style scoped>
+@media (pointer: coarse) {
+  [data-testid="staff-request-actions"] :deep(button) {
+    min-height: v-bind(tapTarget);
+  }
+}
+</style>

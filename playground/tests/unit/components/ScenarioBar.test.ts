@@ -2,6 +2,7 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import { setActivePinia, createPinia } from 'pinia'
+import { setBreakpoint, useMediaQueryMock } from '../../helpers/breakpoint-mock'
 import ScenarioBar from '@/components/scenario/ScenarioBar.vue'
 import { SCENARIOS } from '@/constants/scenarios'
 import { getScenarioDurationMs } from '@/utils/scenarioDuration'
@@ -19,9 +20,15 @@ vi.mock('@/composables/useSimulationToasts', () => ({
   }),
 }))
 
+vi.mock('@vueuse/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@vueuse/core')>()
+  return { ...actual, useMediaQuery: useMediaQueryMock }
+})
+
 beforeEach(() => {
   setActivePinia(createPinia())
   mockIsMuted.value = false
+  setBreakpoint('desktop')
 })
 
 describe('ScenarioBar', () => {
@@ -92,5 +99,25 @@ describe('ScenarioBar', () => {
 
     const htmlAfter = btn.html()
     expect(htmlAfter).not.toBe(htmlBefore)
+  })
+
+  it('mobile: renders dropdown trigger, not card strip', () => {
+    setBreakpoint('mobile')
+    const wrapper = mount(ScenarioBar)
+    expect(wrapper.find('[data-testid="scenario-dropdown"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="scenario-card-strip"]').exists()).toBe(false)
+  })
+
+  it('desktop: renders card strip, not dropdown', () => {
+    setBreakpoint('desktop')
+    const wrapper = mount(ScenarioBar)
+    expect(wrapper.find('[data-testid="scenario-card-strip"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="scenario-dropdown"]').exists()).toBe(false)
+  })
+
+  it('mobile: dropdown trigger shows "Scenarios" when no active scenario', () => {
+    setBreakpoint('mobile')
+    const wrapper = mount(ScenarioBar)
+    expect(wrapper.find('[data-testid="scenario-dropdown-trigger"]').text()).toContain('Scenarios')
   })
 })

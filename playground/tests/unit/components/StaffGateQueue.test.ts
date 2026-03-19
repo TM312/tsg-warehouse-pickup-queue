@@ -1,7 +1,8 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { h, markRaw } from 'vue'
+import Sortable from 'sortablejs'
 import StaffGateQueue from '@/components/staff/StaffGateQueue.vue'
 import { useQueueStore } from '@/stores/queue'
 import { useGatesStore } from '@/stores/gates'
@@ -9,6 +10,7 @@ import { useSimulationStore } from '@/stores/simulation'
 import { createPickupRequest } from '@/utils/factories'
 import { PICKUP_STATUS } from '@/constants/status'
 import { DEFAULT_GATES, DEFAULT_PROCESSING_DURATION_MS } from '@/constants/defaults'
+import { RESPONSIVE } from '@/constants/responsive'
 
 const stubComponent = (name: string) =>
   markRaw({ name, render: () => h('div', { 'data-testid': name }) })
@@ -234,5 +236,31 @@ describe('StaffGateQueue', () => {
     })
 
     expect(wrapper.find('[data-testid="processing-progress-bar"]').exists()).toBe(false)
+  })
+
+  it('initializes SortableJS with forceFallback and touch delay options', () => {
+    const createSpy = vi.spyOn(Sortable, 'create')
+    seedGates()
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'r1',
+      status: PICKUP_STATUS.IN_QUEUE,
+      gate_id: GATE_ID,
+      queue_position: 1,
+    }))
+
+    mount(StaffGateQueue, {
+      props: { gateId: GATE_ID },
+      global: { stubs },
+    })
+
+    expect(createSpy).toHaveBeenCalled()
+    const opts = createSpy.mock.calls[0][1]!
+    expect(opts.forceFallback).toBe(true)
+    expect(opts.delay).toBe(RESPONSIVE.SORTABLE_TOUCH_DELAY_MS)
+    expect(opts.delayOnTouchOnly).toBe(true)
+    expect(opts.touchStartThreshold).toBe(RESPONSIVE.SORTABLE_TOUCH_THRESHOLD_PX)
+
+    createSpy.mockRestore()
   })
 })

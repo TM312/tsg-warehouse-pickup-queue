@@ -1,5 +1,6 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { ref } from 'vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { useQueueStore } from '@/stores/queue'
 import { createPickupRequest } from '@/utils/factories'
@@ -7,12 +8,23 @@ import { PICKUP_STATUS } from '@/constants/status'
 import AnalyticsKpiGrid from '@/components/analytics/AnalyticsKpiGrid.vue'
 import AnalyticsKpiCard from '@/components/analytics/AnalyticsKpiCard.vue'
 
+const mockMediaQuery = ref(false)
+
+vi.mock('@vueuse/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@vueuse/core')>()
+  return {
+    ...actual,
+    useMediaQuery: () => mockMediaQuery,
+  }
+})
+
 describe('AnalyticsKpiGrid', () => {
   let queue: ReturnType<typeof useQueueStore>
 
   beforeEach(() => {
     setActivePinia(createPinia())
     queue = useQueueStore()
+    mockMediaQuery.value = false
   })
 
   const mountGrid = () =>
@@ -63,5 +75,21 @@ describe('AnalyticsKpiGrid', () => {
     const wrapper = mountGrid()
     expect(wrapper.find('[data-testid="kpi-avg-wait-time"]').text()).toContain('--')
     expect(wrapper.find('[data-testid="kpi-avg-processing-time"]').text()).toContain('--')
+  })
+
+  it('compact breakpoint renders grid-cols-1', () => {
+    mockMediaQuery.value = true
+    const wrapper = mountGrid()
+    const grid = wrapper.find('[data-testid="analytics-kpi-grid"]')
+    expect(grid.classes()).toContain('grid-cols-1')
+    expect(grid.classes()).not.toContain('grid-cols-2')
+  })
+
+  it('default renders grid-cols-2', () => {
+    mockMediaQuery.value = false
+    const wrapper = mountGrid()
+    const grid = wrapper.find('[data-testid="analytics-kpi-grid"]')
+    expect(grid.classes()).toContain('grid-cols-2')
+    expect(grid.classes()).not.toContain('grid-cols-1')
   })
 })

@@ -4,6 +4,7 @@ import Sortable from 'sortablejs'
 import { Star } from 'lucide-vue-next'
 import { PICKUP_STATUS } from '@/constants/status'
 import { ANIMATION, cssMs } from '@/constants/animations'
+import { RESPONSIVE } from '@/constants/responsive'
 import { useQueueStore } from '@/stores/queue'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { useProcessingProgress } from '@/composables/useProcessingProgress'
@@ -22,6 +23,7 @@ const queue = useQueueStore()
 const actions = useSimulationActions()
 const enterMs = cssMs(ANIMATION.QUEUE_ITEM_ENTER_MS)
 const leaveMs = cssMs(ANIMATION.QUEUE_ITEM_LEAVE_MS)
+const tapTarget = `${RESPONSIVE.TAP_TARGET_MIN_PX}px`
 const listRef = ref<InstanceType<typeof TransitionGroup> | null>(null)
 let sortableInstance: Sortable | null = null
 
@@ -42,6 +44,10 @@ onMounted(() => {
   if (!el) return
   sortableInstance = Sortable.create(el, {
     animation: ANIMATION.SORTABLE_REORDER_MS,
+    forceFallback: true,
+    delay: RESPONSIVE.SORTABLE_TOUCH_DELAY_MS,
+    delayOnTouchOnly: true,
+    touchStartThreshold: RESPONSIVE.SORTABLE_TOUCH_THRESHOLD_PX,
     onEnd: () => {
       const container = listRef.value?.$el as HTMLElement | undefined
       if (!container) return
@@ -128,6 +134,16 @@ onBeforeUnmount(() => {
   .queue-item-enter-active,
   .queue-item-leave-active {
     transition: none;
+  }
+}
+
+[data-request-id] {
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  [data-testid="staff-gate-queue"] :deep(button) {
+    min-height: v-bind(tapTarget);
   }
 }
 </style>
