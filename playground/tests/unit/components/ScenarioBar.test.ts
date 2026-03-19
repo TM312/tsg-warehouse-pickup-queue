@@ -36,4 +36,16 @@ describe('ScenarioBar', () => {
     expect(wrapper.find('[data-testid="speed-control-2"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="speed-control-5"]').exists()).toBe(true)
   })
+
+  it('renders elapsed time display', () => {
+    const wrapper = mount(ScenarioBar)
+    const elapsed = wrapper.find('[data-testid="sim-elapsed-time"]')
+    expect(elapsed.exists()).toBe(true)
+    expect(elapsed.text()).toBe('00:00')
+  })
+
+  it('renders ScenarioProgressBar component', () => {
+    const wrapper = mount(ScenarioBar)
+    expect(wrapper.findComponent({ name: 'ScenarioProgressBar' }).exists()).toBe(true)
+  })
 })

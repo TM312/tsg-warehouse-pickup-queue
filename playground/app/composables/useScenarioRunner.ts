@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import type { Scenario } from '@/types/scenario'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { useSimulationStore } from '@/stores/simulation'
@@ -6,9 +6,17 @@ import { useSimulationStore } from '@/stores/simulation'
 export function useScenarioRunner() {
   const isRunning = ref(false)
   const activeScenarioId = ref<string | null>(null)
+  const currentStepIndex = ref(0)
+  const totalSteps = ref(0)
+  const activeScenario = shallowRef<Scenario | null>(null)
 
   let pendingTimeout: ReturnType<typeof setTimeout> | null = null
   let unwatchResume: (() => void) | null = null
+  let unwatchSpeed: (() => void) | null = null
+  let pendingStepDelayMs = 0
+  let timeoutStartedAt = 0
+  let timeoutSpeedAtSchedule = 1
+  let rescheduleNext: (() => void) | null = null
 
   function cleanup() {
     if (pendingTimeout !== null) {
@@ -19,12 +27,20 @@ export function useScenarioRunner() {
       unwatchResume()
       unwatchResume = null
     }
+    if (unwatchSpeed) {
+      unwatchSpeed()
+      unwatchSpeed = null
+    }
+    rescheduleNext = null
   }
 
   function stopScenario() {
     cleanup()
     isRunning.value = false
     activeScenarioId.value = null
+    currentStepIndex.value = 0
+    totalSteps.value = 0
+    activeScenario.value = null
   }
 
   function runScenario(scenario: Scenario) {
@@ -37,6 +53,9 @@ export function useScenarioRunner() {
 
     isRunning.value = true
     activeScenarioId.value = scenario.id
+    currentStepIndex.value = 0
+    totalSteps.value = scenario.steps.length
+    activeScenario.value = scenario
 
     // Start simulation if not running
     if (!simulation.isRunning) {
@@ -60,12 +79,11 @@ export function useScenarioRunner() {
       }
 
       stepIndex++
+      currentStepIndex.value = stepIndex
       if (stepIndex < scenario.steps.length) {
         scheduleNext()
       } else {
-        cleanup()
-        isRunning.value = false
-        activeScenarioId.value = null
+        stopScenario()
       }
     }
 
@@ -90,6 +108,17 @@ export function useScenarioRunner() {
       executeStep()
     }
 
+    function scheduleTimeout(wallClockDelayMs: number, stepDelayMs: number) {
+      timeoutStartedAt = Date.now()
+      timeoutSpeedAtSchedule = simulation.speed
+      pendingStepDelayMs = stepDelayMs
+
+      pendingTimeout = setTimeout(() => {
+        pendingTimeout = null
+        runOrWaitForResume()
+      }, wallClockDelayMs)
+    }
+
     function scheduleNext() {
       if (activeScenarioId.value !== scenario.id) return
 
@@ -101,14 +130,29 @@ export function useScenarioRunner() {
         return
       }
 
-      pendingTimeout = setTimeout(() => {
+      rescheduleNext = () => {
+        if (pendingTimeout === null) return
+        const wallClockElapsed = Date.now() - timeoutStartedAt
+        const simTimeElapsed = wallClockElapsed * timeoutSpeedAtSchedule
+        const remainingSimTime = Math.max(0, pendingStepDelayMs - simTimeElapsed)
+        const newWallClockDelay = remainingSimTime / simulation.speed
+
+        clearTimeout(pendingTimeout)
         pendingTimeout = null
-        runOrWaitForResume()
-      }, delay)
+        scheduleTimeout(newWallClockDelay, remainingSimTime)
+      }
+
+      scheduleTimeout(delay, step.delayMs)
     }
+
+    unwatchSpeed = watch(
+      () => simulation.speed,
+      () => { rescheduleNext?.() },
+      { flush: 'sync' },
+    )
 
     scheduleNext()
   }
 
-  return { runScenario, stopScenario, isRunning, activeScenarioId }
+  return { runScenario, stopScenario, isRunning, activeScenarioId, currentStepIndex, totalSteps, activeScenario }
 }

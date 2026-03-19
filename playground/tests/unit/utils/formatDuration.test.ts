@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDurationMs, formatDurationMinutes } from '@/utils/formatDuration'
+import { formatDurationMs, formatDurationMinutes, formatElapsedTime } from '@/utils/formatDuration'
 
 describe('formatDurationMs', () => {
   it('returns -- for null/undefined', () => {
@@ -25,6 +25,18 @@ describe('formatDurationMs', () => {
 
   it('returns 0s for negative values', () => {
     expect(formatDurationMs(-5000)).toBe('0s')
+  })
+})
+
+describe('formatElapsedTime', () => {
+  it.each([
+    [0, '00:00'],
+    [30000, '00:30'],
+    [135000, '02:15'],
+    [3600000, '60:00'],
+    [-5000, '00:00'],
+  ])('formats %i ms as %s', (ms, expected) => {
+    expect(formatElapsedTime(ms)).toBe(expected)
   })
 })
 

@@ -10,6 +10,7 @@ describe('animation constants', () => {
     'PROCESSING_PULSE_MS',
     'FEED_ITEM_ENTER_MS',
     'CROSS_PANEL_HIGHLIGHT_MS',
+    'PROGRESS_BAR_TRANSITION_MS',
   ] as const
 
   it('exports all expected animation keys', () => {

@@ -310,6 +310,110 @@ describe('useScenarioRunner', () => {
       vi.advanceTimersByTime(600)
       expect(isRunning.value).toBe(false)
     })
+
+    it('reschedules pending timeout when speed changes mid-step', () => {
+      vi.spyOn(Date, 'now').mockReturnValue(0)
+
+      const simulation = useSimulationStore()
+      simulation.setSpeed(1)
+
+      const { runScenario } = useScenarioRunner()
+      const scenario = createTestScenario({
+        steps: [
+          { delayMs: 0, action: vi.fn() },
+          { delayMs: 1000, action: vi.fn() },
+        ],
+      })
+
+      runScenario(scenario)
+      // Step 1 fires immediately
+      vi.advanceTimersByTime(0)
+      expect(scenario.steps[0].action).toHaveBeenCalledTimes(1)
+
+      // Advance 200ms at 1x speed, then switch to 5x
+      vi.spyOn(Date, 'now').mockReturnValue(200)
+      vi.advanceTimersByTime(200)
+      expect(scenario.steps[1].action).not.toHaveBeenCalled()
+
+      // Change speed to 5x: remaining 800ms sim-time → 160ms wall-clock
+      simulation.setSpeed(5)
+
+      vi.advanceTimersByTime(159)
+      expect(scenario.steps[1].action).not.toHaveBeenCalled()
+
+      vi.spyOn(Date, 'now').mockReturnValue(360)
+      vi.advanceTimersByTime(1)
+      expect(scenario.steps[1].action).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('step progress tracking', () => {
+    it('starts with currentStepIndex 0 and totalSteps 0', () => {
+      const { currentStepIndex, totalSteps } = useScenarioRunner()
+      expect(currentStepIndex.value).toBe(0)
+      expect(totalSteps.value).toBe(0)
+    })
+
+    it('sets totalSteps to scenario.steps.length on run', () => {
+      const { runScenario, totalSteps } = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      runScenario(scenario)
+      expect(totalSteps.value).toBe(3)
+    })
+
+    it('increments currentStepIndex after each non-final step', () => {
+      const { runScenario, currentStepIndex } = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      runScenario(scenario)
+
+      vi.advanceTimersByTime(0)
+      expect(currentStepIndex.value).toBe(1)
+
+      vi.advanceTimersByTime(1000)
+      expect(currentStepIndex.value).toBe(2)
+
+      // After final step, state resets
+      vi.advanceTimersByTime(2000)
+      expect(currentStepIndex.value).toBe(0)
+    })
+
+    it('sets activeScenario to the running scenario', () => {
+      const { runScenario, activeScenario } = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      expect(activeScenario.value).toBeNull()
+      runScenario(scenario)
+      expect(activeScenario.value).toBe(scenario)
+    })
+
+    it('resets all progress refs on stopScenario', () => {
+      const { runScenario, stopScenario, currentStepIndex, totalSteps, activeScenario } = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      runScenario(scenario)
+      vi.advanceTimersByTime(0)
+
+      stopScenario()
+      expect(currentStepIndex.value).toBe(0)
+      expect(totalSteps.value).toBe(0)
+      expect(activeScenario.value).toBeNull()
+    })
+
+    it('resets all progress refs on natural completion', () => {
+      const { runScenario, currentStepIndex, totalSteps, activeScenario, isRunning, activeScenarioId } = useScenarioRunner()
+      const scenario = createTestScenario()
+
+      runScenario(scenario)
+      vi.advanceTimersByTime(5000)
+
+      expect(currentStepIndex.value).toBe(0)
+      expect(totalSteps.value).toBe(0)
+      expect(activeScenario.value).toBeNull()
+      expect(isRunning.value).toBe(false)
+      expect(activeScenarioId.value).toBeNull()
+    })
   })
 
   describe('concurrent protection', () => {

@@ -3,18 +3,23 @@ import { Play, Pause } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Separator } from '@/components/ui/separator'
+import { computed } from 'vue'
 import { SCENARIOS } from '@/constants/scenarios'
 import { useScenarioRunner } from '@/composables/useScenarioRunner'
 import { useSimulation } from '@/composables/useSimulation'
 import { useSimulationStore } from '@/stores/simulation'
+import { formatElapsedTime } from '@/utils/formatDuration'
 import ScenarioButton from './ScenarioButton.vue'
+import ScenarioProgressBar from './ScenarioProgressBar.vue'
 import SimulationSpeedControl from './SimulationSpeedControl.vue'
 import ResetButton from './ResetButton.vue'
 import type { Scenario } from '@/types/scenario'
 
 const simulation = useSimulationStore()
 const { toggle } = useSimulation()
-const { runScenario, stopScenario, isRunning, activeScenarioId } = useScenarioRunner()
+const { runScenario, stopScenario, isRunning, activeScenarioId, currentStepIndex, totalSteps, activeScenario } = useScenarioRunner()
+
+const elapsedDisplay = computed(() => formatElapsedTime(simulation.elapsedMs))
 
 function handleScenarioClick(scenario: Scenario) {
   if (activeScenarioId.value === scenario.id) {
@@ -27,41 +32,56 @@ function handleScenarioClick(scenario: Scenario) {
 
 <template>
   <div
-    class="flex shrink-0 items-center gap-2 border-b px-4 py-2"
     data-testid="scenario-bar"
     data-walkthrough="scenario-bar"
   >
-    <TooltipProvider :delay-duration="300">
-      <ScenarioButton
-        v-for="scenario in SCENARIOS"
-        :key="scenario.id"
-        :scenario="scenario"
-        :disabled="isRunning"
-        :active="activeScenarioId === scenario.id"
-        @run="handleScenarioClick(scenario)"
-      />
+    <div class="flex shrink-0 items-center gap-2 border-b px-4 py-2">
+      <TooltipProvider :delay-duration="300">
+        <ScenarioButton
+          v-for="scenario in SCENARIOS"
+          :key="scenario.id"
+          :scenario="scenario"
+          :disabled="isRunning"
+          :active="activeScenarioId === scenario.id"
+          @run="handleScenarioClick(scenario)"
+        />
 
-      <Separator orientation="vertical" class="mx-1 h-6" />
+        <Separator orientation="vertical" class="mx-1 h-6" />
 
-      <SimulationSpeedControl />
+        <SimulationSpeedControl />
 
-      <!-- Play/Pause -->
-      <Tooltip>
-        <TooltipTrigger as-child>
-          <Button
-            size="icon-sm"
-            variant="outline"
-            data-testid="sim-play-pause"
-            @click="toggle()"
-          >
-            <Pause v-if="simulation.isRunning" class="size-4" />
-            <Play v-else class="size-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{{ simulation.isRunning ? 'Pause' : 'Play' }}</TooltipContent>
-      </Tooltip>
+        <!-- Play/Pause -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button
+              size="icon-sm"
+              variant="outline"
+              data-testid="sim-play-pause"
+              @click="toggle()"
+            >
+              <Pause v-if="simulation.isRunning" class="size-4" />
+              <Play v-else class="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{{ simulation.isRunning ? 'Pause' : 'Play' }}</TooltipContent>
+        </Tooltip>
 
-      <ResetButton :on-before-reset="stopScenario" />
-    </TooltipProvider>
+        <ResetButton :on-before-reset="stopScenario" />
+
+        <span
+          class="ml-auto font-mono text-sm tabular-nums text-muted-foreground"
+          data-testid="sim-elapsed-time"
+        >
+          {{ elapsedDisplay }}
+        </span>
+      </TooltipProvider>
+    </div>
+
+    <ScenarioProgressBar
+      :current-step="currentStepIndex"
+      :total-steps="totalSteps"
+      :steps="activeScenario?.steps ?? []"
+      :visible="isRunning"
+    />
   </div>
 </template>
