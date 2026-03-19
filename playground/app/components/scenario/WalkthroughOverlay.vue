@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useGuidedWalkthrough } from '@/composables/useGuidedWalkthrough'
+import { ANIMATION, cssMs } from '@/constants/animations'
 
 const { isActive, highlightRect } = useGuidedWalkthrough()
+
+const cutoutTransitionDuration = cssMs(ANIMATION.WALKTHROUGH_CUTOUT_TRANSITION_MS)
 
 const padding = 8
 const radius = 8
@@ -47,13 +50,13 @@ const hasCutout = computed(() => {
               <animate
                 attributeName="x"
                 :to="cutout.x"
-                dur="0.3s"
+                :dur="cutoutTransitionDuration"
                 fill="freeze"
               />
               <animate
                 attributeName="y"
                 :to="cutout.y"
-                dur="0.3s"
+                :dur="cutoutTransitionDuration"
                 fill="freeze"
               />
             </rect>
@@ -68,6 +71,19 @@ const hasCutout = computed(() => {
           mask="url(#walkthrough-mask)"
         />
       </svg>
+      <div
+        v-if="hasCutout"
+        class="animate-walkthrough-glow rounded-lg pointer-events-none absolute"
+        :style="{
+          left: `${cutout.x}px`,
+          top: `${cutout.y}px`,
+          width: `${cutout.width}px`,
+          height: `${cutout.height}px`,
+          transitionDuration: cutoutTransitionDuration,
+          animationDuration: cssMs(ANIMATION.WALKTHROUGH_GLOW_MS),
+        }"
+        data-testid="walkthrough-highlight-glow"
+      />
     </div>
   </Teleport>
 </template>

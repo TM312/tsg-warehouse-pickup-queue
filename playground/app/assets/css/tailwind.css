@@ -132,8 +132,31 @@
   animation: cross-panel-highlight 600ms ease-out forwards;
 }
 
+@keyframes walkthrough-tooltip-enter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-walkthrough-tooltip-enter {
+  animation: walkthrough-tooltip-enter var(--walkthrough-tooltip-enter-duration, 200ms) ease-out forwards;
+}
+
+@keyframes walkthrough-glow {
+  0%, 100% { box-shadow: 0 0 8px 2px oklch(from var(--primary) l c h / 40%); }
+  50% { box-shadow: 0 0 16px 4px oklch(from var(--primary) l c h / 60%); }
+}
+.animate-walkthrough-glow {
+  animation: walkthrough-glow var(--walkthrough-glow-duration, 1500ms) ease-in-out infinite;
+  transition-property: left, top, width, height;
+  transition-timing-function: ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-cross-panel-highlight {
     animation: none;
+  }
+  .animate-walkthrough-tooltip-enter { animation: none; }
+  .animate-walkthrough-glow {
+    animation: none;
+    box-shadow: 0 0 8px 2px oklch(from var(--primary) l c h / 40%);
   }
 }

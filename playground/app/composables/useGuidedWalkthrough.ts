@@ -1,4 +1,4 @@
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { WALKTHROUGH_STEPS } from '@/constants/walkthrough'
 import { useActivePanel } from '@/composables/useActivePanel'
 import { useSimulationActions } from '@/composables/useSimulationActions'
@@ -13,6 +13,7 @@ const highlightRect = ref({ x: 0, y: 0, width: 0, height: 0 })
 
 let resizeObserver: ResizeObserver | null = null
 let scrollHandler: (() => void) | null = null
+let keydownHandler: ((e: KeyboardEvent) => void) | null = null
 let pendingActionTimer: ReturnType<typeof setTimeout> | null = null
 
 function cleanupObservers() {
@@ -23,6 +24,13 @@ function cleanupObservers() {
   if (scrollHandler) {
     window.removeEventListener('scroll', scrollHandler, true)
     scrollHandler = null
+  }
+}
+
+function cleanupKeyboard() {
+  if (keydownHandler) {
+    window.removeEventListener('keydown', keydownHandler)
+    keydownHandler = null
   }
 }
 
@@ -122,6 +130,15 @@ export function useGuidedWalkthrough() {
     const simulation = useSimulationStore()
     simulation.isRunning = true
 
+    cleanupKeyboard()
+    keydownHandler = (e: KeyboardEvent) => {
+      if (!isActive.value) return
+      if (e.key === 'ArrowRight') { e.preventDefault(); next() }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); previous() }
+      else if (e.key === 'Escape') { e.preventDefault(); skip() }
+    }
+    window.addEventListener('keydown', keydownHandler)
+
     const step = WALKTHROUGH_STEPS[0]
     switchToPanel(step.panel)
     executeStepAction(step)
@@ -145,6 +162,7 @@ export function useGuidedWalkthrough() {
     currentStepIndex.value--
     const step = WALKTHROUGH_STEPS[currentStepIndex.value]
     switchToPanel(step.panel)
+    nextTick(() => updateHighlightRect())
   }
 
   function skip() {
@@ -152,11 +170,8 @@ export function useGuidedWalkthrough() {
     isActive.value = false
     currentStepIndex.value = 0
     cleanupObservers()
+    cleanupKeyboard()
   }
-
-  watch(currentStepIndex, () => {
-    nextTick(() => updateHighlightRect())
-  })
 
   return {
     isActive,

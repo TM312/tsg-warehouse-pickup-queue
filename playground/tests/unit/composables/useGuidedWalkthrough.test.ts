@@ -1,19 +1,45 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
+import { useMediaQuery } from '@vueuse/core'
 import { useGuidedWalkthrough } from '@/composables/useGuidedWalkthrough'
+import { useActivePanel } from '@/composables/useActivePanel'
 import { useSimulationStore } from '@/stores/simulation'
 import { useQueueStore } from '@/stores/queue'
 import { WALKTHROUGH_STEPS } from '@/constants/walkthrough'
 import { PICKUP_STATUS } from '@/constants/status'
+import { BREAKPOINTS } from '@/constants/panels'
+
+const mediaQueryResults = new Map<string, { value: boolean }>()
 
 vi.mock('@vueuse/core', () => ({
-  useMediaQuery: vi.fn(() => ({ value: true })),
+  useMediaQuery: vi.fn((query: string) => {
+    const existing = mediaQueryResults.get(query)
+    if (existing) return existing
+    const result = { value: false }
+    mediaQueryResults.set(query, result)
+    return result
+  }),
 }))
+
+function setBreakpoint(bp: 'mobile' | 'tablet' | 'desktop') {
+  const desktopQuery = `(min-width: ${BREAKPOINTS.DESKTOP}px)`
+  const mobileQuery = `(max-width: ${BREAKPOINTS.MOBILE - 1}px)`
+
+  // Ensure entries exist by calling useActivePanel (which calls useMediaQuery)
+  const desktopRef = mediaQueryResults.get(desktopQuery) ?? { value: false }
+  const mobileRef = mediaQueryResults.get(mobileQuery) ?? { value: false }
+  mediaQueryResults.set(desktopQuery, desktopRef)
+  mediaQueryResults.set(mobileQuery, mobileRef)
+
+  desktopRef.value = bp === 'desktop'
+  mobileRef.value = bp === 'mobile'
+}
 
 describe('useGuidedWalkthrough', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     setActivePinia(createPinia())
+    setBreakpoint('desktop')
   })
 
   afterEach(() => {
@@ -295,6 +321,116 @@ describe('useGuidedWalkthrough', () => {
       // Only the second start's timer should be active
       vi.advanceTimersByTime(1200)
       expect(queue.requests.length).toBe(1)
+    })
+  })
+
+  describe('keyboard navigation', () => {
+    function dispatchKey(key: string) {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key }))
+    }
+
+    it('ArrowRight increments step index', () => {
+      const { start, currentStepIndex } = useGuidedWalkthrough()
+      start()
+
+      dispatchKey('ArrowRight')
+      expect(currentStepIndex.value).toBe(1)
+    })
+
+    it('ArrowLeft decrements step index', () => {
+      const { start, next, currentStepIndex } = useGuidedWalkthrough()
+      start()
+      next()
+      expect(currentStepIndex.value).toBe(1)
+
+      dispatchKey('ArrowLeft')
+      expect(currentStepIndex.value).toBe(0)
+    })
+
+    it('ArrowLeft at step 0 is a no-op', () => {
+      const { start, currentStepIndex } = useGuidedWalkthrough()
+      start()
+
+      dispatchKey('ArrowLeft')
+      expect(currentStepIndex.value).toBe(0)
+    })
+
+    it('Escape deactivates walkthrough', () => {
+      const { start, isActive } = useGuidedWalkthrough()
+      start()
+
+      dispatchKey('Escape')
+      expect(isActive.value).toBe(false)
+    })
+
+    it('listener removed after skip', () => {
+      const { start, next, skip, currentStepIndex } = useGuidedWalkthrough()
+      start()
+      next()
+      expect(currentStepIndex.value).toBe(1)
+
+      skip()
+
+      // Dispatch after skip should have no effect
+      dispatchKey('ArrowRight')
+      expect(currentStepIndex.value).toBe(0) // reset by skip
+    })
+
+    it('no response when walkthrough not started', () => {
+      const { currentStepIndex, isActive } = useGuidedWalkthrough()
+
+      dispatchKey('ArrowRight')
+      expect(currentStepIndex.value).toBe(0)
+      expect(isActive.value).toBe(false)
+    })
+  })
+
+  describe('panel switching', () => {
+    it('sets activePanel on mobile when step changes panel', () => {
+      setBreakpoint('mobile')
+      const { activePanel } = useActivePanel()
+      const { start, next } = useGuidedWalkthrough()
+
+      // Step 0 targets customer panel
+      start()
+      expect(activePanel.value).toBe('customer')
+
+      // Step 1 targets staff panel
+      next()
+      expect(activePanel.value).toBe('staff')
+    })
+
+    it('opens customer overlay on tablet when step targets customer panel', () => {
+      setBreakpoint('tablet')
+      const { customerOverlayOpen } = useActivePanel()
+      const { start } = useGuidedWalkthrough()
+
+      // Step 0 targets customer panel
+      start()
+      expect(customerOverlayOpen.value).toBe(true)
+    })
+
+    it('closes customer overlay on tablet when step targets non-customer panel', () => {
+      setBreakpoint('tablet')
+      const { customerOverlayOpen } = useActivePanel()
+      const { start, next } = useGuidedWalkthrough()
+
+      start()
+      expect(customerOverlayOpen.value).toBe(true)
+
+      // Step 1 targets staff panel
+      next()
+      expect(customerOverlayOpen.value).toBe(false)
+    })
+
+    it('does not change activePanel on desktop', () => {
+      setBreakpoint('desktop')
+      const { activePanel } = useActivePanel()
+      const initialPanel = activePanel.value
+      const { start } = useGuidedWalkthrough()
+
+      start()
+      expect(activePanel.value).toBe(initialPanel)
     })
   })
 

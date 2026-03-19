@@ -17,6 +17,13 @@ describe('animation constants', () => {
     expect(ANIMATION.SCENARIO_CARD_HOVER_MS).toBe(200)
     expect(ANIMATION.SCENARIO_CARD_ACTIVE_PULSE_MS).toBe(2_000)
   })
+
+  it('has walkthrough animation constants', () => {
+    expect(ANIMATION.WALKTHROUGH_TOOLTIP_ENTER_MS).toBe(200)
+    expect(ANIMATION.WALKTHROUGH_GLOW_MS).toBe(1_500)
+    expect(ANIMATION.WALKTHROUGH_CUTOUT_TRANSITION_MS).toBe(300)
+    expect(ANIMATION.WALKTHROUGH_STEP_DOT_TRANSITION_MS).toBe(150)
+  })
 })
 
 describe('cssMs', () => {
