@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Play, Pause, Bell, BellOff } from 'lucide-vue-next'
+import { Play, Pause, Bell, BellOff, Keyboard } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { computed } from 'vue'
@@ -13,10 +13,13 @@ import ScenarioProgressBar from './ScenarioProgressBar.vue'
 import SimulationSpeedControl from './SimulationSpeedControl.vue'
 import ResetButton from './ResetButton.vue'
 import { useSimulationToasts } from '@/composables/useSimulationToasts'
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 import type { Scenario } from '@/types/scenario'
 
 const simulation = useSimulationStore()
 const { toggle } = useSimulation()
+const { showHelp, registerSimulationToggle } = useKeyboardShortcuts()
+registerSimulationToggle(toggle)
 const { runScenario, stopScenario, isRunning, activeScenarioId, currentStepIndex, totalSteps, activeScenario } = useScenarioRunner()
 const { isMuted, toggleMute } = useSimulationToasts()
 
@@ -85,6 +88,16 @@ function handleScenarioClick(scenario: Scenario) {
             </Button>
           </TooltipTrigger>
           <TooltipContent>{{ isMuted ? 'Unmute notifications' : 'Mute notifications' }}</TooltipContent>
+        </Tooltip>
+
+        <!-- Keyboard shortcuts hint -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button size="icon-sm" variant="outline" data-testid="keyboard-shortcut-hint" @click="showHelp()">
+              <Keyboard class="size-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Keyboard shortcuts (?)</TooltipContent>
         </Tooltip>
 
         <span

@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import { useAutoPlay } from '@/composables/useAutoPlay'
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
 
 const { isFirstVisit, panelsReady, initialize, cleanup } = useAutoPlay()
+const { init: initShortcuts, destroy: destroyShortcuts } = useKeyboardShortcuts()
 
 onMounted(() => {
   initialize()
+  initShortcuts()
 })
 
 onUnmounted(() => {
+  destroyShortcuts()
   cleanup()
 })
 </script>
@@ -32,5 +36,6 @@ onUnmounted(() => {
 
     <ScenarioWalkthroughOverlay />
     <ScenarioWalkthroughTooltip />
+    <ScenarioKeyboardShortcutOverlay />
   </div>
 </template>
