@@ -216,9 +216,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ---
 
-### WP-6: Processing Progress & Gate Status Indicators
+### WP-6: Processing Progress & Gate Status Indicators ✅
 
 **Goal:** Make gate activity scannable at a glance — what's busy, what's idle, how far along.
+
+**Status:** Implemented
 
 **Scope:**
 - **Processing progress bar:** In `StaffProcessingTable` and `StaffGateQueue` "Now Processing" section, show a thin progress bar under the processing item indicating elapsed vs expected duration (120s default). Color: amber fill on muted background.
@@ -229,20 +231,33 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - Apply gate dots in: processing table headers, queue tab labels, analytics queue chart labels, gate select dropdown items.
 - **Queue tab badges:** Show item count in each gate's tab label: "Gate 1 (3)"
 
-**Components affected:**
-- `app/components/staff/StaffProcessingTable.vue` — progress bar per row
-- `app/components/staff/StaffGateQueue.vue` — progress bar on "Now Processing"
-- `app/components/staff/StaffQueueTabs.vue` — count badges + gate dots in tab labels
-- `app/components/staff/StaffGateSelect.vue` — gate dots in dropdown items
-- `app/components/analytics/AnalyticsQueueChart.vue` — gate dots in chart labels
-- New: `app/components/ui/GateStatusDot.vue` — small reusable dot component
+**Implementation details:**
+- New: `app/constants/gate-status.ts` — `GATE_OPERATIONAL_STATUS` enum-like const (`IDLE`, `PROCESSING`, `OFFLINE`), `GateOperationalStatus` type, `GATE_STATUS_COLORS` mapping statuses to Tailwind classes (`bg-green-500`, `bg-amber-500`, `bg-red-500`), `GATE_STATUS_LABELS` mapping statuses to human-readable names
+- New: `app/utils/processing.ts` — `calcProcessingProgress(processingStartedSimMs, elapsedMs)` utility returning normalized [0, 1] progress value based on `DEFAULT_PROCESSING_DURATION_MS` (120s), with null/undefined handling and clamping
+- New: `app/composables/useGateStatus.ts` — two APIs: `useGateStatus(gateId)` returns reactive `ComputedRef<GateOperationalStatus>` for single-gate tracking, `useGateStatuses()` returns synchronous `statusOf(gateId)` for batch queries. Status logic: OFFLINE when gate not found or `is_active === false`, PROCESSING when active gate has a processing request, IDLE otherwise. Reads from `useGatesStore` and `useQueueStore`
+- New: `app/components/staff/GateStatusDot.vue` — reusable dot component with `status` and optional `size` (`sm`/`md`) props, applies status-specific color classes, includes `role="status"` and `aria-label` for accessibility
+- New: `app/components/staff/ProcessingProgressBar.vue` — thin progress bar (`h-1 rounded-full`) with amber fill on muted background, clamps progress to [0, 1], smooth CSS transition via `ANIMATION.PROGRESS_BAR_TRANSITION_MS` (300ms), includes `role="progressbar"` with full ARIA attributes, respects `prefers-reduced-motion`
+- Modified: `app/components/staff/StaffProcessingTable.vue` — integrates `GateStatusDot` in each gate row header and `ProcessingProgressBar` as a secondary row below processing items, uses `useGateStatuses` for batch status lookup and `calcProcessingProgress` for progress calculation
+- Modified: `app/components/staff/StaffGateQueue.vue` — adds `ProcessingProgressBar` below the "Now Processing" section item, calculates progress via `calcProcessingProgress` with simulation elapsed time
+- Modified: `app/components/staff/StaffQueueTabs.vue` — renders `GateStatusDot` and queue count badge in each gate tab trigger, uses `useGateStatuses` for status lookup
+- Modified: `app/components/staff/StaffGateSelect.vue` — renders `GateStatusDot` inline with gate labels in dropdown items, uses `useGateStatuses` for status lookup
+- Modified: `app/components/analytics/AnalyticsQueueChart.vue` — renders `GateStatusDot` in chart legend alongside gate labels, uses `useGateStatuses` for status lookup
+
+**Test coverage:**
+- `tests/unit/components/GateStatusDot.test.ts` — 3 tests covering color class application per status, aria-label accessibility, and size variant classes
+- `tests/unit/components/ProcessingProgressBar.test.ts` — 7 tests covering percentage rendering at boundaries (0%, 50%, 100%), clamping of out-of-range values, ARIA attributes validation
+- `tests/unit/composables/useGateStatus.test.ts` — 9 tests covering all three status states, reactive updates on request/gate changes, batch `statusOf` function, edge cases (non-existent gates, mixed statuses)
+- `tests/unit/constants/gate-status.test.ts` — 4 tests covering status definitions, color/label mappings for all statuses
+- `tests/unit/utils/processing.test.ts` — 7 tests covering null/undefined handling, interpolation at 0%/50%/100%, clamping behavior, offset handling
+- `tests/unit/components/StaffGateQueue.test.ts` — 3 new tests for progress bar rendering, correct progress value passing, and no-progress-bar-when-idle
+- `tests/unit/components/StaffProcessingTable.test.ts` — 4 new tests for gate status dots in rows, progress bar rendering with processing requests, idle gate handling, and correct progress value calculation
 
 **Acceptance criteria:**
-- [ ] Processing progress bar fills over 120s and is visible in both table and gate queue views
-- [ ] Gate status dots are color-correct (green/amber/red)
-- [ ] Gate dots appear consistently across all gate references in UI
-- [ ] Queue tab labels show item count
-- [ ] Progress bar resets when new item starts processing
+- [x] Processing progress bar fills over 120s and is visible in both table and gate queue views
+- [x] Gate status dots are color-correct (green/amber/red)
+- [x] Gate dots appear consistently across all gate references in UI
+- [x] Queue tab labels show item count
+- [x] Progress bar resets when new item starts processing
 
 ---
 

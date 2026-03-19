@@ -5,16 +5,20 @@ import { Star } from 'lucide-vue-next'
 import { PICKUP_STATUS } from '@/constants/status'
 import { ANIMATION } from '@/constants/animations'
 import { useQueueStore } from '@/stores/queue'
+import { useSimulationStore } from '@/stores/simulation'
+import { calcProcessingProgress } from '@/utils/processing'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { Button } from '@/components/ui/button'
 import StaffStatusBadge from './StaffStatusBadge.vue'
 import StaffRequestActions from './StaffRequestActions.vue'
+import ProcessingProgressBar from './ProcessingProgressBar.vue'
 
 const props = defineProps<{
   gateId: string
 }>()
 
 const queue = useQueueStore()
+const simulation = useSimulationStore()
 const actions = useSimulationActions()
 const enterMs = `${ANIMATION.QUEUE_ITEM_ENTER_MS}ms`
 const leaveMs = `${ANIMATION.QUEUE_ITEM_LEAVE_MS}ms`
@@ -29,6 +33,10 @@ const queueItems = computed(() =>
   queue.requests
     .filter(r => r.gate_id === props.gateId && r.status === PICKUP_STATUS.IN_QUEUE)
     .sort((a, b) => (a.queue_position ?? 0) - (b.queue_position ?? 0)),
+)
+
+const processingProgress = computed(() =>
+  calcProcessingProgress(processingItem.value?.processing_started_sim_ms, simulation.elapsedMs),
 )
 
 onMounted(() => {
@@ -63,6 +71,7 @@ onBeforeUnmount(() => {
         </div>
         <StaffRequestActions :request="processingItem" />
       </div>
+      <ProcessingProgressBar :progress="processingProgress" class="mt-2" />
     </div>
 
     <!-- Queue list -->

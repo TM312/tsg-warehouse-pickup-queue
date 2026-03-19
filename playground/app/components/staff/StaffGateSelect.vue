@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { PICKUP_STATUS, type PickupStatus } from '@/constants/status'
 import { useGatesStore } from '@/stores/gates'
+import { useGateStatuses } from '@/composables/useGateStatus'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import {
   Select,
@@ -10,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import GateStatusDot from './GateStatusDot.vue'
 
 const props = defineProps<{
   currentGateId: string | null
@@ -18,6 +20,7 @@ const props = defineProps<{
 }>()
 
 const gates = useGatesStore()
+const { statusOf } = useGateStatuses()
 const actions = useSimulationActions()
 
 const isDisabled = computed(() =>
@@ -49,7 +52,10 @@ function handleChange(gateId: string) {
         :key="gate.id"
         :value="gate.id"
       >
-        Gate {{ gate.gate_number }}
+        <span class="inline-flex items-center gap-1.5">
+          <GateStatusDot :status="statusOf(gate.id)" />
+          Gate {{ gate.gate_number }}
+        </span>
       </SelectItem>
     </SelectContent>
   </Select>

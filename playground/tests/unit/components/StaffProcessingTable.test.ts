@@ -8,7 +8,7 @@ import { useGatesStore } from '@/stores/gates'
 import { useSimulationStore } from '@/stores/simulation'
 import { createPickupRequest } from '@/utils/factories'
 import { PICKUP_STATUS } from '@/constants/status'
-import { DEFAULT_GATES } from '@/constants/defaults'
+import { DEFAULT_GATES, DEFAULT_PROCESSING_DURATION_MS } from '@/constants/defaults'
 
 const stubComponent = (name: string) =>
   markRaw({ name, render: () => h('div', { 'data-testid': name }) })
@@ -20,6 +20,14 @@ const stubs = {
   TableRow: markRaw({ name: 'TableRow', setup(_: unknown, { slots }: { slots: Record<string, () => unknown> }) { return () => h('tr', slots.default?.()) } }),
   TableHead: markRaw({ name: 'TableHead', setup(_: unknown, { slots }: { slots: Record<string, () => unknown> }) { return () => h('th', slots.default?.()) } }),
   TableCell: markRaw({ name: 'TableCell', setup(_: unknown, { slots }: { slots: Record<string, () => unknown> }) { return () => h('td', slots.default?.()) } }),
+  GateStatusDot: stubComponent('gate-status-dot'),
+  ProcessingProgressBar: markRaw({
+    name: 'ProcessingProgressBar',
+    props: ['progress'],
+    setup(props: { progress: number }) {
+      return () => h('div', { 'data-testid': 'processing-progress-bar', 'data-progress': props.progress })
+    },
+  }),
 }
 
 function seedGates() {
@@ -113,5 +121,50 @@ describe('StaffProcessingTable', () => {
   it('has data-testid="staff-processing-table"', () => {
     const wrapper = mount(StaffProcessingTable, { global: { stubs } })
     expect(wrapper.find('[data-testid="staff-processing-table"]').exists()).toBe(true)
+  })
+
+  it('renders gate status dots in each row', () => {
+    const wrapper = mount(StaffProcessingTable, { global: { stubs } })
+    const dots = wrapper.findAll('[data-testid="gate-status-dot"]')
+    expect(dots).toHaveLength(DEFAULT_GATES.length)
+  })
+
+  it('renders progress bar when gate has a processing request', () => {
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'r1',
+      sales_order_number: 'SO-12345',
+      status: PICKUP_STATUS.PROCESSING,
+      gate_id: DEFAULT_GATES[0].id,
+      processing_started_at: new Date().toISOString(),
+      processing_started_sim_ms: 0,
+    }))
+
+    const wrapper = mount(StaffProcessingTable, { global: { stubs } })
+    expect(wrapper.find('[data-testid="processing-progress-bar"]').exists()).toBe(true)
+  })
+
+  it('does not render progress bar when gate is idle', () => {
+    const wrapper = mount(StaffProcessingTable, { global: { stubs } })
+    expect(wrapper.find('[data-testid="processing-progress-bar"]').exists()).toBe(false)
+  })
+
+  it('calculates correct progress value (50% at halfway through processing)', () => {
+    const simulation = useSimulationStore()
+    simulation.elapsedMs = DEFAULT_PROCESSING_DURATION_MS / 2 // halfway
+
+    const queue = useQueueStore()
+    queue.addRequest(createPickupRequest({
+      id: 'r1',
+      sales_order_number: 'SO-12345',
+      status: PICKUP_STATUS.PROCESSING,
+      gate_id: DEFAULT_GATES[0].id,
+      processing_started_at: new Date().toISOString(),
+      processing_started_sim_ms: 0,
+    }))
+
+    const wrapper = mount(StaffProcessingTable, { global: { stubs } })
+    const bar = wrapper.find('[data-testid="processing-progress-bar"]')
+    expect(bar.attributes('data-progress')).toBe('0.5')
   })
 })
