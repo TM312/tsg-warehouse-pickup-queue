@@ -1,8 +1,15 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { useSimulationStore } from '@/stores/simulation'
+import { RESPONSIVE } from '@/constants/responsive'
+import { setBreakpoint, useMediaQueryMock } from '../../helpers/breakpoint-mock'
 import AnalyticsActivityFeed from '@/components/analytics/AnalyticsActivityFeed.vue'
+
+vi.mock('@vueuse/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@vueuse/core')>()
+  return { ...actual, useMediaQuery: useMediaQueryMock }
+})
 
 describe('AnalyticsActivityFeed', () => {
   let simulation: ReturnType<typeof useSimulationStore>
@@ -10,6 +17,7 @@ describe('AnalyticsActivityFeed', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     simulation = useSimulationStore()
+    setBreakpoint('desktop')
   })
 
   const mountFeed = () => mount(AnalyticsActivityFeed)
@@ -54,5 +62,21 @@ describe('AnalyticsActivityFeed', () => {
     simulation.addEvent({ timestamp: 2000, label: 'Future event', type: 'submit' })
     const wrapper = mountFeed()
     expect(wrapper.text()).toContain('just now')
+  })
+
+  it('mobile: feed uses reduced max-height', () => {
+    setBreakpoint('mobile')
+    simulation.addEvent({ timestamp: 1000, label: 'Test event', type: 'submit' })
+    const wrapper = mountFeed()
+    const container = wrapper.find('.overflow-y-auto')
+    expect(container.attributes('style')).toContain(`${RESPONSIVE.ACTIVITY_FEED_MOBILE_MAX_H_PX}px`)
+  })
+
+  it('desktop: feed uses default max-height', () => {
+    setBreakpoint('desktop')
+    simulation.addEvent({ timestamp: 1000, label: 'Test event', type: 'submit' })
+    const wrapper = mountFeed()
+    const container = wrapper.find('.overflow-y-auto')
+    expect(container.attributes('style')).toContain(`${RESPONSIVE.ACTIVITY_FEED_DEFAULT_MAX_H_PX}px`)
   })
 })

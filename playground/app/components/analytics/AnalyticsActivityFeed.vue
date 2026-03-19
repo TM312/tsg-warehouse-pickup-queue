@@ -4,7 +4,9 @@ import { useSimulationStore } from '@/stores/simulation'
 import { EVENT_TYPE_CONFIG } from '@/constants/analytics'
 import { ANIMATION, cssMs } from '@/constants/animations'
 import { HIGHLIGHT_TARGET } from '@/constants/highlights'
+import { RESPONSIVE } from '@/constants/responsive'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
+import { useActivePanel } from '@/composables/useActivePanel'
 import { EmptyState } from '@/components/ui/empty-state'
 import { EMPTY_STATE } from '@/constants/empty-states'
 import { formatDurationMs } from '@/utils/formatDuration'
@@ -13,6 +15,13 @@ const simulation = useSimulationStore()
 const enterMs = cssMs(ANIMATION.FEED_ITEM_ENTER_MS)
 const { isHighlighted } = useCrossPanelHighlight()
 const feedHighlighted = computed(() => isHighlighted(HIGHLIGHT_TARGET.ACTIVITY_FEED))
+const { breakpoint } = useActivePanel()
+
+const feedMaxHeight = computed(() =>
+  breakpoint.value === 'mobile'
+    ? `${RESPONSIVE.ACTIVITY_FEED_MOBILE_MAX_H_PX}px`
+    : `${RESPONSIVE.ACTIVITY_FEED_DEFAULT_MAX_H_PX}px`,
+)
 
 function formatRelativeTime(eventTimestamp: number): string {
   const diff = simulation.elapsedMs - eventTimestamp
@@ -29,7 +38,8 @@ function formatRelativeTime(eventTimestamp: number): string {
       v-if="simulation.activityFeed.length > 0"
       tag="div"
       name="feed-item"
-      class="max-h-[240px] space-y-1 overflow-y-auto"
+      class="space-y-1 overflow-y-auto overscroll-contain"
+      :style="{ maxHeight: feedMaxHeight }"
     >
       <div
         v-for="(event, index) in simulation.activityFeed"

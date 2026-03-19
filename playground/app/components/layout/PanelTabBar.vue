@@ -3,6 +3,7 @@ import { Smartphone, ClipboardList, BarChart3 } from 'lucide-vue-next'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PANEL_ID, PANEL_DEFINITIONS } from '@/constants/panels'
 import type { PanelId } from '@/constants/panels'
+import { RESPONSIVE } from '@/constants/responsive'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 
 defineProps<{
@@ -34,6 +35,7 @@ const iconMap: Record<PanelId, typeof Smartphone> = {
         :key="panel.id"
         :value="panel.id"
         class="relative flex-1 gap-1.5"
+        :style="{ minHeight: `${RESPONSIVE.TAP_TARGET_MIN_PX}px` }"
         :data-testid="`panel-tab-${panel.id}`"
       >
         <component :is="iconMap[panel.id]" class="size-4" />

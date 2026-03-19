@@ -1,39 +1,16 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { useMediaQuery } from '@vueuse/core'
+import { setBreakpoint, useMediaQueryMock } from '../../helpers/breakpoint-mock'
 import { useGuidedWalkthrough } from '@/composables/useGuidedWalkthrough'
 import { useActivePanel } from '@/composables/useActivePanel'
 import { useSimulationStore } from '@/stores/simulation'
 import { useQueueStore } from '@/stores/queue'
 import { WALKTHROUGH_STEPS } from '@/constants/walkthrough'
 import { PICKUP_STATUS } from '@/constants/status'
-import { BREAKPOINTS } from '@/constants/panels'
-
-const mediaQueryResults = new Map<string, { value: boolean }>()
 
 vi.mock('@vueuse/core', () => ({
-  useMediaQuery: vi.fn((query: string) => {
-    const existing = mediaQueryResults.get(query)
-    if (existing) return existing
-    const result = { value: false }
-    mediaQueryResults.set(query, result)
-    return result
-  }),
+  useMediaQuery: vi.fn(useMediaQueryMock),
 }))
-
-function setBreakpoint(bp: 'mobile' | 'tablet' | 'desktop') {
-  const desktopQuery = `(min-width: ${BREAKPOINTS.DESKTOP}px)`
-  const mobileQuery = `(max-width: ${BREAKPOINTS.MOBILE - 1}px)`
-
-  // Ensure entries exist by calling useActivePanel (which calls useMediaQuery)
-  const desktopRef = mediaQueryResults.get(desktopQuery) ?? { value: false }
-  const mobileRef = mediaQueryResults.get(mobileQuery) ?? { value: false }
-  mediaQueryResults.set(desktopQuery, desktopRef)
-  mediaQueryResults.set(mobileQuery, mobileRef)
-
-  desktopRef.value = bp === 'desktop'
-  mobileRef.value = bp === 'mobile'
-}
 
 describe('useGuidedWalkthrough', () => {
   beforeEach(() => {

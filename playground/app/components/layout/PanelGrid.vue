@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useResizeObserver } from '@vueuse/core'
 import { PANEL_ID } from '@/constants/panels'
 import { AUTOPLAY_PANEL_STAGGER_MS } from '@/constants/autoplay'
+import { RESPONSIVE } from '@/constants/responsive'
 import { useActivePanel } from '@/composables/useActivePanel'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 
@@ -9,6 +11,18 @@ const props = withDefaults(defineProps<{ introAnimate?: boolean }>(), { introAni
 
 const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActivePanel()
 const { clearUnseen } = useCrossPanelHighlight()
+
+const overlayContainerRef = ref<HTMLElement | null>(null)
+const overlayContainerHeight = ref(RESPONSIVE.PHONE_FRAME_BASELINE_PX)
+
+useResizeObserver(overlayContainerRef, (entries) => {
+  const height = entries[0]?.contentRect.height
+  if (height && height > 0) overlayContainerHeight.value = height
+})
+
+const phoneScale = computed(() =>
+  Math.min(1, (overlayContainerHeight.value * RESPONSIVE.PHONE_FRAME_SCALE_RATIO) / RESPONSIVE.PHONE_FRAME_BASELINE_PX),
+)
 
 watch(activePanel, (newPanelId) => {
   clearUnseen(newPanelId)
@@ -38,14 +52,14 @@ function panelStaggerStyle(index: number) {
       </div>
       <div
         data-testid="panel-col-staff"
-        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :class="['min-h-0 overflow-y-auto overscroll-contain rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
         :style="panelStaggerStyle(1)"
       >
         <slot name="staff" />
       </div>
       <div
         data-testid="panel-col-analytics"
-        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :class="['min-h-0 overflow-y-auto overscroll-contain rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
         :style="panelStaggerStyle(2)"
       >
         <slot name="analytics" />
@@ -59,14 +73,14 @@ function panelStaggerStyle(index: number) {
     >
       <div
         data-testid="panel-col-staff"
-        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :class="['min-h-0 overflow-y-auto overscroll-contain rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
         :style="panelStaggerStyle(0)"
       >
         <slot name="staff" />
       </div>
       <div
         data-testid="panel-col-analytics"
-        :class="['min-h-0 overflow-y-auto rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
+        :class="['min-h-0 overflow-y-auto overscroll-contain rounded-lg border bg-card', { 'panel-intro-animate': introAnimate }]"
         :style="panelStaggerStyle(1)"
       >
         <slot name="analytics" />
@@ -81,10 +95,13 @@ function panelStaggerStyle(index: number) {
       >
         <div
           v-show="customerOverlayOpen"
+          ref="overlayContainerRef"
           data-testid="panel-col-customer"
-          class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 p-4"
+          class="absolute inset-0 z-20 flex items-center justify-center bg-black/40 p-4 overscroll-contain"
         >
-          <LayoutPhoneFrame class="h-[80%]">
+          <LayoutPhoneFrame
+            :style="{ transform: `scale(${phoneScale})`, transformOrigin: 'top center' }"
+          >
             <slot name="customer" />
           </LayoutPhoneFrame>
         </div>
@@ -96,7 +113,7 @@ function panelStaggerStyle(index: number) {
       <div class="shrink-0 border-b px-3 py-2">
         <LayoutPanelTabBar :model-value="activePanel" @update:model-value="setActivePanel" />
       </div>
-      <div class="min-h-0 flex-1 overflow-y-auto p-3">
+      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
         <div v-if="activePanel === PANEL_ID.CUSTOMER" data-testid="panel-col-customer">
           <slot name="customer" />
         </div>
