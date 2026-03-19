@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Loader2 } from 'lucide-vue-next'
 import { PICKUP_STATUS, STATUS_LABELS } from '@/constants/status'
 import { STATUS_VARIANT } from '@/constants/status-ui'
 import { ANIMATION } from '@/constants/animations'
+import { HIGHLIGHT_TARGET } from '@/constants/highlights'
+import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 import type { PickupRequest } from '@/types/pickup-request'
 
 const crossfadeMs = `${ANIMATION.STATUS_CROSSFADE_MS}ms`
+
+const { isHighlighted } = useCrossPanelHighlight()
+const highlighted = computed(() => isHighlighted(HIGHLIGHT_TARGET.CUSTOMER_STATUS))
 
 defineProps<{
   request: PickupRequest
@@ -13,7 +19,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 p-4" data-testid="customer-status-card" data-walkthrough="customer-status">
+  <div :class="['flex flex-col gap-4 p-4', { 'animate-cross-panel-highlight': highlighted }]" data-testid="customer-status-card" data-walkthrough="customer-status">
     <div class="flex items-center justify-between">
       <p class="text-sm font-medium">{{ request.sales_order_number }}</p>
       <UiBadge

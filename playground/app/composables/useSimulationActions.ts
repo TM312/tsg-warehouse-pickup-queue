@@ -7,6 +7,7 @@ import { DEFAULT_GATES } from '@/constants/defaults'
 import { createPickupRequest } from '@/utils/factories'
 import { computeNextPosition, recalculatePositions } from '@/utils/queue'
 import type { SimulationEventType } from '@/types/simulation'
+import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 
 function syncGates() {
   const queue = useQueueStore()
@@ -28,6 +29,7 @@ function applyRecalculation(gateId: string) {
 export function useSimulationActions() {
   const queue = useQueueStore()
   const gates = useGatesStore()
+  const { highlight, resetAll: resetHighlights } = useCrossPanelHighlight()
 
   function submitOrder(orderNumber: string, companyName?: string) {
     const overrides: Record<string, string> = { sales_order_number: orderNumber }
@@ -46,6 +48,7 @@ export function useSimulationActions() {
     queue.updateRequest(id, { status: PICKUP_STATUS.APPROVED })
     syncGates()
     logEvent(`Approved ${request.sales_order_number}`, 'approve')
+    highlight('approve')
   }
 
   function assignToGate(id: string, gateId: string) {
@@ -61,6 +64,7 @@ export function useSimulationActions() {
     syncGates()
     const gate = gates.gateById(gateId)
     logEvent(`Assigned ${request.sales_order_number} to Gate ${gate?.gate_number ?? gateId}`, 'assign')
+    highlight('assign')
   }
 
   function reorderQueue(gateId: string, orderedIds: string[]) {
@@ -97,6 +101,7 @@ export function useSimulationActions() {
     if (gateId) applyRecalculation(gateId)
     syncGates()
     logEvent(`Started processing ${request.sales_order_number}`, 'start_processing')
+    highlight('start_processing')
   }
 
   function completeRequest(id: string) {
@@ -109,6 +114,7 @@ export function useSimulationActions() {
     })
     syncGates()
     logEvent(`Completed ${request.sales_order_number}`, 'complete')
+    highlight('complete')
   }
 
   function cancelRequest(id: string) {
@@ -153,6 +159,7 @@ export function useSimulationActions() {
     simulation.reset()
     queue.clear()
     gates.setGates(DEFAULT_GATES.map((g) => ({ ...g, queue_count: 0 })))
+    resetHighlights()
   }
 
   return {
