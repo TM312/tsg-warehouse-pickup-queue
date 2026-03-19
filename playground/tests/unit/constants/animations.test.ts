@@ -12,6 +12,11 @@ describe('animation constants', () => {
   it('has leave durations not exceeding enter durations', () => {
     expect(ANIMATION.QUEUE_ITEM_LEAVE_MS).toBeLessThanOrEqual(ANIMATION.QUEUE_ITEM_ENTER_MS)
   })
+
+  it('has scenario card animation constants', () => {
+    expect(ANIMATION.SCENARIO_CARD_HOVER_MS).toBe(200)
+    expect(ANIMATION.SCENARIO_CARD_ACTIVE_PULSE_MS).toBe(2_000)
+  })
 })
 
 describe('cssMs', () => {

@@ -3,6 +3,8 @@ import { mount } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import ScenarioBar from '@/components/scenario/ScenarioBar.vue'
 import { SCENARIOS } from '@/constants/scenarios'
+import { getScenarioDurationMs } from '@/utils/scenarioDuration'
+import { formatDurationMs } from '@/utils/formatDuration'
 
 vi.mock('@/composables/useSimulation', () => ({
   useSimulation: () => ({ toggle: vi.fn() }),
@@ -47,5 +49,21 @@ describe('ScenarioBar', () => {
   it('renders ScenarioProgressBar component', () => {
     const wrapper = mount(ScenarioBar)
     expect(wrapper.findComponent({ name: 'ScenarioProgressBar' }).exists()).toBe(true)
+  })
+
+  it('renders scenario descriptions in cards', () => {
+    const wrapper = mount(ScenarioBar)
+    for (const scenario of SCENARIOS) {
+      expect(wrapper.text()).toContain(scenario.description)
+    }
+  })
+
+  it('renders duration badges derived from scenario data', () => {
+    const wrapper = mount(ScenarioBar)
+    for (const scenario of SCENARIOS) {
+      const ms = getScenarioDurationMs(scenario.steps)
+      const expected = ms === 0 ? 'Instant' : formatDurationMs(ms)
+      expect(wrapper.text()).toContain(expected)
+    }
   })
 })
