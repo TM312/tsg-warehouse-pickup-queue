@@ -9,6 +9,7 @@ describe('animation constants', () => {
     'KPI_TWEEN_MS',
     'PROCESSING_PULSE_MS',
     'FEED_ITEM_ENTER_MS',
+    'CROSS_PANEL_HIGHLIGHT_MS',
   ] as const
 
   it('exports all expected animation keys', () => {

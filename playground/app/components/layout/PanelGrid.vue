@@ -1,11 +1,18 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import { PANEL_ID } from '@/constants/panels'
 import { AUTOPLAY_PANEL_STAGGER_MS } from '@/constants/autoplay'
 import { useActivePanel } from '@/composables/useActivePanel'
+import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 
 const props = withDefaults(defineProps<{ introAnimate?: boolean }>(), { introAnimate: false })
 
 const { activePanel, setActivePanel, customerOverlayOpen, breakpoint } = useActivePanel()
+const { clearUnseen } = useCrossPanelHighlight()
+
+watch(activePanel, (newPanelId) => {
+  clearUnseen(newPanelId)
+})
 
 function panelStaggerStyle(index: number) {
   if (!props.introAnimate) return undefined

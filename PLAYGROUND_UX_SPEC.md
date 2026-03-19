@@ -99,28 +99,48 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 **Goal:** When something happens in one panel, the effect is visually echoed in the other panels so viewers understand they're connected.
 
+**Status:** Implemented
+
 **Scope:**
 - When a staff action occurs (approve, assign, start processing, complete), briefly highlight (border pulse or glow, ~600ms) the corresponding element in:
-  - **Customer panel:** The status card or queue position
-  - **Analytics panel:** The relevant KPI card and/or activity feed entry
-- Use a lightweight event bus or shared composable (`useCrossPanelHighlight`) that emits highlight targets.
-- Highlight style: a brief `ring-2 ring-primary/50` that fades out via CSS animation.
-- On mobile/tablet where panels are hidden, show a subtle badge/dot on the tab indicating "something changed" (clear on panel switch).
+  - **Customer panel:** The status card
+  - **Analytics panel:** The relevant KPI card(s) and/or the newest activity feed entry
+- Use a shared composable (`useCrossPanelHighlight`) with module-level singleton state (same pattern as `useActivePanel` and `useProcessingPulse`)
+- Highlight style: a `box-shadow` ring at `primary/50` that fades to transparent via CSS `@keyframes` animation (600ms, ease-out, forwards fill)
+- On mobile where panels are hidden, show a subtle badge/dot on the tab indicating "something changed" (clear on panel switch)
 
-**Components affected:**
-- New: `app/composables/useCrossPanelHighlight.ts`
-- `app/components/customer/CustomerStatusCard.vue` — highlight receiver
-- `app/components/analytics/AnalyticsKpiCard.vue` — highlight receiver
-- `app/components/analytics/AnalyticsActivityFeed.vue` — highlight receiver
-- `app/components/layout/PanelTabBar.vue` — unseen-change badge (mobile)
-- `app/composables/useSimulationActions.ts` — emit highlight events after actions
+**Action-to-target mapping:**
+
+| Staff Action | Customer Panel | Analytics KPI Targets | Activity Feed |
+|---|---|---|---|
+| `approve` | Status card | Currently Waiting | Latest entry |
+| `assign` | Status card | Currently Waiting | Latest entry |
+| `start_processing` | Status card | — | Latest entry |
+| `complete` | Status card | Completed Today, Avg Processing Time, Avg Wait Time | Latest entry |
+
+**Implementation details:**
+- New: `app/constants/highlights.ts` — `HIGHLIGHT_TARGET` enum-like const (customer-status, kpi-completed-count, kpi-avg-wait-time, kpi-avg-processing-time, kpi-currently-waiting, activity-feed), `TARGET_PANEL` mapping each target → `PanelId`, `ACTION_HIGHLIGHT_TARGETS` mapping `SimulationEventType` → `HighlightTarget[]`
+- Modified: `app/constants/animations.ts` — added `CROSS_PANEL_HIGHLIGHT_MS: 600` to `ANIMATION` object
+- New: `app/composables/useCrossPanelHighlight.ts` — module-level `reactive(new Set())` for `highlightedTargets` and `unseenPanels`, timeout `Map` for auto-clear. API: `highlight(eventType)` fires targets from mapping, `isHighlighted(target)` for consumers, `hasUnseen(panelId)` / `clearUnseen(panelId)` for mobile badge, `resetAll()` for simulation reset. Respects `prefers-reduced-motion` via `useMediaQuery`
+- Modified: `app/composables/useSimulationActions.ts` — calls `highlight(eventType)` after each relevant `logEvent()` (approve, assign, start_processing, complete), calls `resetAll()` in `resetAll()`
+- Modified: `app/components/customer/CustomerStatusCard.vue` — reads `isHighlighted(HIGHLIGHT_TARGET.CUSTOMER_STATUS)` via computed, conditionally applies `animate-cross-panel-highlight` CSS class
+- Modified: `app/components/analytics/AnalyticsKpiCard.vue` — added optional `highlightTarget` prop, reads `isHighlighted(props.highlightTarget)`, conditionally applies highlight class
+- Modified: `app/components/analytics/AnalyticsKpiGrid.vue` — maps each KPI definition `id` to its `HIGHLIGHT_TARGET` constant, passes as `:highlight-target` prop to each card
+- Modified: `app/components/analytics/AnalyticsActivityFeed.vue` — highlights only the first (newest) feed item when `isHighlighted(HIGHLIGHT_TARGET.ACTIVITY_FEED)` is true
+- Modified: `app/components/layout/PanelTabBar.vue` — renders absolute-positioned dot (`size-2 rounded-full bg-primary`) inside each `TabsTrigger` when `hasUnseen(panel.id)` is true
+- Modified: `app/components/layout/PanelGrid.vue` — watches `activePanel`, calls `clearUnseen(panelId)` on switch
+- Modified: `app/assets/css/tailwind.css` — `@keyframes cross-panel-highlight` animating `box-shadow` from `primary/50` to transparent, with `prefers-reduced-motion` override
+
+**Test coverage:**
+- `tests/unit/constants/highlights.test.ts` — validates all targets have panel mappings, all action mappings reference valid targets, expected event types are covered
+- `tests/unit/composables/useCrossPanelHighlight.test.ts` — highlight triggering (correct targets activate per event type), highlight expiry (auto-clear after `CROSS_PANEL_HIGHLIGHT_MS`), timeout reset on re-highlight, unseen panel tracking (mobile only, clears on panel switch, skips when target = active panel), reduced-motion skip, resetAll cleanup
 
 **Acceptance criteria:**
-- [ ] Approving a request in staff panel visibly pulses the customer status card
-- [ ] Completing a request pulses the "Completed Today" KPI card
-- [ ] Highlights fade out naturally (not stuck on)
-- [ ] Mobile tab bar shows dot indicator for panels with unseen changes
-- [ ] No performance degradation from event bus
+- [x] Approving a request in staff panel visibly pulses the customer status card
+- [x] Completing a request pulses the "Completed Today" KPI card
+- [x] Highlights fade out naturally (not stuck on)
+- [x] Mobile tab bar shows dot indicator for panels with unseen changes
+- [x] No performance degradation from event bus
 
 ---
 

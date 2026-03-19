@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useSimulationStore } from '@/stores/simulation'
 import { EVENT_TYPE_CONFIG } from '@/constants/analytics'
 import { ANIMATION } from '@/constants/animations'
+import { HIGHLIGHT_TARGET } from '@/constants/highlights'
+import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
 import { formatDurationMs } from '@/utils/formatDuration'
 
 const simulation = useSimulationStore()
 const enterMs = `${ANIMATION.FEED_ITEM_ENTER_MS}ms`
+const { isHighlighted } = useCrossPanelHighlight()
+const feedHighlighted = computed(() => isHighlighted(HIGHLIGHT_TARGET.ACTIVITY_FEED))
 
 function formatRelativeTime(eventTimestamp: number): string {
   const diff = simulation.elapsedMs - eventTimestamp
@@ -25,10 +30,10 @@ function formatRelativeTime(eventTimestamp: number): string {
       class="max-h-[240px] space-y-1 overflow-y-auto"
     >
       <div
-        v-for="event in simulation.activityFeed"
+        v-for="(event, index) in simulation.activityFeed"
         :key="event.id"
         data-testid="feed-event"
-        class="flex items-center gap-2 rounded px-2 py-1 text-sm"
+        :class="['flex items-center gap-2 rounded px-2 py-1 text-sm', { 'animate-cross-panel-highlight': index === 0 && feedHighlighted }]"
       >
         <component
           :is="EVENT_TYPE_CONFIG[event.type].icon"

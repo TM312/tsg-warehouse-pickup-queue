@@ -118,3 +118,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes cross-panel-highlight {
+  0% {
+    box-shadow: 0 0 0 4px oklch(from var(--primary) l c h / 50%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0%);
+  }
+}
+
+.animate-cross-panel-highlight {
+  animation: cross-panel-highlight 600ms ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cross-panel-highlight {
+    animation: none;
+  }
+}
