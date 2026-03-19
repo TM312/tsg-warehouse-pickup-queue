@@ -8,6 +8,7 @@ import { createPickupRequest } from '@/utils/factories'
 import { computeNextPosition, recalculatePositions } from '@/utils/queue'
 import type { SimulationEventType } from '@/types/simulation'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
+import { useQueueHistory } from '@/composables/useQueueHistory'
 
 function syncGates() {
   const queue = useQueueStore()
@@ -30,6 +31,7 @@ export function useSimulationActions() {
   const queue = useQueueStore()
   const gates = useGatesStore()
   const { highlight, resetAll: resetHighlights } = useCrossPanelHighlight()
+  const { reset: resetQueueHistory } = useQueueHistory()
 
   function submitOrder(orderNumber: string, companyName?: string) {
     const overrides: Record<string, string> = { sales_order_number: orderNumber }
@@ -160,6 +162,7 @@ export function useSimulationActions() {
     queue.clear()
     gates.setGates(DEFAULT_GATES.map((g) => ({ ...g, queue_count: 0 })))
     resetHighlights()
+    resetQueueHistory()
   }
 
   return {

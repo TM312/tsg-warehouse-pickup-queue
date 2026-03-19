@@ -144,9 +144,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ---
 
-### WP-4: Live Timeline Chart
+### WP-4: Live Timeline Chart ✅
 
 **Goal:** Replace the static bar chart with a time-series chart that tells a story as the simulation runs.
+
+**Status:** Implemented
 
 **Scope:**
 - Replace `AnalyticsQueueChart.vue` (horizontal bars) with a stacked area chart showing queue depth over time, one series per gate.
@@ -157,18 +159,25 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - Gate colors should match the rest of the UI (use Tailwind theme colors).
 - On reset, clear the chart data.
 
-**Components affected:**
-- `app/components/analytics/AnalyticsQueueChart.vue` — full rewrite
-- `app/stores/simulation.ts` or new: `app/composables/useQueueHistory.ts` — track time-series data
-- `app/composables/useSimulation.ts` — push data point per tick
+**Implementation details:**
+- New: `app/constants/chart.ts` — `QUEUE_HISTORY` config (5s sample interval, 120 max points), `GATE_CHART_COLORS` with OKLCH color palettes for light/dark modes (warm orange, teal, dark blue-gray for light; purple, teal-green, yellow-orange for dark), `CHART_HEIGHT_PX` fixed at 120px
+- New: `app/utils/chart.ts` — `resolveGateColors()` utility that returns appropriate color palette based on dark mode detection (`.dark` class on `document.documentElement`), SSR-safe with light fallback
+- New: `app/composables/useQueueHistory.ts` — reactive composable tracking queue depth time-series data. Records initial point at t=0, samples every 5s, tracks per-gate `queue_count`, sliding window capped at 120 points. Exposes `history`, `gateIds`, `gateLabels` computed properties, and `reset()` method
+- Modified: `app/components/analytics/AnalyticsQueueChart.vue` — full rewrite from static bar chart to Unovis-powered live area chart with smooth Basis curve interpolation, multi-gate series, dynamic gate colors, mm:ss time axis, legend, and minimum 2-point display threshold
+- Modified: `app/composables/useSimulationActions.ts` — imports `useQueueHistory`, calls `resetQueueHistory()` in `resetAll()` to clear history on simulation reset
+
+**Test coverage:**
+- `tests/unit/composables/useQueueHistory.test.ts` — 7 tests covering initial point recording, sample interval gating, correct per-gate counts, MAX_POINTS cap, reset clearing, and inactive gate handling
+- `tests/unit/constants/chart.test.ts` — 5 constant value assertions (sample interval, max points, light/dark color array lengths, chart height)
+- `tests/unit/utils/chart.test.ts` — 3 tests covering light/dark theme detection and return-value isolation
 
 **Acceptance criteria:**
-- [ ] Chart shows stacked area for each gate over time
-- [ ] Updates in real-time as simulation runs
-- [ ] X-axis shows elapsed time, Y-axis shows count
-- [ ] Chart resets cleanly on simulation reset
-- [ ] Compact height, no vertical scroll needed
-- [ ] Looks polished (smooth curves, proper colors, minimal axis clutter)
+- [x] Chart shows stacked area for each gate over time
+- [x] Updates in real-time as simulation runs
+- [x] X-axis shows elapsed time, Y-axis shows count
+- [x] Chart resets cleanly on simulation reset
+- [x] Compact height, no vertical scroll needed
+- [x] Looks polished (smooth curves, proper colors, minimal axis clutter)
 
 ---
 
