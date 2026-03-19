@@ -13,6 +13,7 @@ const dashboard = useDashboardData()
       :icon="kpi.icon"
       :label="kpi.label"
       :value="kpi.format(dashboard[kpi.key].value)"
+      :numeric-value="kpi.animate ? (dashboard[kpi.key].value ?? 0) : undefined"
       :test-id="`kpi-${kpi.id}`"
     />
   </div>

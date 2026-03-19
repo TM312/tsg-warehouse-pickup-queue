@@ -2,7 +2,10 @@
 import { Loader2 } from 'lucide-vue-next'
 import { PICKUP_STATUS, STATUS_LABELS } from '@/constants/status'
 import { STATUS_VARIANT } from '@/constants/status-ui'
+import { ANIMATION } from '@/constants/animations'
 import type { PickupRequest } from '@/types/pickup-request'
+
+const crossfadeMs = `${ANIMATION.STATUS_CROSSFADE_MS}ms`
 
 defineProps<{
   request: PickupRequest
@@ -21,32 +24,53 @@ defineProps<{
       </UiBadge>
     </div>
 
-    <!-- Pending -->
-    <div v-if="request.status === PICKUP_STATUS.PENDING" class="flex flex-col items-center gap-3 py-6">
-      <Loader2 class="size-8 animate-spin text-muted-foreground" />
-      <p class="text-sm text-muted-foreground">Waiting for approval...</p>
-    </div>
+    <Transition mode="out-in" name="status-fade">
+      <div :key="request.status">
+        <!-- Pending -->
+        <div v-if="request.status === PICKUP_STATUS.PENDING" class="flex flex-col items-center gap-3 py-6">
+          <Loader2 class="size-8 animate-spin text-muted-foreground" />
+          <p class="text-sm text-muted-foreground">Waiting for approval...</p>
+        </div>
 
-    <!-- Approved -->
-    <div v-else-if="request.status === PICKUP_STATUS.APPROVED" class="flex flex-col items-center gap-3 py-6">
-      <p class="text-sm text-muted-foreground">Approved! Waiting for gate assignment...</p>
-    </div>
+        <!-- Approved -->
+        <div v-else-if="request.status === PICKUP_STATUS.APPROVED" class="flex flex-col items-center gap-3 py-6">
+          <p class="text-sm text-muted-foreground">Approved! Waiting for gate assignment...</p>
+        </div>
 
-    <!-- In Queue -->
-    <CustomerQueuePosition v-else-if="request.status === PICKUP_STATUS.IN_QUEUE" :request="request" />
+        <!-- In Queue -->
+        <CustomerQueuePosition v-else-if="request.status === PICKUP_STATUS.IN_QUEUE" :request="request" />
 
-    <!-- Processing -->
-    <div v-else-if="request.status === PICKUP_STATUS.PROCESSING" class="flex flex-col items-center gap-3 py-6">
-      <Loader2 class="size-8 animate-spin text-amber-500" />
-      <p class="text-sm font-medium">Your order is being loaded!</p>
-    </div>
+        <!-- Processing -->
+        <div v-else-if="request.status === PICKUP_STATUS.PROCESSING" class="flex flex-col items-center gap-3 py-6">
+          <Loader2 class="size-8 animate-spin text-amber-500" />
+          <p class="text-sm font-medium">Your order is being loaded!</p>
+        </div>
 
-    <!-- Completed -->
-    <CustomerCompletedState v-else-if="request.status === PICKUP_STATUS.COMPLETED" :request="request" />
+        <!-- Completed -->
+        <CustomerCompletedState v-else-if="request.status === PICKUP_STATUS.COMPLETED" :request="request" />
 
-    <!-- Cancelled -->
-    <div v-else-if="request.status === PICKUP_STATUS.CANCELLED" class="flex flex-col items-center gap-3 py-6">
-      <p class="text-sm text-destructive">Request cancelled</p>
-    </div>
+        <!-- Cancelled -->
+        <div v-else-if="request.status === PICKUP_STATUS.CANCELLED" class="flex flex-col items-center gap-3 py-6">
+          <p class="text-sm text-destructive">Request cancelled</p>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.status-fade-enter-active,
+.status-fade-leave-active {
+  transition: opacity v-bind(crossfadeMs) ease;
+}
+.status-fade-enter-from,
+.status-fade-leave-to {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-fade-enter-active,
+  .status-fade-leave-active {
+    transition: none;
+  }
+}
+</style>
