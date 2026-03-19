@@ -181,9 +181,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ---
 
-### WP-5: Simulation Timeline & Scenario Progress
+### WP-5: Simulation Timeline & Scenario Progress ✅
 
 **Goal:** Give viewers a sense of narrative — where they are in time and in the scenario.
+
+**Status:** Implemented
 
 **Scope:**
 - Add a thin progress bar below the scenario bar showing scenario completion (step X of Y).
@@ -191,17 +193,26 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - During a scenario, show small event markers on the progress bar at the relative positions where steps occur.
 - When no scenario is running, hide the progress bar and show only elapsed time.
 
-**Components affected:**
-- New: `app/components/scenario/ScenarioProgressBar.vue`
-- `app/components/scenario/ScenarioBar.vue` — add elapsed time display, mount progress bar
-- `app/composables/useScenarioRunner.ts` — expose step progress (currentStep / totalSteps)
+**Implementation details:**
+- New: `app/components/scenario/ScenarioProgressBar.vue` — thin progress bar with primary-colored fill whose width transitions smoothly (`PROGRESS_BAR_TRANSITION_MS: 300ms`). Computes step marker positions from cumulative `delayMs` values and renders them as vertical `foreground/30` bars. Uses Vue `<Transition>` for slide-in/out animation, includes `role="progressbar"` with ARIA attributes, and respects `prefers-reduced-motion`
+- Modified: `app/constants/animations.ts` — added `PROGRESS_BAR_TRANSITION_MS: 300` to `ANIMATION` object
+- Modified: `app/utils/formatDuration.ts` — added `formatElapsedTime(ms)` utility returning `mm:ss` format with zero-padded minutes and seconds
+- Modified: `app/composables/useScenarioRunner.ts` — added `currentStepIndex`, `totalSteps`, and `activeScenario` reactive refs. `currentStepIndex` increments after each step executes, `totalSteps` is set from `scenario.steps.length` on run, both reset on stop. All three exposed from the composable return
+- Modified: `app/components/scenario/ScenarioBar.vue` — added monospace elapsed time display (`formatElapsedTime`) right-aligned in the scenario bar, mounted `ScenarioProgressBar` below the bar with `currentStep`, `totalSteps`, `steps`, and `visible` props wired to `useScenarioRunner` state
+
+**Test coverage:**
+- `tests/unit/components/ScenarioProgressBar.test.ts` — 8 tests covering visibility toggle, fill width percentage, marker count and cumulative position calculation, ARIA attributes, zero-totalSteps edge case, single-step marker suppression
+- `tests/unit/composables/useScenarioRunner.test.ts` — 6 new tests in `step progress tracking` describe block covering initial state, totalSteps on run, currentStepIndex increment per step, activeScenario assignment, reset on stop, natural completion
+- `tests/unit/components/ScenarioBar.test.ts` — added test for elapsed time display
+- `tests/unit/constants/animations.test.ts` — added constant value assertion for `PROGRESS_BAR_TRANSITION_MS`
+- `tests/unit/utils/formatDuration.test.ts` — added tests for `formatElapsedTime` utility
 
 **Acceptance criteria:**
-- [ ] Progress bar shows scenario completion percentage
-- [ ] Elapsed simulation time is always visible when simulation is running
-- [ ] Event markers visible on progress bar
-- [ ] Progress bar hidden when no scenario active
-- [ ] Clean visual integration with existing scenario bar
+- [x] Progress bar shows scenario completion percentage
+- [x] Elapsed simulation time is always visible when simulation is running
+- [x] Event markers visible on progress bar
+- [x] Progress bar hidden when no scenario active
+- [x] Clean visual integration with existing scenario bar
 
 ---
 
