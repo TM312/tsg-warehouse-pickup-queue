@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useDashboardData } from '@/composables/useDashboardData'
+import { useProcessingPulse } from '@/composables/useProcessingPulse'
 import { useSimulationStore } from '@/stores/simulation'
+import { ANIMATION } from '@/constants/animations'
 import { formatDurationMs } from '@/utils/formatDuration'
 import type { PickupRequest } from '@/types/pickup-request'
 import {
@@ -14,6 +16,8 @@ import {
 
 const { processingGateRows } = useDashboardData()
 const simulation = useSimulationStore()
+const pulse = useProcessingPulse(processingGateRows)
+const pulseMs = `${ANIMATION.PROCESSING_PULSE_MS}ms`
 
 function elapsedForRequest(request: PickupRequest | null): string {
   if (!request?.processing_started_sim_ms) return '--'
@@ -33,7 +37,11 @@ function elapsedForRequest(request: PickupRequest | null): string {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-for="row in processingGateRows" :key="row.gateId">
+        <TableRow
+          v-for="row in processingGateRows"
+          :key="row.gateId"
+          :class="{ 'processing-pulse': pulse.isPulsing(row.gateId) }"
+        >
           <TableCell class="font-medium">{{ row.gate }}</TableCell>
           <TableCell>
             {{ row.request ? row.request.sales_order_number : 'Idle' }}
@@ -44,3 +52,23 @@ function elapsedForRequest(request: PickupRequest | null): string {
     </Table>
   </div>
 </template>
+
+<style scoped>
+@keyframes row-pulse {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: oklch(0.9 0.05 85);
+  }
+}
+.processing-pulse {
+  animation: row-pulse v-bind(pulseMs) ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .processing-pulse {
+    animation: none;
+  }
+}
+</style>

@@ -3,6 +3,7 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import Sortable from 'sortablejs'
 import { Star } from 'lucide-vue-next'
 import { PICKUP_STATUS } from '@/constants/status'
+import { ANIMATION } from '@/constants/animations'
 import { useQueueStore } from '@/stores/queue'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,9 @@ const props = defineProps<{
 
 const queue = useQueueStore()
 const actions = useSimulationActions()
-const listRef = ref<HTMLElement | null>(null)
+const enterMs = `${ANIMATION.QUEUE_ITEM_ENTER_MS}ms`
+const leaveMs = `${ANIMATION.QUEUE_ITEM_LEAVE_MS}ms`
+const listRef = ref<InstanceType<typeof TransitionGroup> | null>(null)
 let sortableInstance: Sortable | null = null
 
 const processingItem = computed(() =>
@@ -29,12 +32,14 @@ const queueItems = computed(() =>
 )
 
 onMounted(() => {
-  if (!listRef.value) return
-  sortableInstance = Sortable.create(listRef.value, {
+  const el = listRef.value?.$el as HTMLElement | undefined
+  if (!el) return
+  sortableInstance = Sortable.create(el, {
     animation: 150,
     onEnd: () => {
-      if (!listRef.value) return
-      const children = listRef.value.querySelectorAll('[data-request-id]')
+      const container = listRef.value?.$el as HTMLElement | undefined
+      if (!container) return
+      const children = container.querySelectorAll('[data-request-id]')
       const orderedIds = Array.from(children).map(el => el.getAttribute('data-request-id')!)
       actions.reorderQueue(props.gateId, orderedIds)
     },
@@ -65,7 +70,7 @@ onBeforeUnmount(() => {
       No items in this gate's queue
     </div>
 
-    <div ref="listRef" class="space-y-1">
+    <TransitionGroup ref="listRef" tag="div" name="queue-item" class="space-y-1">
       <div
         v-for="item in queueItems"
         :key="item.id"
@@ -87,6 +92,32 @@ onBeforeUnmount(() => {
         </div>
         <StaffRequestActions :request="item" />
       </div>
-    </div>
+    </TransitionGroup>
   </div>
 </template>
+
+<style scoped>
+.queue-item-enter-active {
+  transition:
+    opacity v-bind(enterMs) ease,
+    transform v-bind(enterMs) ease;
+}
+.queue-item-leave-active {
+  transition: opacity v-bind(leaveMs) ease;
+  position: absolute;
+  width: 100%;
+}
+.queue-item-enter-from {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.queue-item-leave-to {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .queue-item-enter-active,
+  .queue-item-leave-active {
+    transition: none;
+  }
+}
+</style>

@@ -55,9 +55,11 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 
 ---
 
-### WP-2: State Transition Animations
+### WP-2: State Transition Animations ✅
 
 **Goal:** Queue changes, status updates, and panel switches feel fluid, not abrupt.
+
+**Status:** Implemented
 
 **Scope:**
 - **Queue list:** Use Vue `<TransitionGroup>` on staff gate queues. Items slide in (translateY + opacity), slide out on complete/cancel, reorder smoothly.
@@ -66,21 +68,30 @@ The Playground must never feel like a prototype or a dev tool. It should feel li
 - **Processing table rows:** Subtle background pulse when a gate starts processing a new order.
 - **Analytics activity feed:** New items slide in from top with opacity transition.
 
-**Components affected:**
-- `app/components/staff/StaffGateQueue.vue` — TransitionGroup wrapper
-- `app/components/customer/CustomerStatusCard.vue` — Transition wrapper
-- `app/components/analytics/AnalyticsKpiCard.vue` — animated number display
-- `app/components/staff/StaffProcessingTable.vue` — row highlight on change
-- `app/components/analytics/AnalyticsActivityFeed.vue` — list enter transition
-- New: `app/composables/useAnimatedNumber.ts`
+**Implementation details:**
+- New: `app/constants/animations.ts` — named constants (`ANIMATION` object) for queue item enter (300ms), leave (200ms), status crossfade (200ms), KPI tween (400ms), processing pulse (1500ms), feed item enter (300ms)
+- New: `app/composables/useAnimatedNumber.ts` — rAF-driven tween composable with ease-out cubic easing, `useMediaQuery` for `prefers-reduced-motion` detection, cleanup via `onScopeDispose`
+- New: `app/composables/useProcessingPulse.ts` — tracks per-gate processing request changes, exposes `isPulsing(gateId)`, auto-clears after `PROCESSING_PULSE_MS`, skips when reduced-motion active
+- Modified: `app/components/staff/StaffGateQueue.vue` — replaced plain `<div>` list container with `<TransitionGroup name="queue-item">`, Sortable.js accesses DOM via `$el` on the TransitionGroup ref, scoped CSS for enter/leave/reduced-motion
+- Modified: `app/components/customer/CustomerStatusCard.vue` — wrapped status content in `<Transition mode="out-in" name="status-fade">` with `:key="request.status"`, scoped CSS for 200ms opacity crossfade with reduced-motion override
+- Modified: `app/components/analytics/AnalyticsKpiCard.vue` — added optional `numericValue` prop, integrates `useAnimatedNumber` for count-based KPIs (completedCount, currentlyWaiting), duration-formatted KPIs display string value directly
+- Modified: `app/components/analytics/AnalyticsKpiGrid.vue` — passes `numericValue` to KPI cards when `kpi.animate` flag is true
+- Modified: `app/constants/analytics.ts` — added `animate: boolean` field to `KpiDefinition` interface, set `true` for completedCount and currentlyWaiting
+- Modified: `app/components/staff/StaffProcessingTable.vue` — integrates `useProcessingPulse`, applies `processing-pulse` class on rows, scoped `@keyframes row-pulse` with amber OKLCH background color pulse
+- Modified: `app/components/analytics/AnalyticsActivityFeed.vue` — replaced `<div>` wrapper with `<TransitionGroup name="feed-item">`, scoped CSS for slide-in-from-top (translateY -12px) with reduced-motion override
+
+**Test coverage:**
+- `tests/unit/composables/useAnimatedNumber.test.ts` — 7 tests covering tween behavior, reduced-motion instant jump, mid-tween target change cancellation, count-down, rounding, scope dispose cleanup
+- `tests/unit/composables/useProcessingPulse.test.ts` — 6 tests covering new-request pulse detection, auto-clear after timeout, no pulse on same request, no pulse on idle transition, reduced-motion skip, timeout cleanup on dispose
+- `tests/unit/constants/animations.test.ts` — 6 constant value assertions
 
 **Acceptance criteria:**
-- [ ] Queue items animate in/out (no pop-in/pop-out)
-- [ ] Customer status changes crossfade smoothly
-- [ ] KPI numbers tween between values (not instant jump)
-- [ ] Processing table shows brief highlight when new item starts
-- [ ] Activity feed items slide in from top
-- [ ] All animations respect `prefers-reduced-motion`
+- [x] Queue items animate in/out (no pop-in/pop-out)
+- [x] Customer status changes crossfade smoothly
+- [x] KPI numbers tween between values (not instant jump)
+- [x] Processing table shows brief highlight when new item starts
+- [x] Activity feed items slide in from top
+- [x] All animations respect `prefers-reduced-motion`
 
 ---
 

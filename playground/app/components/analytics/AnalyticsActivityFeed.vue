@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useSimulationStore } from '@/stores/simulation'
 import { EVENT_TYPE_CONFIG } from '@/constants/analytics'
+import { ANIMATION } from '@/constants/animations'
 import { formatDurationMs } from '@/utils/formatDuration'
 
 const simulation = useSimulationStore()
+const enterMs = `${ANIMATION.FEED_ITEM_ENTER_MS}ms`
 
 function formatRelativeTime(eventTimestamp: number): string {
   const diff = simulation.elapsedMs - eventTimestamp
@@ -16,7 +18,12 @@ function formatRelativeTime(eventTimestamp: number): string {
   <div data-testid="analytics-activity-feed">
     <h3 class="mb-2 text-sm font-semibold">Activity Feed</h3>
 
-    <div v-if="simulation.activityFeed.length > 0" class="max-h-[240px] space-y-1 overflow-y-auto">
+    <TransitionGroup
+      v-if="simulation.activityFeed.length > 0"
+      tag="div"
+      name="feed-item"
+      class="max-h-[240px] space-y-1 overflow-y-auto"
+    >
       <div
         v-for="event in simulation.activityFeed"
         :key="event.id"
@@ -31,8 +38,25 @@ function formatRelativeTime(eventTimestamp: number): string {
         <span class="min-w-0 flex-1 truncate">{{ event.label }}</span>
         <span class="shrink-0 text-xs text-muted-foreground">{{ formatRelativeTime(event.timestamp) }}</span>
       </div>
-    </div>
+    </TransitionGroup>
 
     <p v-else class="text-sm text-muted-foreground">No activity yet</p>
   </div>
 </template>
+
+<style scoped>
+.feed-item-enter-active {
+  transition:
+    opacity v-bind(enterMs) ease,
+    transform v-bind(enterMs) ease;
+}
+.feed-item-enter-from {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-item-enter-active {
+    transition: none;
+  }
+}
+</style>
