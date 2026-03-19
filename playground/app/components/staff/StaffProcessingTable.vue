@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { ArrowRight } from 'lucide-vue-next'
 import { useDashboardData } from '@/composables/useDashboardData'
 import { useProcessingPulse } from '@/composables/useProcessingPulse'
 import { useGateStatuses } from '@/composables/useGateStatus'
 import { useSimulationStore } from '@/stores/simulation'
+import { useMorningRush } from '@/composables/useMorningRush'
 import { ANIMATION, cssMs } from '@/constants/animations'
+import { EMPTY_STATE, RUN_SCENARIO_LABEL } from '@/constants/empty-states'
 import { calcProcessingProgress, formatProcessingElapsed } from '@/utils/processing'
 import type { PickupRequest } from '@/types/pickup-request'
 import {
@@ -14,6 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Button } from '@/components/ui/button'
 import GateStatusDot from './GateStatusDot.vue'
 import ProcessingProgressBar from './ProcessingProgressBar.vue'
 
@@ -21,7 +27,10 @@ const { processingGateRows } = useDashboardData()
 const simulation = useSimulationStore()
 const pulse = useProcessingPulse(processingGateRows)
 const { statusOf } = useGateStatuses()
+const { handleRunMorningRush, isRunning } = useMorningRush()
 const pulseMs = cssMs(ANIMATION.PROCESSING_PULSE_MS)
+
+const hasAnyProcessing = computed(() => processingGateRows.value.some(row => row.request !== null))
 
 function elapsedForRequest(request: PickupRequest | null): string {
   return formatProcessingElapsed(request?.processing_started_sim_ms, simulation.elapsedMs)
@@ -30,11 +39,12 @@ function elapsedForRequest(request: PickupRequest | null): string {
 function progressForRequest(request: PickupRequest | null): number {
   return calcProcessingProgress(request?.processing_started_sim_ms, simulation.elapsedMs)
 }
+
 </script>
 
 <template>
   <div data-testid="staff-processing-table" data-walkthrough="processing-table">
-    <Table>
+    <Table v-if="hasAnyProcessing">
       <TableHeader>
         <TableRow>
           <TableHead>Gate</TableHead>
@@ -66,6 +76,18 @@ function progressForRequest(request: PickupRequest | null): number {
         </template>
       </TableBody>
     </Table>
+
+    <EmptyState
+      v-else
+      :icon="EMPTY_STATE.STAFF_PROCESSING.icon"
+      :heading="EMPTY_STATE.STAFF_PROCESSING.heading"
+      :subtext="EMPTY_STATE.STAFF_PROCESSING.subtext"
+    >
+      <Button variant="outline" size="sm" :disabled="isRunning" @click="handleRunMorningRush">
+        {{ RUN_SCENARIO_LABEL }}
+        <ArrowRight class="ml-1 size-4" />
+      </Button>
+    </EmptyState>
   </div>
 </template>
 

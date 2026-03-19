@@ -8,6 +8,8 @@ import { useQueueHistory } from '@/composables/useQueueHistory'
 import { useGateStatuses } from '@/composables/useGateStatus'
 import { resolveGateColors, formatTimeMs } from '@/utils/chart'
 import { CHART_HEIGHT_PX } from '@/constants/chart'
+import { EmptyState } from '@/components/ui/empty-state'
+import { EMPTY_STATE } from '@/constants/empty-states'
 import GateStatusDot from '@/components/staff/GateStatusDot.vue'
 
 const { history, gateIds, gateLabels } = useQueueHistory()
@@ -92,6 +94,11 @@ const legendItems = computed(() =>
       </VisXYContainer>
     </template>
 
-    <p v-else class="text-sm text-muted-foreground">No activity yet</p>
+    <EmptyState
+      v-else
+      :icon="EMPTY_STATE.ANALYTICS_QUEUE_CHART.icon"
+      :heading="EMPTY_STATE.ANALYTICS_QUEUE_CHART.heading"
+      :subtext="EMPTY_STATE.ANALYTICS_QUEUE_CHART.subtext"
+    />
   </div>
 </template>

@@ -8,6 +8,8 @@ import { useQueueStore } from '@/stores/queue'
 import { useSimulationActions } from '@/composables/useSimulationActions'
 import { useProcessingProgress } from '@/composables/useProcessingProgress'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { EMPTY_STATE } from '@/constants/empty-states'
 import StaffStatusBadge from './StaffStatusBadge.vue'
 import StaffRequestActions from './StaffRequestActions.vue'
 import ProcessingProgressBar from './ProcessingProgressBar.vue'
@@ -71,9 +73,12 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Queue list -->
-    <div v-if="queueItems.length === 0 && !processingItem" class="py-8 text-center text-sm text-muted-foreground">
-      No items in this gate's queue
-    </div>
+    <EmptyState
+      v-if="queueItems.length === 0 && !processingItem"
+      :icon="EMPTY_STATE.STAFF_GATE_QUEUE.icon"
+      :heading="EMPTY_STATE.STAFF_GATE_QUEUE.heading"
+      :subtext="EMPTY_STATE.STAFF_GATE_QUEUE.subtext"
+    />
 
     <TransitionGroup ref="listRef" tag="div" name="queue-item" class="space-y-1">
       <div

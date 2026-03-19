@@ -5,6 +5,8 @@ import { EVENT_TYPE_CONFIG } from '@/constants/analytics'
 import { ANIMATION, cssMs } from '@/constants/animations'
 import { HIGHLIGHT_TARGET } from '@/constants/highlights'
 import { useCrossPanelHighlight } from '@/composables/useCrossPanelHighlight'
+import { EmptyState } from '@/components/ui/empty-state'
+import { EMPTY_STATE } from '@/constants/empty-states'
 import { formatDurationMs } from '@/utils/formatDuration'
 
 const simulation = useSimulationStore()
@@ -45,7 +47,12 @@ function formatRelativeTime(eventTimestamp: number): string {
       </div>
     </TransitionGroup>
 
-    <p v-else class="text-sm text-muted-foreground">No activity yet</p>
+    <EmptyState
+      v-else
+      :icon="EMPTY_STATE.ANALYTICS_ACTIVITY_FEED.icon"
+      :heading="EMPTY_STATE.ANALYTICS_ACTIVITY_FEED.heading"
+      :subtext="EMPTY_STATE.ANALYTICS_ACTIVITY_FEED.subtext"
+    />
   </div>
 </template>
 

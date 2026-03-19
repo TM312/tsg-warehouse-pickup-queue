@@ -33,7 +33,7 @@ describe('AnalyticsActivityFeed', () => {
 
   it('shows empty state', () => {
     const wrapper = mountFeed()
-    expect(wrapper.text()).toContain('No activity yet')
+    expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true)
   })
 
   it('displays event label', () => {
