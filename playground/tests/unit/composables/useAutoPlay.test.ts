@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { effectScope } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { toast } from 'vue-sonner'
@@ -189,6 +190,22 @@ describe('useAutoPlay', () => {
     })
   })
 
+  describe('toast action', () => {
+    it('invokes the guided walkthrough when toast action is clicked', () => {
+      const { initialize } = useAutoPlay()
+      initialize()
+
+      vi.advanceTimersByTime(AUTOPLAY_DELAY_MS)
+
+      const toastCall = mockedToast.mock.calls[0]
+      const options = toastCall[1] as { action: { onClick: () => void } }
+      options.action.onClick()
+
+      const { isActive } = useGuidedWalkthrough()
+      expect(isActive.value).toBe(true)
+    })
+  })
+
   describe('cleanup', () => {
     it('clears pending timeout before delay fires', () => {
       const queue = useQueueStore()
@@ -233,6 +250,22 @@ describe('useAutoPlay', () => {
         cleanup()
         cleanup()
       }).not.toThrow()
+    })
+  })
+
+  describe('scope disposal', () => {
+    it('cleans up pending timeout when scope is disposed', () => {
+      const queue = useQueueStore()
+      const scope = effectScope()
+
+      scope.run(() => {
+        const { initialize } = useAutoPlay()
+        initialize()
+      })
+
+      scope.stop()
+      vi.advanceTimersByTime(AUTOPLAY_DELAY_MS * 2)
+      expect(queue.requests.length).toBe(0)
     })
   })
 

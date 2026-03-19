@@ -228,6 +228,44 @@ describe('useCrossPanelHighlight', () => {
     })
   })
 
+  describe('scope disposal', () => {
+    it('disposing one consumer does not clear shared state for other consumers', () => {
+      mockBreakpoint.value = 'mobile'
+      mockActivePanel.value = 'staff'
+
+      const scope1 = effectScope()
+      scope1.run(() => {
+        const { highlight } = useCrossPanelHighlight()
+        highlight('approve')
+      })
+
+      // A second consumer can see the highlights
+      const scope2 = effectScope()
+      let isHighlighted2: ReturnType<typeof useCrossPanelHighlight>['isHighlighted']
+      let hasUnseen2: ReturnType<typeof useCrossPanelHighlight>['hasUnseen']
+      scope2.run(() => {
+        const api = useCrossPanelHighlight()
+        isHighlighted2 = api.isHighlighted
+        hasUnseen2 = api.hasUnseen
+      })
+
+      expect(isHighlighted2!(HIGHLIGHT_TARGET.CUSTOMER_STATUS)).toBe(true)
+      expect(hasUnseen2!('customer')).toBe(true)
+
+      // Dispose scope1 — state must survive for scope2
+      scope1.stop()
+
+      expect(isHighlighted2!(HIGHLIGHT_TARGET.CUSTOMER_STATUS)).toBe(true)
+      expect(hasUnseen2!('customer')).toBe(true)
+
+      // Expiry timers still fire correctly
+      vi.advanceTimersByTime(ANIMATION.CROSS_PANEL_HIGHLIGHT_MS)
+      expect(isHighlighted2!(HIGHLIGHT_TARGET.CUSTOMER_STATUS)).toBe(false)
+
+      scope2.stop()
+    })
+  })
+
   describe('reset', () => {
     it('resetAll() clears highlights, unseen set, and timeouts', () => {
       mockBreakpoint.value = 'mobile'

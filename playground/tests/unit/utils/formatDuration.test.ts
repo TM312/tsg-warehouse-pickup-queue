@@ -38,11 +38,22 @@ describe('formatElapsedTime', () => {
   ])('formats %i ms as %s', (ms, expected) => {
     expect(formatElapsedTime(ms)).toBe(expected)
   })
+
+  it.each([
+    [0, '0:00'],
+    [30000, '0:30'],
+    [135000, '2:15'],
+    [3600000, '60:00'],
+    [-5000, '0:00'],
+  ])('formats %i ms as %s with padMinutes: false', (ms, expected) => {
+    expect(formatElapsedTime(ms, { padMinutes: false })).toBe(expected)
+  })
 })
 
 describe('formatDurationMinutes', () => {
-  it('returns -- for null', () => {
+  it('returns -- for null or undefined', () => {
     expect(formatDurationMinutes(null)).toBe('--')
+    expect(formatDurationMinutes(undefined)).toBe('--')
   })
 
   it('returns 0m for 0', () => {

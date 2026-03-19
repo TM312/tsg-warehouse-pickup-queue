@@ -3,9 +3,8 @@ import { useDashboardData } from '@/composables/useDashboardData'
 import { useProcessingPulse } from '@/composables/useProcessingPulse'
 import { useGateStatuses } from '@/composables/useGateStatus'
 import { useSimulationStore } from '@/stores/simulation'
-import { ANIMATION } from '@/constants/animations'
-import { formatDurationMs } from '@/utils/formatDuration'
-import { calcProcessingProgress } from '@/utils/processing'
+import { ANIMATION, cssMs } from '@/constants/animations'
+import { calcProcessingProgress, formatProcessingElapsed } from '@/utils/processing'
 import type { PickupRequest } from '@/types/pickup-request'
 import {
   Table,
@@ -22,12 +21,10 @@ const { processingGateRows } = useDashboardData()
 const simulation = useSimulationStore()
 const pulse = useProcessingPulse(processingGateRows)
 const { statusOf } = useGateStatuses()
-const pulseMs = `${ANIMATION.PROCESSING_PULSE_MS}ms`
+const pulseMs = cssMs(ANIMATION.PROCESSING_PULSE_MS)
 
 function elapsedForRequest(request: PickupRequest | null): string {
-  if (!request?.processing_started_sim_ms) return '--'
-  const elapsed = simulation.elapsedMs - request.processing_started_sim_ms
-  return formatDurationMs(Math.max(0, elapsed))
+  return formatProcessingElapsed(request?.processing_started_sim_ms, simulation.elapsedMs)
 }
 
 function progressForRequest(request: PickupRequest | null): number {

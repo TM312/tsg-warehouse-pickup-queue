@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ANIMATION } from '@/constants/animations'
+import { ANIMATION, cssMs } from '@/constants/animations'
 import { GATE_STATUS_COLORS, GATE_OPERATIONAL_STATUS } from '@/constants/gate-status'
 
 const props = defineProps<{
@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const clampedPercent = computed(() => Math.max(0, Math.min(props.progress, 1)) * 100)
 const progressColor = GATE_STATUS_COLORS[GATE_OPERATIONAL_STATUS.PROCESSING]
-const transitionMs = `${ANIMATION.PROGRESS_BAR_TRANSITION_MS}ms`
+const transitionMs = cssMs(ANIMATION.PROGRESS_BAR_TRANSITION_MS)
 </script>
 
 <template>
