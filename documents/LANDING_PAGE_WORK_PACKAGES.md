@@ -14,13 +14,13 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  ├── WP-3  Problem Statement                      ✅ DONE
  ├── WP-4  Product Overview                       ✅ DONE
  ├── WP-5  ROI Calculator                         ✅ DONE
- ├── WP-6  ERP Integration + How It Works         🔧 In progress
- ├── WP-7  Pricing Section                        ⬚ Not started
+ ├── WP-6  ERP Integration + How It Works         ✅ DONE
+ ├── WP-7  Pricing Section                        🔧 In progress
  ├── WP-9  Social Proof + FAQ                     ⬚ Not started
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0** through **WP-5** are complete. **WP-6** is in progress. **WP-7 through WP-10** are independent and can be built in parallel.
+**WP-0** through **WP-6** are complete. **WP-7** is in progress (branch `TM312/wp7-social-proof`). **WP-8 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -143,9 +143,9 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-6 — ERP Integration + How It Works 🔧
+## WP-6 — ERP Integration + How It Works ✅
 
-**Status:** In progress (branch `TM312/wp6-social-proof`, not yet committed)
+**Status:** Complete (PR #35, merged)
 
 **Goal:** Spec Sections 5 and 6 — integration pitch and four-step timeline.
 
@@ -166,21 +166,25 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-7 — Pricing Section ⬚
+## WP-7 — Pricing Section 🔧
+
+**Status:** In progress (branch `TM312/wp7-social-proof`, uncommitted)
 
 **Goal:** Spec Section 7 — three-tier pricing cards with annual toggle.
 
-**Tasks:**
-1. `app/components/landing/PricingSection.vue`
-2. Three cards: Starter, Professional (highlighted as "Most Popular"), Enterprise
-3. Annual/monthly toggle — 20% discount on annual. Animate price change.
-4. Feature comparison rows per spec table
-5. CTA buttons: "Start Free Trial" for Starter/Professional, "Contact Sales" for Enterprise
-6. Fine print about 14-day trial
-7. Add shadcn-vue components: `Card`, `Badge`, `Switch` or `Toggle`, `Button`
-8. Use `id="pricing"` for anchor linking from nav
+**What has been built:**
+- `app/components/landing/PricingSection.vue` — Section with three-tier pricing cards and billing toggle
+- `app/components/landing/PricingCard.vue` — Individual pricing card component
+- `app/components/landing/PricingFeatureRow.vue` — Feature comparison row component
+- `app/components/landing/PricingToggle.vue` — Annual/monthly billing toggle
+- `app/composables/useBillingToggle.ts` — Reactive billing period state composable
+- `app/constants/pricing.ts` — Pricing tiers, features, and configuration data
+- `app/types/pricing.ts` — TypeScript types for pricing domain
+- shadcn-vue components added: `Card` (with CardHeader, CardTitle, CardDescription, CardContent, CardFooter), `Badge`, `Switch`
+- `app/pages/index.vue` — Updated to include `<LandingPricingSection />` (replacing placeholder)
+- Test coverage: `PricingCard.test.ts`, `PricingSection.test.ts`, `PricingToggle.test.ts`, `useBillingToggle.test.ts`, `pricing.test.ts`
 
-**Outputs:** Responsive pricing section with billing toggle.
+**Outputs:** Responsive pricing section with billing toggle. Not yet committed.
 
 ---
 
@@ -228,19 +232,19 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0 through WP-5 are complete. WP-6 is in progress. All remaining work packages (WP-7 through WP-10) are independent and ready to build in parallel.
+WP-0 through WP-6 are complete. WP-7 is in progress (nearly done, needs commit). Three work packages remain: WP-8, WP-9, and WP-10 — all independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-6 (finish) → WP-7 → WP-9 → WP-10 → WP-8
+WP-7 (finish) → WP-9 → WP-10 → WP-8
 ```
 
-Rationale: Finish WP-6 first (nearly done), then Pricing as the highest-impact remaining section for conversion. SEO is last because it's a polish pass after content is in place.
+Rationale: Finish WP-7 first (code written, needs commit/PR), then Social Proof + FAQ for trust signals, Final CTA for conversion. SEO is last because it's a polish pass after content is in place.
 
 For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
-| WP-6 Integration (finish) | WP-7 Pricing | WP-9 Social Proof + FAQ |
-| WP-10 Final CTA | WP-8 SEO & Meta | — |
+| WP-7 Pricing (finish) | WP-9 Social Proof + FAQ | WP-10 Final CTA |
+| WP-8 SEO & Meta | — | — |
