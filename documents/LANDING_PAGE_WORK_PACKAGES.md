@@ -12,7 +12,7 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  │    └── WP-8  SEO & Meta                        ⬚ Not started
  ├── WP-2  Hero Section                           ✅ DONE
  ├── WP-3  Problem Statement                      ✅ DONE
- ├── WP-4  Product Overview                       ⬚ Not started
+ ├── WP-4  Product Overview                       🔧 In progress
  ├── WP-5  ROI Calculator                         ⬚ Not started
  ├── WP-6  ERP Integration + How It Works         ⬚ Not started
  ├── WP-7  Pricing Section                        ⬚ Not started
@@ -20,7 +20,7 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0**, **WP-1**, **WP-2**, and **WP-3** are complete. **WP-4 through WP-10** are independent and can be built in parallel.
+**WP-0**, **WP-1**, **WP-2**, and **WP-3** are complete. **WP-4** is in progress. **WP-5 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -99,18 +99,24 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-4 — Product Overview ⬚
+## WP-4 — Product Overview 🔧
+
+**Status:** In progress (branch `TM312/wp4-features-section`, not yet committed)
 
 **Goal:** Spec Section 3 — three feature columns with stylized UI illustrations.
 
-**Tasks:**
-1. `app/components/landing/ProductOverviewSection.vue`
-2. Three columns: Customer Mobile View, Staff Dashboard, Gate Operator Console
-3. Each column: stylized UI illustration (SVG or CSS mockup) + heading + description
-4. Illustrations should be simple, recognizable representations of each interface (phone frame, browser frame, tablet frame)
-5. Scroll-triggered fade-in
+**What has been built:**
+- `app/components/landing/ProductOverviewSection.vue` — Section with heading ("One system. Three interfaces. Zero confusion."), responsive 3-column grid (stacks on mobile), scroll-triggered staggered reveal animation via `useSectionReveal`
+- `app/components/landing/ProductFeatureCard.vue` — Card with dynamic mockup component, heading, and description. Mockups mapped via `Record<ProductMockupType, Component>` (phone, browser, tablet)
+- `app/components/landing/ProductMockupPhone.vue` — Phone frame CSS mockup for Customer Mobile View
+- `app/components/landing/ProductMockupBrowser.vue` — Browser frame CSS mockup for Staff Dashboard
+- `app/components/landing/ProductMockupTablet.vue` — Tablet frame CSS mockup for Gate Operator Console
+- `app/constants/product.ts` — Section heading, three feature definitions with mockup type/heading/description, reveal stagger config (150ms)
+- `app/types/product.ts` — TypeScript types (`ProductMockupType`, `ProductFeature`)
+- `app/pages/index.vue` — Updated to include `<LandingProductOverviewSection />` with `id="features"` anchor
+- Test coverage: `ProductOverviewSection.test.ts`, `ProductFeatureCard.test.ts`, `product.test.ts`
 
-**Outputs:** Three-column product overview with illustrations.
+**Outputs:** Three-column product overview with CSS mockup illustrations and scroll-reveal animation.
 
 ---
 
@@ -206,20 +212,20 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0 through WP-3 are complete. All remaining work packages (WP-4 through WP-10) are independent and ready to build in parallel.
+WP-0 through WP-3 are complete. WP-4 is in progress. All remaining work packages (WP-5 through WP-10) are independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-5 → WP-7 → WP-4 → WP-6 → WP-9 → WP-10 → WP-8
+WP-4 (finish) → WP-5 → WP-7 → WP-6 → WP-9 → WP-10 → WP-8
 ```
 
-Rationale: Calculator and Pricing are the highest-impact remaining sections for conversion. SEO is last because it's a polish pass after content is in place.
+Rationale: Finish WP-4 first (nearly done), then Calculator and Pricing as the highest-impact remaining sections for conversion. SEO is last because it's a polish pass after content is in place.
 
 For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
-| WP-5 ROI Calculator | WP-7 Pricing | WP-4 Product Overview |
-| WP-3 Problem Statement | WP-6 Integration + How It Works | WP-9 Social Proof + FAQ |
-| WP-10 Final CTA | WP-8 SEO & Meta | — |
+| WP-4 Product Overview (finish) | WP-7 Pricing | WP-5 ROI Calculator |
+| WP-6 Integration + How It Works | WP-9 Social Proof + FAQ | WP-10 Final CTA |
+| WP-8 SEO & Meta | — | — |

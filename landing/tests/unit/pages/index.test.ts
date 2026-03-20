@@ -6,6 +6,7 @@ describe('index page', () => {
   const stubs = {
     LandingHeroSection: { template: '<div data-testid="hero-section" />' },
     LandingProblemSection: { template: '<div data-testid="problem-section" />' },
+    LandingProductOverviewSection: { template: '<div id="features" data-testid="product-section" />' },
   }
 
   it('renders anchor sections for smooth-scroll targets', () => {
@@ -18,10 +19,9 @@ describe('index page', () => {
   it('renders section headings', () => {
     const wrapper = mount(IndexPage, { global: { stubs } })
     const headings = wrapper.findAll('h2')
-    expect(headings).toHaveLength(3)
-    expect(headings[0].text()).toBe('Features')
-    expect(headings[1].text()).toBe('Pricing')
-    expect(headings[2].text()).toBe('Demo')
+    expect(headings).toHaveLength(2)
+    expect(headings[0].text()).toBe('Pricing')
+    expect(headings[1].text()).toBe('Demo')
   })
 
   it('renders the hero section', () => {
