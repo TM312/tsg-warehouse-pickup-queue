@@ -10,6 +10,7 @@ describe('index page', () => {
     LandingRoiSection: { template: '<div id="roi" data-testid="roi-section" />' },
     LandingErpSection: { template: '<div id="erp-integration" data-testid="erp-section" />' },
     LandingHowItWorksSection: { template: '<div id="how-it-works" data-testid="how-it-works-section" />' },
+    LandingPricingSection: { template: '<div id="pricing" data-testid="pricing-section" />' },
   }
 
   it('renders anchor sections for smooth-scroll targets', () => {
@@ -22,9 +23,8 @@ describe('index page', () => {
   it('renders section headings', () => {
     const wrapper = mount(IndexPage, { global: { stubs } })
     const headings = wrapper.findAll('h2')
-    expect(headings).toHaveLength(2)
-    expect(headings[0].text()).toBe('Pricing')
-    expect(headings[1].text()).toBe('Demo')
+    expect(headings).toHaveLength(1)
+    expect(headings[0].text()).toBe('Demo')
   })
 
   it('renders the hero section', () => {
