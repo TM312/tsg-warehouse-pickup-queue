@@ -7,57 +7,61 @@ Reference: `documents/LANDING_PAGE_SPEC.md` for all copy, content, and design de
 ## Dependency Graph
 
 ```
-WP-0  Nuxt App Scaffold
- ├── WP-1  Layout Shell (nav + footer)
- │    └── WP-8  SEO & Meta
- ├── WP-2  Hero Section
- ├── WP-3  Problem Statement
- ├── WP-4  Product Overview
- ├── WP-5  ROI Calculator
- ├── WP-6  NetSuite Integration + How It Works
- ├── WP-7  Pricing Section
- ├── WP-9  Social Proof + FAQ
- └── WP-10 Final CTA
+WP-0  Nuxt App Scaffold                          ✅ DONE
+ ├── WP-1  Layout Shell (nav + footer)            ✅ DONE
+ │    └── WP-8  SEO & Meta                        ⬚ Not started
+ ├── WP-2  Hero Section                           ⬚ Not started
+ ├── WP-3  Problem Statement                      ⬚ Not started
+ ├── WP-4  Product Overview                       ⬚ Not started
+ ├── WP-5  ROI Calculator                         ⬚ Not started
+ ├── WP-6  NetSuite Integration + How It Works    ⬚ Not started
+ ├── WP-7  Pricing Section                        ⬚ Not started
+ ├── WP-9  Social Proof + FAQ                     ⬚ Not started
+ └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0** must complete first. After that, **WP-1** should go next (provides layout for all sections). Once WP-1 is done, **WP-2 through WP-10** are independent and can be built in parallel.
+**WP-0** and **WP-1** are complete. **WP-2 through WP-10** are independent and can be built in parallel.
 
 ---
 
-## WP-0 — Nuxt App Scaffold
+## WP-0 — Nuxt App Scaffold ✅
+
+**Status:** Complete (PR #29)
 
 **Goal:** Bootable `/landing` Nuxt app with zero content, matching existing monorepo conventions.
 
-**Tasks:**
-1. `pnpm create nuxt landing` (or copy from `playground/` as a template)
-2. Match `nuxt.config.ts` to playground: `ssr: true` (landing page needs SSR for SEO), `shadcn-nuxt` module, `@tailwindcss/vite` plugin
-3. Copy tailwind.css from playground — use existing theme tokens. Strip playground-specific keyframes (walkthrough, cross-panel). **No indigo anywhere.**
-4. Install shared deps: `shadcn-nuxt`, `reka-ui`, `lucide-vue-next`, `class-variance-authority`, `clsx`, `tailwind-merge`, `tw-animate-css`, `@vueuse/core`
-5. Bootstrap shadcn-vue (`npx shadcn-vue@latest init`) — component dir at `app/components/ui`
-6. Add to root `Makefile`: `landing-dev`, `landing-build` targets
-7. Create `app/app.vue` with a single `<NuxtPage />` and `app/pages/index.vue` with placeholder text
-8. Verify `pnpm dev` starts clean on port 3003
-
-**Outputs:** Running Nuxt app at `localhost:3003` with theme tokens, shadcn-vue ready.
+**What was delivered:**
+- Nuxt 4.4.2 app with `ssr: true`, `shadcn-nuxt` module, `@tailwindcss/vite` plugin
+- Tailwind CSS v4 with oklch color system, dark/light mode, no indigo
+- All shared deps installed: `shadcn-nuxt`, `reka-ui`, `lucide-vue-next`, `class-variance-authority`, `clsx`, `tailwind-merge`, `tw-animate-css`, `@vueuse/core`
+- shadcn-vue initialized with `app/components/ui` directory
+- Makefile targets added (`landing-dev`, `landing-build`)
+- `app/app.vue` → `<NuxtLayout><NuxtPage /></NuxtLayout>`
+- Vitest test infrastructure with `@vue/test-utils`
 
 ---
 
-## WP-1 — Layout Shell
+## WP-1 — Layout Shell ✅
+
+**Status:** Complete (branch `TM312/landing-hero-section`, pending merge)
 
 **Goal:** Sticky nav + footer that wraps all page content.
 
-**Tasks:**
-1. `app/components/LandingNav.vue` — Logo/product name left, nav links (Features, Pricing, Demo) center, "Start Free Trial" CTA button right. Collapses to hamburger on mobile.
-2. `app/components/LandingFooter.vue` — Spec Section 11 content. Four-column grid on desktop, stacked on mobile.
-3. `app/layouts/default.vue` — Nav + `<slot />` + Footer
-4. Smooth-scroll behavior for in-page anchor links (`#pricing`, `#features`, etc.)
-5. Add shadcn-vue components as needed: `Button`, `Sheet` (for mobile nav)
-
-**Outputs:** Page has persistent navigation and footer. Sections can be added independently inside the layout.
+**What was delivered:**
+- `app/components/LandingNav.vue` — Fixed header with product name, desktop nav links (Features, Pricing, Demo), "Start Free Trial" CTA, hamburger menu on mobile with Sheet drawer, scroll-aware blur/transparency
+- `app/components/LandingFooter.vue` — Multi-section footer (Product, Company) with contact email, support hours, social links (LinkedIn), responsive grid (1-col mobile → 4-col desktop), dynamic copyright year
+- `app/layouts/default.vue` — Integrates nav + footer, passes `isScrolled` to nav, applies `pt-16` for fixed nav offset
+- `app/composables/useSmoothScroll.ts` — Smooth anchor scrolling with history updates
+- `app/composables/useScrolledNav.ts` — Reactive scroll-position detection (threshold: 10px)
+- `app/constants/navigation.ts` — All nav/footer/contact data centralized
+- `app/types/navigation.ts` — TypeScript interfaces (`NavLink`, `FooterSection`, `SocialLink`)
+- UI components: `Button` (CVA-based, 6 variants, 6 sizes), `Sheet` (full drawer system with slide animations)
+- `app/pages/index.vue` — Placeholder sections with anchor IDs (`#features`, `#pricing`, `#demo`)
+- Full test coverage: components, composables, constants, layouts, pages
 
 ---
 
-## WP-2 — Hero Section
+## WP-2 — Hero Section ⬚
 
 **Goal:** Spec Section 1 — headline, subheadline, dual CTAs, animated split-screen visual, trust bar.
 
@@ -72,7 +76,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-3 — Problem Statement
+## WP-3 — Problem Statement ⬚
 
 **Goal:** Spec Section 2 — three pain-point cards.
 
@@ -86,7 +90,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-4 — Product Overview
+## WP-4 — Product Overview ⬚
 
 **Goal:** Spec Section 3 — three feature columns with stylized UI illustrations.
 
@@ -101,7 +105,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-5 — ROI Calculator
+## WP-5 — ROI Calculator ⬚
 
 **Goal:** Spec Section 4 — interactive calculator with live-updating outputs.
 
@@ -117,7 +121,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-6 — NetSuite Integration + How It Works
+## WP-6 — ERP Integration + How It Works ⬚
 
 **Goal:** Spec Sections 5 and 6 — integration pitch and four-step timeline.
 
@@ -131,7 +135,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-7 — Pricing Section
+## WP-7 — Pricing Section ⬚
 
 **Goal:** Spec Section 7 — three-tier pricing cards with annual toggle.
 
@@ -149,7 +153,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-8 — SEO & Meta
+## WP-8 — SEO & Meta ⬚
 
 **Goal:** Spec SEO & Meta section — proper meta tags, OG tags, structured data.
 
@@ -163,7 +167,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-9 — Social Proof + FAQ
+## WP-9 — Social Proof + FAQ ⬚
 
 **Goal:** Spec Sections 8 and 9 — testimonials/metrics and expandable FAQ.
 
@@ -177,7 +181,7 @@ WP-0  Nuxt App Scaffold
 
 ---
 
-## WP-10 — Final CTA
+## WP-10 — Final CTA ⬚
 
 **Goal:** Spec Section 10 — closing CTA block.
 
@@ -193,15 +197,17 @@ WP-0  Nuxt App Scaffold
 
 ## Suggested Implementation Order
 
+WP-0 and WP-1 are complete. All remaining work packages (WP-2 through WP-10) are independent and ready to build in parallel.
+
 For a single developer working sequentially:
 
 ```
-WP-0 → WP-1 → WP-2 → WP-5 → WP-7 → WP-4 → WP-3 → WP-6 → WP-9 → WP-10 → WP-8
+WP-2 → WP-5 → WP-7 → WP-4 → WP-3 → WP-6 → WP-9 → WP-10 → WP-8
 ```
 
 Rationale: Hero, Calculator, and Pricing are the highest-impact sections for conversion. SEO is last because it's a polish pass after content is in place.
 
-For parallel execution (2–3 agents), after WP-0 and WP-1 are done:
+For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
