@@ -10,17 +10,17 @@ Reference: `documents/LANDING_PAGE_SPEC.md` for all copy, content, and design de
 WP-0  Nuxt App Scaffold                          ✅ DONE
  ├── WP-1  Layout Shell (nav + footer)            ✅ DONE
  │    └── WP-8  SEO & Meta                        ⬚ Not started
- ├── WP-2  Hero Section                           ⬚ Not started
+ ├── WP-2  Hero Section                           🔄 In review
  ├── WP-3  Problem Statement                      ⬚ Not started
  ├── WP-4  Product Overview                       ⬚ Not started
  ├── WP-5  ROI Calculator                         ⬚ Not started
- ├── WP-6  NetSuite Integration + How It Works    ⬚ Not started
+ ├── WP-6  ERP Integration + How It Works         ⬚ Not started
  ├── WP-7  Pricing Section                        ⬚ Not started
  ├── WP-9  Social Proof + FAQ                     ⬚ Not started
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0** and **WP-1** are complete. **WP-2 through WP-10** are independent and can be built in parallel.
+**WP-0** and **WP-1** are complete. **WP-2** is implemented and in review. **WP-3 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -43,7 +43,7 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## WP-1 — Layout Shell ✅
 
-**Status:** Complete (branch `TM312/landing-hero-section`, pending merge)
+**Status:** Complete (merged)
 
 **Goal:** Sticky nav + footer that wraps all page content.
 
@@ -61,18 +61,23 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-2 — Hero Section ⬚
+## WP-2 — Hero Section 🔄
+
+**Status:** Implemented (branch `TM312/wp2-hero-social-proof`, pending merge)
 
 **Goal:** Spec Section 1 — headline, subheadline, dual CTAs, animated split-screen visual, trust bar.
 
-**Tasks:**
-1. `app/components/landing/HeroSection.vue`
-2. Animated split-screen mockup: two side-by-side panels showing stylized customer mobile view and staff dashboard. Use CSS/SVG illustration, not real screenshots. Subtle animation (e.g., queue items moving, gate assignment appearing).
-3. Primary CTA → `/playground` (external link to playground app). Secondary CTA → `#trial` anchor or future signup.
-4. Trust bar below CTAs — three items with separator dots
-5. Responsive: stack panels vertically on mobile, reduce visual complexity
-
-**Outputs:** Hero section with CTAs and animated product visual.
+**What was delivered:**
+- `app/components/landing/HeroSection.vue` — Main hero with headline ("Your warehouse pickup line is costing you $1,500/month"), subheadline, dual CTAs, trust bar, and two synchronized mockup panels
+- `app/components/landing/HeroMockupPhone.vue` — Mobile phone mockup showing animated queue progression (#3 → #2 → #1 → "Your turn!") with wait times and gate assignment. CSS keyframe animations on a 10s cycle (`--hero-cycle-duration`)
+- `app/components/landing/HeroMockupDashboard.vue` — Browser dashboard mockup with live queue table, status badges (loading/called/waiting/complete), and gate assignments. Animations synchronized with phone mockup via staggered delays
+- `app/composables/useHeroAnimation.ts` — IntersectionObserver-based animation visibility control with `prefers-reduced-motion` support
+- `app/constants/hero.ts` — All hero copy, CTA labels/hrefs, trust bar items, and sample queue data centralized
+- `app/types/hero.ts` — TypeScript interfaces (`TrustBarItem`, `MockupQueueEntry`)
+- Primary CTA → `/playground`, Secondary CTA → `#trial`
+- Trust bar: "Purpose-built for wholesale distributors" · "ERP integration ready" · "Go live in under a day"
+- Responsive: panels stack vertically on mobile
+- Full test coverage: `HeroSection.test.ts`, `HeroMockupPhone.test.ts`, `HeroMockupDashboard.test.ts`, `useHeroAnimation.test.ts`, `hero.test.ts`
 
 ---
 
@@ -129,7 +134,7 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 1. `app/components/landing/IntegrationSection.vue` — bullet points, flow diagram (SVG), ERP roadmap note
 2. `app/components/landing/HowItWorksSection.vue` — horizontal four-step timeline with numbered steps and icons. Stacks vertically on mobile.
 3. Flow diagram: simple SVG showing bidirectional data sync between ERP and the product
-4. Position as ERP-agnostic per project context (NetSuite is current, others on roadmap)
+4. Position as ERP-agnostic (no current NetSuite integration; planned). Present as compatible with major ERPs.
 
 **Outputs:** Integration section and setup timeline.
 
@@ -197,20 +202,20 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0 and WP-1 are complete. All remaining work packages (WP-2 through WP-10) are independent and ready to build in parallel.
+WP-0, WP-1, and WP-2 are complete or in review. All remaining work packages (WP-3 through WP-10) are independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-2 → WP-5 → WP-7 → WP-4 → WP-3 → WP-6 → WP-9 → WP-10 → WP-8
+WP-5 → WP-7 → WP-4 → WP-3 → WP-6 → WP-9 → WP-10 → WP-8
 ```
 
-Rationale: Hero, Calculator, and Pricing are the highest-impact sections for conversion. SEO is last because it's a polish pass after content is in place.
+Rationale: Calculator and Pricing are the highest-impact remaining sections for conversion. SEO is last because it's a polish pass after content is in place.
 
 For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
-| WP-2 Hero | WP-5 ROI Calculator | WP-7 Pricing |
-| WP-4 Product Overview | WP-6 Integration + How It Works | WP-9 Social Proof + FAQ |
-| WP-3 Problem Statement | WP-10 Final CTA | WP-8 SEO & Meta |
+| WP-5 ROI Calculator | WP-7 Pricing | WP-4 Product Overview |
+| WP-3 Problem Statement | WP-6 Integration + How It Works | WP-9 Social Proof + FAQ |
+| WP-10 Final CTA | WP-8 SEO & Meta | — |
