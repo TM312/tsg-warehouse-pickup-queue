@@ -1,46 +1,27 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 
-describe('usePrefersReducedMotion', () => {
+describe('prefersReducedMotion', () => {
   afterEach(() => {
-    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
 
-  it('returns false by default', () => {
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: false,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }))
-
-    expect(usePrefersReducedMotion()).toBe(false)
+  it('returns false when matchMedia reports no preference', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: false })))
+    expect(prefersReducedMotion()).toBe(false)
   })
 
-  it('returns true when matchMedia matches', () => {
-    vi.stubGlobal('matchMedia', (query: string) => ({
-      matches: query === '(prefers-reduced-motion: reduce)',
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }))
-
-    expect(usePrefersReducedMotion()).toBe(true)
+  it('returns true when matchMedia reports reduced motion', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true })))
+    expect(prefersReducedMotion()).toBe(true)
   })
 
-  it('returns false when window is undefined (SSR)', () => {
-    const originalWindow = globalThis.window
-    // @ts-expect-error -- simulating SSR
-    delete globalThis.window
+  it('queries the correct media query string', () => {
+    const spy = vi.fn(() => ({ matches: false }))
+    vi.stubGlobal('matchMedia', spy)
 
-    expect(usePrefersReducedMotion()).toBe(false)
+    prefersReducedMotion()
 
-    globalThis.window = originalWindow
+    expect(spy).toHaveBeenCalledWith('(prefers-reduced-motion: reduce)')
   })
 })

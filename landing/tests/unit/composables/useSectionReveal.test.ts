@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { effectScope } from 'vue'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 import { setupIntersectionObserverMock } from '../helpers/mockIntersectionObserver'
+import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 describe('useSectionReveal', () => {
   let mock: ReturnType<typeof setupIntersectionObserverMock>
@@ -66,6 +67,13 @@ describe('useSectionReveal', () => {
     scope.stop()
   })
 
+  it('uses REVEAL_THRESHOLD from animation constants', () => {
+    const { init } = useSectionReveal()
+    init(document.createElement('div'))
+
+    expect(IntersectionObserver).toHaveBeenCalledWith(expect.any(Function), { threshold: REVEAL_THRESHOLD })
+  })
+
   it('destroy disconnects observer', () => {
     const scope = effectScope()
     scope.run(() => {
@@ -101,5 +109,30 @@ describe('useSectionReveal', () => {
     scope.stop()
 
     expect(mock.disconnectSpy).toHaveBeenCalled()
+  })
+
+  it('handles empty entries array without throwing', () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const { isRevealed, init } = useSectionReveal()
+      init(document.createElement('div'))
+
+      mock.trigger([])
+      expect(isRevealed.value).toBe(false)
+    })
+    scope.stop()
+  })
+
+  it('ignores entries where isIntersecting is false', () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const { isRevealed, init } = useSectionReveal()
+      init(document.createElement('div'))
+
+      mock.trigger([{ isIntersecting: false }])
+      expect(isRevealed.value).toBe(false)
+      expect(mock.disconnectSpy).not.toHaveBeenCalled()
+    })
+    scope.stop()
   })
 })

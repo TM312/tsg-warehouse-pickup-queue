@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { effectScope } from 'vue'
 import { useHeroAnimation } from '@/composables/useHeroAnimation'
 import { setupIntersectionObserverMock } from '../helpers/mockIntersectionObserver'
+import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 describe('useHeroAnimation', () => {
   let mock: ReturnType<typeof setupIntersectionObserverMock>
@@ -62,6 +63,13 @@ describe('useHeroAnimation', () => {
     scope.stop()
   })
 
+  it('uses REVEAL_THRESHOLD from animation constants', () => {
+    const { init } = useHeroAnimation()
+    init(document.createElement('div'))
+
+    expect(IntersectionObserver).toHaveBeenCalledWith(expect.any(Function), { threshold: REVEAL_THRESHOLD })
+  })
+
   it('destroy disconnects observer and resets isVisible', () => {
     const scope = effectScope()
     scope.run(() => {
@@ -101,5 +109,17 @@ describe('useHeroAnimation', () => {
     scope.stop()
 
     expect(mock.disconnectSpy).toHaveBeenCalled()
+  })
+
+  it('handles empty entries array without throwing', () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const { isVisible, init } = useHeroAnimation()
+      init(document.createElement('div'))
+
+      mock.trigger([])
+      expect(isVisible.value).toBe(false)
+    })
+    scope.stop()
   })
 })

@@ -1,5 +1,5 @@
 import { ref, onScopeDispose } from 'vue'
-import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 export function useSectionReveal(threshold: number = REVEAL_THRESHOLD) {
@@ -9,17 +9,17 @@ export function useSectionReveal(threshold: number = REVEAL_THRESHOLD) {
   function init(el: HTMLElement) {
     if (observer) return
 
-    if (usePrefersReducedMotion()) {
+    if (prefersReducedMotion()) {
       isRevealed.value = true
       return
     }
 
     observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          isRevealed.value = true
-          observer?.disconnect()
-        }
+      (entries) => {
+        const entry = entries[0]
+        if (!entry?.isIntersecting) return
+        isRevealed.value = true
+        observer?.disconnect()
       },
       { threshold },
     )

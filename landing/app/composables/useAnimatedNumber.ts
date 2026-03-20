@@ -1,7 +1,6 @@
 import { ref, watch, onScopeDispose, type Ref } from 'vue'
-import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
-import { cubicEaseOut } from '@/lib/easing'
-import { ANIMATION_DURATION_MS } from '@/constants/animation'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { ANIMATION_DURATION_MS, EASE_OUT_EXPONENT } from '@/constants/animation'
 
 export function useAnimatedNumber(
   source: Ref<number>,
@@ -20,12 +19,7 @@ export function useAnimatedNumber(
   watch(source, (newVal) => {
     cancelPending()
 
-    if (typeof window === 'undefined') {
-      displayed.value = newVal
-      return
-    }
-
-    if (usePrefersReducedMotion()) {
+    if (typeof window === 'undefined' || prefersReducedMotion()) {
       displayed.value = newVal
       return
     }
@@ -36,7 +30,7 @@ export function useAnimatedNumber(
     function animate(currentTime: number) {
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
-      const eased = cubicEaseOut(progress)
+      const eased = 1 - Math.pow(1 - progress, EASE_OUT_EXPONENT)
 
       displayed.value = Math.round(startVal + (newVal - startVal) * eased)
 

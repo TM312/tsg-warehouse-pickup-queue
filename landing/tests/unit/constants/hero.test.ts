@@ -8,7 +8,11 @@ import {
   HERO_SECONDARY_CTA_HREF,
   HERO_TRUST_BAR_ITEMS,
   HERO_MOCKUP_QUEUE_ENTRIES,
+  HERO_STATUS_COLORS,
+  heroRowDelay,
+  heroGateDelay,
 } from '@/constants/hero'
+import { HERO_ANIMATION_DELAY_S, HERO_GATE_DELAY_OFFSET_S } from '@/constants/animation'
 
 describe('hero constants', () => {
   it('has a non-empty headline', () => {
@@ -43,5 +47,22 @@ describe('hero constants', () => {
       expect(entry.order).toBeTruthy()
       expect(['waiting', 'called', 'loading', 'complete']).toContain(entry.status)
     }
+  })
+
+  it('HERO_STATUS_COLORS has an entry for each possible status', () => {
+    const statuses: Array<'waiting' | 'called' | 'loading' | 'complete'> = ['waiting', 'called', 'loading', 'complete']
+    for (const status of statuses) {
+      expect(HERO_STATUS_COLORS[status]).toBeTruthy()
+    }
+  })
+
+  it('heroRowDelay returns correct delay string', () => {
+    expect(heroRowDelay(0)).toBe(`${0 * HERO_ANIMATION_DELAY_S}s`)
+    expect(heroRowDelay(2)).toBe(`${2 * HERO_ANIMATION_DELAY_S}s`)
+  })
+
+  it('heroGateDelay returns correct delay string', () => {
+    expect(heroGateDelay(0)).toBe(`${0 * HERO_ANIMATION_DELAY_S + HERO_GATE_DELAY_OFFSET_S}s`)
+    expect(heroGateDelay(1)).toBe(`${1 * HERO_ANIMATION_DELAY_S + HERO_GATE_DELAY_OFFSET_S}s`)
   })
 })

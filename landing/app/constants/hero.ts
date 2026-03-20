@@ -1,5 +1,6 @@
 import type { MockupQueueEntry, TrustBarItem } from '@/types/hero'
 import { CTA_LABEL, TRIAL_HREF } from '@/constants/navigation'
+import { HERO_ANIMATION_DELAY_S, HERO_GATE_DELAY_OFFSET_S } from '@/constants/animation'
 
 export const HERO_HEADLINE = 'Your warehouse pickup line is costing you $1,500/month'
 
@@ -24,3 +25,20 @@ export const HERO_MOCKUP_QUEUE_ENTRIES: MockupQueueEntry[] = [
   { company: 'Pacific Plumbing', order: 'SO-4473', status: 'waiting', gate: null },
   { company: 'Summit Materials', order: 'SO-4474', status: 'waiting', gate: null },
 ]
+
+export const HERO_STATUS_COLORS: Record<MockupQueueEntry['status'], string> = {
+  loading: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
+  called: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-400',
+  waiting: 'bg-muted text-muted-foreground',
+  complete: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
+}
+
+/** Row animation delay computed from index. */
+export function heroRowDelay(index: number): string {
+  return `${index * HERO_ANIMATION_DELAY_S}s`
+}
+
+/** Gate fade-in delay computed from row index. */
+export function heroGateDelay(index: number): string {
+  return `${index * HERO_ANIMATION_DELAY_S + HERO_GATE_DELAY_OFFSET_S}s`
+}

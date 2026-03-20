@@ -4,6 +4,12 @@ import {
   ERP_SECTION_ID,
   ERP_SECTION_NOTE,
   ERP_BULLETS,
+  ERP_REVEAL_STAGGER_MS,
+  ERP_FLOW_TITLE,
+  ERP_FLOW_LABEL_LEFT,
+  ERP_FLOW_LABEL_RIGHT,
+  ERP_FLOW_ARROW_TOP,
+  ERP_FLOW_ARROW_BOTTOM,
 } from '@/constants/erp'
 
 describe('erp constants', () => {
@@ -28,5 +34,17 @@ describe('erp constants', () => {
       expect(bullet.icon).toBeTruthy()
       expect(bullet.text).toBeTruthy()
     }
+  })
+
+  it('ERP_REVEAL_STAGGER_MS is a positive number', () => {
+    expect(ERP_REVEAL_STAGGER_MS).toBeGreaterThan(0)
+  })
+
+  it('has non-empty ERP flow diagram labels', () => {
+    expect(ERP_FLOW_TITLE).toBeTruthy()
+    expect(ERP_FLOW_LABEL_LEFT).toBeTruthy()
+    expect(ERP_FLOW_LABEL_RIGHT).toBeTruthy()
+    expect(ERP_FLOW_ARROW_TOP).toBeTruthy()
+    expect(ERP_FLOW_ARROW_BOTTOM).toBeTruthy()
   })
 })

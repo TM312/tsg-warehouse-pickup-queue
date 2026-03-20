@@ -1,19 +1,21 @@
 import { ref, onScopeDispose } from 'vue'
-import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 export function useHeroAnimation() {
   const isVisible = ref(false)
-  const prefersReducedMotion = ref(false)
+  const isReducedMotion = ref(false)
   let observer: IntersectionObserver | null = null
 
   function init(el: HTMLElement) {
     if (observer) return
 
-    prefersReducedMotion.value = usePrefersReducedMotion()
+    isReducedMotion.value = prefersReducedMotion()
 
     observer = new IntersectionObserver(
-      ([entry]) => {
+      (entries) => {
+        const entry = entries[0]
+        if (!entry) return
         isVisible.value = entry.isIntersecting
       },
       { threshold: REVEAL_THRESHOLD },
@@ -31,5 +33,5 @@ export function useHeroAnimation() {
 
   onScopeDispose(destroy)
 
-  return { isVisible, prefersReducedMotion, init, destroy }
+  return { isVisible, prefersReducedMotion: isReducedMotion, init, destroy }
 }

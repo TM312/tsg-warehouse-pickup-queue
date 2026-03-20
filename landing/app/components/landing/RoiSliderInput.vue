@@ -15,7 +15,8 @@ const emit = defineEmits<{
 }>()
 
 function onSliderUpdate(value: number[]) {
-  emit('update:modelValue', value[0])
+  const next = value[0]
+  if (next !== undefined) emit('update:modelValue', next)
 }
 </script>
 

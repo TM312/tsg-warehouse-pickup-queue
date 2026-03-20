@@ -1,5 +1,6 @@
 import type { PricingTier, PricingFeature } from '@/types/pricing'
 import { CTA_LABEL, TRIAL_HREF, CONTACT_HREF } from '@/constants/navigation'
+import { DEFAULT_REVEAL_STAGGER_MS } from '@/constants/animation'
 
 export const PRICING_SECTION_ID = 'pricing'
 
@@ -15,6 +16,10 @@ export const PRICING_TOGGLE_LABELS = { monthly: 'Monthly', annual: 'Annual' } as
 export const PRICING_PRICE_SUFFIX = '/mo'
 
 export const PRICING_ANNUAL_NOTE = 'billed annually'
+
+export const PRICING_REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
+
+export const PRICING_PRICE_ANIMATION_MS = 400
 
 export const FEATURE_SUPPORTED = '✓'
 

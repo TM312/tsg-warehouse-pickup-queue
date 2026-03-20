@@ -1,8 +1,12 @@
 import type { ProductFeature } from '@/types/product'
+import type { MockupQueueEntry } from '@/types/hero'
+import { DEFAULT_REVEAL_STAGGER_MS } from '@/constants/animation'
 
 export const PRODUCT_SECTION_ID = 'features'
 
 export const PRODUCT_SECTION_HEADING = 'One system. Three interfaces. Zero confusion.'
+
+export const PRODUCT_REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
 
 export const PRODUCT_FEATURES: ProductFeature[] = [
   {
@@ -26,4 +30,10 @@ export const PRODUCT_FEATURES: ProductFeature[] = [
     description:
       'A dedicated fullscreen view for gate staff. See who\'s next, confirm arrivals, and mark pickups complete with a single tap.',
   },
+]
+
+export const PRODUCT_MOCKUP_BROWSER_ENTRIES: MockupQueueEntry[] = [
+  { company: 'Acme Corp', order: 'SO-5001', status: 'loading', gate: 'Gate 1' },
+  { company: 'BuildRight', order: 'SO-5002', status: 'called', gate: 'Gate 2' },
+  { company: 'FastHaul', order: 'SO-5003', status: 'waiting', gate: null },
 ]

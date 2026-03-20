@@ -1,6 +1,7 @@
-export { scrollToHash } from '@/lib/utils'
 import { onScopeDispose } from 'vue'
-import { scrollToHash } from '@/lib/utils'
+import { scrollToHash } from '@/utils/scrollToHash'
+
+export { scrollToHash }
 
 const ANCHOR_SELECTOR = 'a[href^="#"]'
 
@@ -15,8 +16,10 @@ export function useSmoothScroll() {
       const target = e.target as HTMLElement
       const anchor = target.closest(ANCHOR_SELECTOR) as HTMLAnchorElement | null
       if (!anchor) return
+      const href = anchor.getAttribute('href')
+      if (!href) return
       e.preventDefault()
-      scrollToHash(anchor.getAttribute('href')!)
+      scrollToHash(href)
     }
 
     document.addEventListener('click', handler)

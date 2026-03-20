@@ -18,7 +18,7 @@ const priceSource = computed(() => props.displayPrice ?? 0)
 const { displayed: animatedPrice } = useAnimatedNumber(priceSource, ANIMATION_DURATION_MS)
 
 function featureValue(tierKey: PricingTierKey, featureIndex: number): string {
-  return PRICING_FEATURES[featureIndex].values[tierKey]
+  return PRICING_FEATURES[featureIndex]?.values[tierKey] ?? ''
 }
 </script>
 

@@ -1,7 +1,9 @@
 import type { HowItWorksStep } from '@/types/howItWorks'
+import { DEFAULT_REVEAL_STAGGER_MS } from '@/constants/animation'
 
 export const HOW_IT_WORKS_SECTION_ID = 'how-it-works'
 export const HOW_IT_WORKS_SECTION_HEADING = 'Live in under a day'
+export const HOW_IT_WORKS_REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
 
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
   {

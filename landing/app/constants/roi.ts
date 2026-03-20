@@ -1,6 +1,8 @@
 import type { RoiInputConfig, RoiOutputDisplayConfig, RoiSliderConfig } from '@/types/roi'
 import { PRICING_TIERS } from '@/constants/pricing'
 
+export { ROI_ROUNDING_PRECISION } from '@/constants/animation'
+
 export const ROI_SECTION_ID = 'roi'
 
 export const ROI_SECTION_HEADING = 'Do the math in 10 seconds'
