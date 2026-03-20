@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import type { RoiOutputs } from '@/types/roi'
+import { clampValue } from '@/utils/clamp'
 import {
   MONTHLY_COST,
   PAYBACK_PERIOD_TEXT,
@@ -8,10 +9,9 @@ import {
   ROI_PICKUPS_CONFIG,
   WORKING_DAYS_PER_MONTH,
 } from '@/constants/roi'
+import { ROI_ROUNDING_PRECISION } from '@/constants/animation'
 
-export function clampValue(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
-}
+export { clampValue }
 
 export function useRoiCalculator() {
   const pickups = ref(ROI_PICKUPS_CONFIG.default)
@@ -23,7 +23,9 @@ export function useRoiCalculator() {
     const monthlyLaborSavings = Math.round(
       (dailyTimeSavedMinutes / 60) * hourlyCost.value * WORKING_DAYS_PER_MONTH,
     )
-    const monthlyRoiMultiplier = Math.round((monthlyLaborSavings / MONTHLY_COST) * 10) / 10
+    const monthlyRoiMultiplier =
+      Math.round((monthlyLaborSavings / MONTHLY_COST) * ROI_ROUNDING_PRECISION) /
+      ROI_ROUNDING_PRECISION
 
     return {
       dailyTimeSavedMinutes,

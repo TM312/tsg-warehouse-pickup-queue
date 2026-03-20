@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import type { MockupQueueEntry } from '@/types/hero'
-import { HERO_MOCKUP_QUEUE_ENTRIES } from '@/constants/hero'
+import { HERO_MOCKUP_QUEUE_ENTRIES, HERO_STATUS_COLORS, heroRowDelay, heroGateDelay } from '@/constants/hero'
 
 defineProps<{
   animated: boolean
 }>()
-
-const statusColor: Record<MockupQueueEntry['status'], string> = {
-  loading: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
-  called: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-400',
-  waiting: 'bg-muted text-muted-foreground',
-  complete: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
-}
 </script>
 
 <template>
@@ -50,13 +42,13 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
               i >= 2 ? 'hidden lg:table-row' : '',
               animated ? 'hero-dash-row' : '',
             ]"
-            :style="animated ? `animation-delay: ${i * 0.8}s` : ''"
+            :style="animated ? `animation-delay: ${heroRowDelay(i)}` : ''"
           >
             <td class="py-1.5 font-medium text-foreground">{{ entry.company }}</td>
             <td class="py-1.5">
               <span
                 class="inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
-                :class="statusColor[entry.status]"
+                :class="HERO_STATUS_COLORS[entry.status]"
               >
                 {{ entry.status }}
               </span>
@@ -66,7 +58,7 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
                 v-if="entry.gate"
                 class="hero-dash-gate text-foreground"
                 :class="animated ? 'hero-dash-animate' : ''"
-                :style="animated ? `animation-delay: ${i * 0.8 + 2}s` : ''"
+                :style="animated ? `animation-delay: ${heroGateDelay(i)}` : ''"
               >
                 {{ entry.gate }}
               </span>

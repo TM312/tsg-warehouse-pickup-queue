@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useHeroAnimation } from '@/composables/useHeroAnimation'
+import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 describe('useHeroAnimation', () => {
   let observeSpy: ReturnType<typeof vi.fn>
@@ -56,6 +57,13 @@ describe('useHeroAnimation', () => {
     expect(prefersReducedMotion.value).toBe(true)
   })
 
+  it('uses REVEAL_THRESHOLD from animation constants', () => {
+    const { init } = useHeroAnimation()
+    init(document.createElement('div'))
+
+    expect(IntersectionObserver).toHaveBeenCalledWith(expect.any(Function), { threshold: REVEAL_THRESHOLD })
+  })
+
   it('destroy disconnects observer and resets isVisible', () => {
     const { isVisible, init, destroy } = useHeroAnimation()
     init(document.createElement('div'))
@@ -76,5 +84,13 @@ describe('useHeroAnimation', () => {
     init(el)
 
     expect(observeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles empty entries array without throwing', () => {
+    const { isVisible, init } = useHeroAnimation()
+    init(document.createElement('div'))
+
+    intersectionCallback([])
+    expect(isVisible.value).toBe(false)
   })
 })

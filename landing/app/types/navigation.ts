@@ -8,8 +8,10 @@ export interface FooterSection {
   links: NavLink[]
 }
 
+export type SocialIcon = 'linkedin' | 'twitter' | 'github'
+
 export interface SocialLink {
   label: string
   href: string
-  icon: string
+  icon: SocialIcon
 }

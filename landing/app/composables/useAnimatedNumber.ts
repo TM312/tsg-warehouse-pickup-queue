@@ -1,5 +1,7 @@
 import { ref, watch, type Ref } from 'vue'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { ROI_ANIMATION_DURATION_MS } from '@/constants/roi'
+import { EASE_OUT_EXPONENT } from '@/constants/animation'
 
 export function useAnimatedNumber(
   source: Ref<number>,
@@ -14,15 +16,7 @@ export function useAnimatedNumber(
       rafId = null
     }
 
-    if (typeof window === 'undefined') {
-      displayed.value = newVal
-      return
-    }
-
-    const prefersReducedMotion =
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (prefersReducedMotion) {
+    if (typeof window === 'undefined' || prefersReducedMotion()) {
       displayed.value = newVal
       return
     }
@@ -33,7 +27,7 @@ export function useAnimatedNumber(
     function animate(currentTime: number) {
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
+      const eased = 1 - Math.pow(1 - progress, EASE_OUT_EXPONENT)
 
       displayed.value = Math.round(startVal + (newVal - startVal) * eased)
 

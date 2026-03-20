@@ -1,10 +1,11 @@
 import type { ProblemCard } from '@/types/problem'
+import { REVEAL_THRESHOLD, DEFAULT_REVEAL_STAGGER_MS } from '@/constants/animation'
 
 export const PROBLEM_SECTION_HEADING = 'Sound familiar?'
 
-export const REVEAL_THRESHOLD = 0.15
+export { REVEAL_THRESHOLD }
 
-export const REVEAL_STAGGER_MS = 150
+export const REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
 
 export const PROBLEM_CARDS: ProblemCard[] = [
   {

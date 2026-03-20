@@ -61,18 +61,3 @@ onUnmounted(() => {
     </p>
   </section>
 </template>
-
-<style scoped>
-.section-reveal {
-  opacity: 0;
-  transform: translateY(1rem);
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
-}
-
-.section-reveal.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>

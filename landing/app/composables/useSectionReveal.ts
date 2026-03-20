@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import { REVEAL_THRESHOLD } from '@/constants/problem'
+import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 export function useSectionReveal() {
   const isRevealed = ref(false)
@@ -8,20 +9,17 @@ export function useSectionReveal() {
   function init(el: HTMLElement) {
     if (observer) return
 
-    const prefersReducedMotion =
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion()) {
       isRevealed.value = true
       return
     }
 
     observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          isRevealed.value = true
-          observer?.disconnect()
-        }
+      (entries) => {
+        const entry = entries[0]
+        if (!entry?.isIntersecting) return
+        isRevealed.value = true
+        observer?.disconnect()
       },
       { threshold: REVEAL_THRESHOLD },
     )
