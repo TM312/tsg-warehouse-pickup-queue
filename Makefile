@@ -16,7 +16,8 @@ STATE_FILE := terraform.$(ENV).tfstate
 .PHONY: help setup start stop dev build preview lint format test clean \
         db-start db-stop db-reset db-migrate db-status db-seed db-create-test-user db-push db-pull \
         layer plan apply deploy logs verify status \
-        release rollback health-check
+        release rollback health-check \
+        landing-dev landing-build landing-preview landing-test
 
 # Ensure correct working directory for scripts
 export PROJECT_ROOT := $(PWD)
@@ -41,6 +42,12 @@ help:
 	@echo "  make lint           - Run ESLint on staff app"
 	@echo "  make format         - Auto-fix formatting"
 	@echo "  make test           - Run tests"
+	@echo ""
+	@echo "LANDING PAGE (Nuxt)"
+	@echo "  make landing-dev     - Start landing page dev server"
+	@echo "  make landing-build   - Build landing page for production"
+	@echo "  make landing-preview - Preview production build"
+	@echo "  make landing-test    - Run landing page tests"
 	@echo ""
 	@echo "DATABASE (Supabase)"
 	@echo "  make db-start       - Start local Supabase (Docker)"
@@ -89,6 +96,9 @@ setup:
 	@echo "Installing playground app dependencies..."
 	@cd playground && pnpm install
 	@echo ""
+	@echo "Installing landing page dependencies..."
+	@cd landing && pnpm install
+	@echo ""
 	@echo "Starting local Supabase..."
 	@npx supabase start
 	@echo ""
@@ -117,12 +127,14 @@ start:
 	@echo "  Staff app:       http://localhost:3000"
 	@echo "  Customer app:    http://localhost:3001"
 	@echo "  Playground app:  http://localhost:3002"
+	@echo "  Landing page:    http://localhost:3003"
 	@echo "  Supabase Studio: http://127.0.0.1:54323"
 	@echo ""
 	@trap 'kill 0' EXIT; \
 	(cd staff && pnpm dev) & \
 	(cd customer && pnpm dev --port 3001) & \
 	(cd playground && pnpm dev) & \
+	(cd landing && pnpm dev) & \
 	wait
 
 # Stop all local services
@@ -167,6 +179,26 @@ format:
 test:
 	@echo "🧪 Running tests..."
 	@cd staff && pnpm test
+
+# ============================================================================
+# LANDING PAGE (Nuxt)
+# ============================================================================
+
+landing-dev:
+	@echo "Starting landing page dev server..."
+	@cd landing && pnpm dev
+
+landing-build:
+	@echo "Building landing page for production..."
+	@cd landing && pnpm build
+
+landing-preview:
+	@echo "Previewing landing page production build..."
+	@cd landing && pnpm preview
+
+landing-test:
+	@echo "Running landing page tests..."
+	@cd landing && pnpm test
 
 # ============================================================================
 # DATABASE (Supabase)
@@ -329,6 +361,9 @@ clean:
 	@rm -rf playground/.nuxt/
 	@rm -rf playground/.output/
 	@rm -rf playground/node_modules/.cache/
+	@rm -rf landing/.nuxt/
+	@rm -rf landing/.output/
+	@rm -rf landing/node_modules/.cache/
 	@echo "✅ Clean complete"
 
 # Destroy infrastructure (dangerous!)
