@@ -7,6 +7,7 @@ describe('index page', () => {
     LandingHeroSection: { template: '<div data-testid="hero-section" />' },
     LandingProblemSection: { template: '<div data-testid="problem-section" />' },
     LandingProductOverviewSection: { template: '<div id="features" data-testid="product-section" />' },
+    LandingRoiSection: { template: '<div id="roi" data-testid="roi-section" />' },
   }
 
   it('renders anchor sections for smooth-scroll targets', () => {

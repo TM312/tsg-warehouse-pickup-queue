@@ -3,6 +3,7 @@
     <LandingHeroSection />
     <LandingProblemSection />
     <LandingProductOverviewSection />
+    <LandingRoiSection />
     <section id="pricing" class="min-h-screen px-4 py-24">
       <h2 class="text-3xl font-bold">Pricing</h2>
     </section>

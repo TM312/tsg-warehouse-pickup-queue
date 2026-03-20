@@ -12,15 +12,15 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  │    └── WP-8  SEO & Meta                        ⬚ Not started
  ├── WP-2  Hero Section                           ✅ DONE
  ├── WP-3  Problem Statement                      ✅ DONE
- ├── WP-4  Product Overview                       🔧 In progress
- ├── WP-5  ROI Calculator                         ⬚ Not started
+ ├── WP-4  Product Overview                       ✅ DONE
+ ├── WP-5  ROI Calculator                         🔧 In progress
  ├── WP-6  ERP Integration + How It Works         ⬚ Not started
  ├── WP-7  Pricing Section                        ⬚ Not started
  ├── WP-9  Social Proof + FAQ                     ⬚ Not started
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0**, **WP-1**, **WP-2**, and **WP-3** are complete. **WP-4** is in progress. **WP-5 through WP-10** are independent and can be built in parallel.
+**WP-0** through **WP-4** are complete. **WP-5** is in progress. **WP-6 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -99,9 +99,9 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-4 — Product Overview 🔧
+## WP-4 — Product Overview ✅
 
-**Status:** In progress (branch `TM312/wp4-features-section`, not yet committed)
+**Status:** Complete (PR #33, merged)
 
 **Goal:** Spec Section 3 — three feature columns with stylized UI illustrations.
 
@@ -120,19 +120,26 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-5 — ROI Calculator ⬚
+## WP-5 — ROI Calculator 🔧
+
+**Status:** In progress (branch `TM312/wp5-features-section`, not yet committed)
 
 **Goal:** Spec Section 4 — interactive calculator with live-updating outputs.
 
-**Tasks:**
-1. `app/components/landing/RoiCalculatorSection.vue`
-2. Three inputs: pickups/day (slider), minutes saved (slider), hourly labor cost (text input with constraints)
-3. Computed outputs with animated number transitions (use CSS `transition` or a small counter animation)
-4. Formula: see spec Section 4 for exact calculations
-5. Add shadcn-vue components: `Slider`, `Input`, `Label`
-6. Highlight the ROI multiplier prominently
+**What has been built:**
+- `app/components/landing/RoiSection.vue` — Section with heading ("Do the math in 10 seconds"), two-column layout (inputs left, outputs right), scroll-triggered reveal animation via `useSectionReveal`
+- `app/components/landing/RoiSliderInput.vue` — Reusable slider input with label and live numeric display, uses shadcn `Slider` + `Label`
+- `app/components/landing/RoiCurrencyInput.vue` — Currency text input with `$` prefix, clamped on blur, uses shadcn `Input` + `Label`
+- `app/components/landing/RoiOutputCard.vue` — Output card with animated number transitions, supports minutes/currency/multiplier/text formats, optional highlight styling
+- `app/composables/useRoiCalculator.ts` — Reactive calculator: pickups/day × minutes saved × hourly cost × 22 working days/month, ROI multiplier against $349/mo cost, payback period
+- `app/composables/useAnimatedNumber.ts` — requestAnimationFrame-based counter animation with `prefers-reduced-motion` support
+- `app/constants/roi.ts` — All config: slider ranges (pickups 10–300, minutes 1–5), hourly cost $15–$60, output display configs, animation duration (300ms), reveal stagger (100ms)
+- `app/types/roi.ts` — TypeScript types (`RoiSliderConfig`, `RoiInputConfig`, `RoiOutputs`, `RoiOutputFormat`, `RoiOutputDisplayConfig`)
+- shadcn-vue components added: `Slider`, `Input`, `Label`
+- `app/pages/index.vue` — Updated to include `<LandingRoiSection />` with `id="roi"` anchor
+- Test coverage: `RoiSection.test.ts`, `RoiCurrencyInput.test.ts`, `RoiOutputCard.test.ts`, `useAnimatedNumber.test.ts`, `useRoiCalculator.test.ts`, `roi.test.ts`
 
-**Outputs:** Fully interactive ROI calculator. No backend needed — pure client-side math.
+**Outputs:** Fully interactive ROI calculator with animated outputs. Pure client-side math.
 
 ---
 
@@ -212,20 +219,19 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0 through WP-3 are complete. WP-4 is in progress. All remaining work packages (WP-5 through WP-10) are independent and ready to build in parallel.
+WP-0 through WP-4 are complete. WP-5 is in progress. All remaining work packages (WP-6 through WP-10) are independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-4 (finish) → WP-5 → WP-7 → WP-6 → WP-9 → WP-10 → WP-8
+WP-5 (finish) → WP-7 → WP-6 → WP-9 → WP-10 → WP-8
 ```
 
-Rationale: Finish WP-4 first (nearly done), then Calculator and Pricing as the highest-impact remaining sections for conversion. SEO is last because it's a polish pass after content is in place.
+Rationale: Finish WP-5 first (nearly done), then Pricing as the highest-impact remaining section for conversion. SEO is last because it's a polish pass after content is in place.
 
 For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
-| WP-4 Product Overview (finish) | WP-7 Pricing | WP-5 ROI Calculator |
-| WP-6 Integration + How It Works | WP-9 Social Proof + FAQ | WP-10 Final CTA |
-| WP-8 SEO & Meta | — | — |
+| WP-5 ROI Calculator (finish) | WP-7 Pricing | WP-6 Integration + How It Works |
+| WP-9 Social Proof + FAQ | WP-10 Final CTA | WP-8 SEO & Meta |
