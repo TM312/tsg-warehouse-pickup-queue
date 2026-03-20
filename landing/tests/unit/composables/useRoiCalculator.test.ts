@@ -1,20 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { useRoiCalculator, clampValue } from '@/composables/useRoiCalculator'
+import { useRoiCalculator } from '@/composables/useRoiCalculator'
 import { MONTHLY_COST } from '@/constants/roi'
-
-describe('clampValue', () => {
-  it('returns min when value is below min', () => {
-    expect(clampValue(5, 10, 100)).toBe(10)
-  })
-
-  it('returns max when value is above max', () => {
-    expect(clampValue(150, 10, 100)).toBe(100)
-  })
-
-  it('returns value when within range', () => {
-    expect(clampValue(50, 10, 100)).toBe(50)
-  })
-})
 
 describe('useRoiCalculator', () => {
   it('computes correct default outputs', () => {

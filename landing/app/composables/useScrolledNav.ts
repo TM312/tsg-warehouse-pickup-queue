@@ -1,6 +1,5 @@
 import { ref } from 'vue'
-
-const SCROLL_THRESHOLD = 10
+import { NAV_SCROLL_THRESHOLD } from '@/constants/animation'
 
 export function useScrolledNav() {
   const isScrolled = ref(false)
@@ -10,7 +9,7 @@ export function useScrolledNav() {
     if (listener) return
 
     listener = () => {
-      isScrolled.value = window.scrollY > SCROLL_THRESHOLD
+      isScrolled.value = window.scrollY > NAV_SCROLL_THRESHOLD
     }
 
     listener()

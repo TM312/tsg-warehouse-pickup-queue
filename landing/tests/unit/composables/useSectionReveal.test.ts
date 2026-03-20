@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useSectionReveal } from '@/composables/useSectionReveal'
+import { REVEAL_THRESHOLD } from '@/constants/animation'
 
 describe('useSectionReveal', () => {
   let observeSpy: ReturnType<typeof vi.fn>
@@ -60,6 +61,13 @@ describe('useSectionReveal', () => {
     expect(observeSpy).not.toHaveBeenCalled()
   })
 
+  it('uses REVEAL_THRESHOLD from animation constants', () => {
+    const { init } = useSectionReveal()
+    init(document.createElement('div'))
+
+    expect(IntersectionObserver).toHaveBeenCalledWith(expect.any(Function), { threshold: REVEAL_THRESHOLD })
+  })
+
   it('destroy disconnects observer', () => {
     const { init, destroy } = useSectionReveal()
     init(document.createElement('div'))
@@ -76,5 +84,22 @@ describe('useSectionReveal', () => {
     init(el)
 
     expect(observeSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles empty entries array without throwing', () => {
+    const { isRevealed, init } = useSectionReveal()
+    init(document.createElement('div'))
+
+    intersectionCallback([])
+    expect(isRevealed.value).toBe(false)
+  })
+
+  it('ignores entries where isIntersecting is false', () => {
+    const { isRevealed, init } = useSectionReveal()
+    init(document.createElement('div'))
+
+    intersectionCallback([{ isIntersecting: false }])
+    expect(isRevealed.value).toBe(false)
+    expect(disconnectSpy).not.toHaveBeenCalled()
   })
 })

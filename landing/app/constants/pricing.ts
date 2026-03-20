@@ -1,4 +1,5 @@
 import type { PricingTier, PricingFeature } from '@/types/pricing'
+import { DEFAULT_REVEAL_STAGGER_MS } from '@/constants/animation'
 
 export const PRICING_SECTION_ID = 'pricing'
 
@@ -17,7 +18,7 @@ export const PRICING_PRICE_SUFFIX = '/mo'
 
 export const PRICING_ANNUAL_NOTE = 'billed annually'
 
-export const PRICING_REVEAL_STAGGER_MS = 150
+export const PRICING_REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
 
 export const PRICING_PRICE_ANIMATION_MS = 400
 
