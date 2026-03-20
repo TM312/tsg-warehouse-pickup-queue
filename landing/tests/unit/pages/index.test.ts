@@ -5,6 +5,7 @@ import IndexPage from '@/pages/index.vue'
 describe('index page', () => {
   const stubs = {
     LandingHeroSection: { template: '<div data-testid="hero-section" />' },
+    LandingProblemSection: { template: '<div data-testid="problem-section" />' },
   }
 
   it('renders anchor sections for smooth-scroll targets', () => {
@@ -26,5 +27,10 @@ describe('index page', () => {
   it('renders the hero section', () => {
     const wrapper = mount(IndexPage, { global: { stubs } })
     expect(wrapper.find('[data-testid="hero-section"]').exists()).toBe(true)
+  })
+
+  it('renders the problem section', () => {
+    const wrapper = mount(IndexPage, { global: { stubs } })
+    expect(wrapper.find('[data-testid="problem-section"]').exists()).toBe(true)
   })
 })
