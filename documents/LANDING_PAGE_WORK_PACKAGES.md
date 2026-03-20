@@ -10,8 +10,8 @@ Reference: `documents/LANDING_PAGE_SPEC.md` for all copy, content, and design de
 WP-0  Nuxt App Scaffold                          ✅ DONE
  ├── WP-1  Layout Shell (nav + footer)            ✅ DONE
  │    └── WP-8  SEO & Meta                        ⬚ Not started
- ├── WP-2  Hero Section                           🔄 In review
- ├── WP-3  Problem Statement                      ⬚ Not started
+ ├── WP-2  Hero Section                           ✅ DONE
+ ├── WP-3  Problem Statement                      ✅ DONE
  ├── WP-4  Product Overview                       ⬚ Not started
  ├── WP-5  ROI Calculator                         ⬚ Not started
  ├── WP-6  ERP Integration + How It Works         ⬚ Not started
@@ -20,7 +20,7 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0** and **WP-1** are complete. **WP-2** is implemented and in review. **WP-3 through WP-10** are independent and can be built in parallel.
+**WP-0**, **WP-1**, **WP-2**, and **WP-3** are complete. **WP-4 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -61,9 +61,9 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-2 — Hero Section 🔄
+## WP-2 — Hero Section ✅
 
-**Status:** Implemented (branch `TM312/wp2-hero-social-proof`, pending merge)
+**Status:** Complete (PR #31, merged)
 
 **Goal:** Spec Section 1 — headline, subheadline, dual CTAs, animated split-screen visual, trust bar.
 
@@ -81,17 +81,21 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-3 — Problem Statement ⬚
+## WP-3 — Problem Statement ✅
+
+**Status:** Complete (branch `TM312/wp3-features-section`)
 
 **Goal:** Spec Section 2 — three pain-point cards.
 
-**Tasks:**
-1. `app/components/landing/ProblemSection.vue`
-2. Three cards in a row (stack on mobile) with lucide icons, heading, description
-3. Fade-in-on-scroll animation (use `@vueuse/core` `useIntersectionObserver` or CSS `animation-timeline`)
-4. Add shadcn-vue `Card` component if useful
+**What has been built:**
+- `app/components/landing/ProblemSection.vue` — Section with heading ("Sound familiar?"), responsive 3-column grid (stacks on mobile), scroll-triggered staggered reveal animation
+- `app/components/landing/ProblemCard.vue` — Card with lucide icon, heading, and description. Icons mapped via `Record<ProblemIcon, Component>` (Radio, EyeOff, ClipboardList)
+- `app/composables/useSectionReveal.ts` — Reusable IntersectionObserver-based reveal composable with `prefers-reduced-motion` support, configurable threshold
+- `app/constants/problem.ts` — Section heading, three card definitions (Radio chaos, Blind customers, Whiteboard ops), reveal threshold/stagger config
+- `app/types/problem.ts` — TypeScript types (`ProblemIcon`, `ProblemCard`)
+- Full test coverage: `ProblemSection.test.ts`, `ProblemCard.test.ts`, `useSectionReveal.test.ts`, `problem.test.ts`
 
-**Outputs:** Three-card problem statement section.
+**Outputs:** Three-card problem statement section with scroll-reveal animation.
 
 ---
 
@@ -202,12 +206,12 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0, WP-1, and WP-2 are complete or in review. All remaining work packages (WP-3 through WP-10) are independent and ready to build in parallel.
+WP-0 through WP-3 are complete. All remaining work packages (WP-4 through WP-10) are independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-5 → WP-7 → WP-4 → WP-3 → WP-6 → WP-9 → WP-10 → WP-8
+WP-5 → WP-7 → WP-4 → WP-6 → WP-9 → WP-10 → WP-8
 ```
 
 Rationale: Calculator and Pricing are the highest-impact remaining sections for conversion. SEO is last because it's a polish pass after content is in place.
