@@ -13,14 +13,14 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
  ├── WP-2  Hero Section                           ✅ DONE
  ├── WP-3  Problem Statement                      ✅ DONE
  ├── WP-4  Product Overview                       ✅ DONE
- ├── WP-5  ROI Calculator                         🔧 In progress
- ├── WP-6  ERP Integration + How It Works         ⬚ Not started
+ ├── WP-5  ROI Calculator                         ✅ DONE
+ ├── WP-6  ERP Integration + How It Works         🔧 In progress
  ├── WP-7  Pricing Section                        ⬚ Not started
  ├── WP-9  Social Proof + FAQ                     ⬚ Not started
  └── WP-10 Final CTA                              ⬚ Not started
 ```
 
-**WP-0** through **WP-4** are complete. **WP-5** is in progress. **WP-6 through WP-10** are independent and can be built in parallel.
+**WP-0** through **WP-5** are complete. **WP-6** is in progress. **WP-7 through WP-10** are independent and can be built in parallel.
 
 ---
 
@@ -120,13 +120,13 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-5 — ROI Calculator 🔧
+## WP-5 — ROI Calculator ✅
 
-**Status:** In progress (branch `TM312/wp5-features-section`, not yet committed)
+**Status:** Complete (PR #34, merged)
 
 **Goal:** Spec Section 4 — interactive calculator with live-updating outputs.
 
-**What has been built:**
+**What was delivered:**
 - `app/components/landing/RoiSection.vue` — Section with heading ("Do the math in 10 seconds"), two-column layout (inputs left, outputs right), scroll-triggered reveal animation via `useSectionReveal`
 - `app/components/landing/RoiSliderInput.vue` — Reusable slider input with label and live numeric display, uses shadcn `Slider` + `Label`
 - `app/components/landing/RoiCurrencyInput.vue` — Currency text input with `$` prefix, clamped on blur, uses shadcn `Input` + `Label`
@@ -143,17 +143,26 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ---
 
-## WP-6 — ERP Integration + How It Works ⬚
+## WP-6 — ERP Integration + How It Works 🔧
+
+**Status:** In progress (branch `TM312/wp6-social-proof`, not yet committed)
 
 **Goal:** Spec Sections 5 and 6 — integration pitch and four-step timeline.
 
-**Tasks:**
-1. `app/components/landing/IntegrationSection.vue` — bullet points, flow diagram (SVG), ERP roadmap note
-2. `app/components/landing/HowItWorksSection.vue` — horizontal four-step timeline with numbered steps and icons. Stacks vertically on mobile.
-3. Flow diagram: simple SVG showing bidirectional data sync between ERP and the product
-4. Position as ERP-agnostic (no current NetSuite integration; planned). Present as compatible with major ERPs.
+**What has been built:**
+- `app/components/landing/ErpSection.vue` — Section with heading ("Connects to your ERP. Not bolted on."), two-column layout (bullets left, flow diagram right), ERP roadmap note, scroll-triggered staggered reveal animation via `useSectionReveal`
+- `app/components/landing/ErpBulletItem.vue` — Bullet item with lucide icon and text. Icons mapped via `Record<ErpBulletIcon, Component>` (ShieldCheck, RefreshCw, FileX2, Blocks)
+- `app/components/landing/ErpFlowDiagram.vue` — SVG flow diagram showing bidirectional data sync between ERP and the product
+- `app/components/landing/HowItWorksSection.vue` — Section with heading ("Live in under a day"), horizontal four-step timeline with desktop connector line, stacks vertically on mobile with vertical connector line, scroll-triggered staggered reveal animation
+- `app/components/landing/HowItWorksStep.vue` — Step card with numbered circle, lucide icon, heading, and description. Icons: UserPlus, Settings, QrCode, Rocket
+- `app/constants/erp.ts` — Section heading, four bullet definitions, ERP roadmap note (SAP Business One, Epicor, Acumatica, NetSuite on roadmap), reveal stagger config (150ms)
+- `app/constants/howItWorks.ts` — Section heading ("Live in under a day"), four steps (Sign up → Configure → Print QR code → Go live), reveal stagger config (150ms)
+- `app/types/erp.ts` — TypeScript types (`ErpBulletIcon`, `ErpBullet`)
+- `app/types/howItWorks.ts` — TypeScript types (`HowItWorksIcon`, `HowItWorksStep`)
+- `app/pages/index.vue` — Updated to include `<LandingErpSection />` and `<LandingHowItWorksSection />`
+- Test coverage: `ErpBulletItem.test.ts`, `ErpSection.test.ts`, `HowItWorksSection.test.ts`, `HowItWorksStep.test.ts`, `erp.test.ts`, `howItWorks.test.ts`
 
-**Outputs:** Integration section and setup timeline.
+**Outputs:** ERP integration section with bullet points and flow diagram, plus four-step setup timeline. Positioned as ERP-agnostic.
 
 ---
 
@@ -219,19 +228,19 @@ WP-0  Nuxt App Scaffold                          ✅ DONE
 
 ## Suggested Implementation Order
 
-WP-0 through WP-4 are complete. WP-5 is in progress. All remaining work packages (WP-6 through WP-10) are independent and ready to build in parallel.
+WP-0 through WP-5 are complete. WP-6 is in progress. All remaining work packages (WP-7 through WP-10) are independent and ready to build in parallel.
 
 For a single developer working sequentially:
 
 ```
-WP-5 (finish) → WP-7 → WP-6 → WP-9 → WP-10 → WP-8
+WP-6 (finish) → WP-7 → WP-9 → WP-10 → WP-8
 ```
 
-Rationale: Finish WP-5 first (nearly done), then Pricing as the highest-impact remaining section for conversion. SEO is last because it's a polish pass after content is in place.
+Rationale: Finish WP-6 first (nearly done), then Pricing as the highest-impact remaining section for conversion. SEO is last because it's a polish pass after content is in place.
 
 For parallel execution (2–3 agents):
 
 | Agent A | Agent B | Agent C |
 |---|---|---|
-| WP-5 ROI Calculator (finish) | WP-7 Pricing | WP-6 Integration + How It Works |
-| WP-9 Social Proof + FAQ | WP-10 Final CTA | WP-8 SEO & Meta |
+| WP-6 Integration (finish) | WP-7 Pricing | WP-9 Social Proof + FAQ |
+| WP-10 Final CTA | WP-8 SEO & Meta | — |
