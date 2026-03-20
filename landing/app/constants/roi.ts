@@ -1,4 +1,5 @@
 import type { RoiInputConfig, RoiOutputDisplayConfig, RoiSliderConfig } from '@/types/roi'
+import { PRICING_TIERS } from '@/constants/pricing'
 
 export { ROI_ROUNDING_PRECISION } from '@/constants/animation'
 
@@ -8,7 +9,8 @@ export const ROI_SECTION_HEADING = 'Do the math in 10 seconds'
 
 export const WORKING_DAYS_PER_MONTH = 22
 
-export const MONTHLY_COST = 349
+const professionalTier = PRICING_TIERS.find((t) => t.key === 'professional')!
+export const MONTHLY_COST: number = professionalTier.monthlyPrice!
 
 export const PAYBACK_PERIOD_TEXT = 'Under 1 week'
 
@@ -73,6 +75,5 @@ export const ROI_OUTPUT_CONFIGS: RoiOutputDisplayConfig[] = [
   },
 ]
 
-export const ROI_ANIMATION_DURATION_MS = 400
-
 export const ROI_REVEAL_STAGGER_MS = 100
+

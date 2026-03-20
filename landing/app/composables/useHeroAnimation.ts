@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onScopeDispose } from 'vue'
 import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 import { REVEAL_THRESHOLD } from '@/constants/animation'
 
@@ -30,6 +30,8 @@ export function useHeroAnimation() {
     }
     isVisible.value = false
   }
+
+  onScopeDispose(destroy)
 
   return { isVisible, prefersReducedMotion: isReducedMotion, init, destroy }
 }

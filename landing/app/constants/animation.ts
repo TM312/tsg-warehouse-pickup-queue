@@ -4,6 +4,12 @@ export const REVEAL_THRESHOLD = 0.15
 /** Default stagger delay (ms) between child elements in section reveal animations. */
 export const DEFAULT_REVEAL_STAGGER_MS = 150
 
+/** @deprecated Use DEFAULT_REVEAL_STAGGER_MS instead. */
+export const REVEAL_STAGGER_MS = DEFAULT_REVEAL_STAGGER_MS
+
+/** Animation duration (ms) for number/price transitions. */
+export const ANIMATION_DURATION_MS = 400
+
 /** Cubic ease-out exponent used in number animation easing function. */
 export const EASE_OUT_EXPONENT = 3
 

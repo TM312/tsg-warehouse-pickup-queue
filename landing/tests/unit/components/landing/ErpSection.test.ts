@@ -6,8 +6,8 @@ import {
   ERP_SECTION_ID,
   ERP_SECTION_NOTE,
   ERP_BULLETS,
-  ERP_REVEAL_STAGGER_MS,
 } from '@/constants/erp'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 describe('ErpSection', () => {
   const stubs = {
@@ -55,11 +55,11 @@ describe('ErpSection', () => {
     }
   })
 
-  it('bullet wrappers receive staggered transitionDelay based on index', () => {
+  it('bullet wrappers receive staggered transitionDelay based on REVEAL_STAGGER_MS', () => {
     const wrapper = factory()
     const bullets = wrapper.findAll('[data-testid="erp-bullet-item"]')
     bullets.forEach((bullet, i) => {
-      expect(bullet.element.parentElement?.style.transitionDelay).toBe(`${i * ERP_REVEAL_STAGGER_MS}ms`)
+      expect(bullet.element.parentElement?.style.transitionDelay).toBe(`${i * REVEAL_STAGGER_MS}ms`)
     })
   })
 })

@@ -1,4 +1,5 @@
 import type { MockupQueueEntry, TrustBarItem } from '@/types/hero'
+import { CTA_LABEL, TRIAL_HREF } from '@/constants/navigation'
 import { HERO_ANIMATION_DELAY_S, HERO_GATE_DELAY_OFFSET_S } from '@/constants/animation'
 
 export const HERO_HEADLINE = 'Your warehouse pickup line is costing you $1,500/month'
@@ -9,8 +10,8 @@ export const HERO_SUBHEADLINE =
 export const HERO_PRIMARY_CTA_LABEL = 'Try the Interactive Demo'
 export const HERO_PRIMARY_CTA_HREF = '/playground'
 
-export const HERO_SECONDARY_CTA_LABEL = 'Start Free Trial'
-export const HERO_SECONDARY_CTA_HREF = '#trial'
+export const HERO_SECONDARY_CTA_LABEL = CTA_LABEL
+export const HERO_SECONDARY_CTA_HREF = TRIAL_HREF
 
 export const HERO_TRUST_BAR_ITEMS: TrustBarItem[] = [
   { text: 'Purpose-built for wholesale distributors' },

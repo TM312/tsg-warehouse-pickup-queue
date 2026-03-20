@@ -8,6 +8,7 @@ import {
   ROI_HOURLY_COST_CONFIG,
   ROI_OUTPUT_CONFIGS,
 } from '@/constants/roi'
+import { PRICING_TIERS } from '@/constants/pricing'
 
 describe('roi constants', () => {
   it('has a non-empty section heading', () => {
@@ -18,8 +19,9 @@ describe('roi constants', () => {
     expect(WORKING_DAYS_PER_MONTH).toBe(22)
   })
 
-  it('MONTHLY_COST is positive', () => {
-    expect(MONTHLY_COST).toBeGreaterThan(0)
+  it('MONTHLY_COST is derived from the Professional pricing tier', () => {
+    const pro = PRICING_TIERS.find((t) => t.key === 'professional')!
+    expect(MONTHLY_COST).toBe(pro.monthlyPrice)
   })
 
   it.each([

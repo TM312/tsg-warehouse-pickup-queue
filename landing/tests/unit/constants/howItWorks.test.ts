@@ -3,7 +3,6 @@ import {
   HOW_IT_WORKS_SECTION_HEADING,
   HOW_IT_WORKS_SECTION_ID,
   HOW_IT_WORKS_STEPS,
-  HOW_IT_WORKS_REVEAL_STAGGER_MS,
 } from '@/constants/howItWorks'
 
 describe('howItWorks constants', () => {
@@ -31,9 +30,5 @@ describe('howItWorks constants', () => {
     HOW_IT_WORKS_STEPS.forEach((step, i) => {
       expect(step.step).toBe(i + 1)
     })
-  })
-
-  it('HOW_IT_WORKS_REVEAL_STAGGER_MS is a positive number', () => {
-    expect(HOW_IT_WORKS_REVEAL_STAGGER_MS).toBeGreaterThan(0)
   })
 })

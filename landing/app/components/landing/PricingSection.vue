@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
   PRICING_SECTION_ID,
   PRICING_SECTION_HEADING,
   PRICING_FINE_PRINT,
   PRICING_TIERS,
-  PRICING_REVEAL_STAGGER_MS,
 } from '@/constants/pricing'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 import { useBillingToggle } from '@/composables/useBillingToggle'
 
@@ -18,10 +18,6 @@ onMounted(() => {
   if (sectionRef.value) {
     reveal.init(sectionRef.value)
   }
-})
-
-onUnmounted(() => {
-  reveal.destroy()
 })
 </script>
 
@@ -52,7 +48,7 @@ onUnmounted(() => {
         :billing-cycle="billingCycle"
         class="section-reveal"
         :class="{ revealed: reveal.isRevealed.value }"
-        :style="{ transitionDelay: `${i * PRICING_REVEAL_STAGGER_MS}ms` }"
+        :style="{ transitionDelay: `${i * REVEAL_STAGGER_MS}ms` }"
       />
     </div>
 

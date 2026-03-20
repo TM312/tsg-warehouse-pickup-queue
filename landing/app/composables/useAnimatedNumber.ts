@@ -1,20 +1,23 @@
-import { ref, watch, type Ref } from 'vue'
+import { ref, watch, onScopeDispose, type Ref } from 'vue'
 import { prefersReducedMotion } from '@/composables/usePrefersReducedMotion'
-import { ROI_ANIMATION_DURATION_MS } from '@/constants/roi'
-import { EASE_OUT_EXPONENT } from '@/constants/animation'
+import { ANIMATION_DURATION_MS, EASE_OUT_EXPONENT } from '@/constants/animation'
 
 export function useAnimatedNumber(
   source: Ref<number>,
-  duration: number = ROI_ANIMATION_DURATION_MS,
+  duration: number = ANIMATION_DURATION_MS,
 ) {
   const displayed = ref(source.value)
   let rafId: number | null = null
 
-  watch(source, (newVal) => {
+  function cancelPending() {
     if (rafId !== null) {
       cancelAnimationFrame(rafId)
       rafId = null
     }
+  }
+
+  watch(source, (newVal) => {
+    cancelPending()
 
     if (typeof window === 'undefined' || prefersReducedMotion()) {
       displayed.value = newVal
@@ -40,6 +43,8 @@ export function useAnimatedNumber(
 
     rafId = requestAnimationFrame(animate)
   })
+
+  onScopeDispose(cancelPending)
 
   return { displayed }
 }

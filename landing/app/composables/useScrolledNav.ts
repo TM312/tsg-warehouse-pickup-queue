@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onScopeDispose } from 'vue'
 import { NAV_SCROLL_THRESHOLD } from '@/constants/animation'
 
 export function useScrolledNav() {
@@ -23,6 +23,8 @@ export function useScrolledNav() {
     }
     isScrolled.value = false
   }
+
+  onScopeDispose(destroy)
 
   return { isScrolled, init, destroy }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import {
   HERO_HEADLINE,
@@ -23,10 +23,6 @@ onMounted(() => {
   if (sectionRef.value) {
     heroAnimation.init(sectionRef.value)
   }
-})
-
-onUnmounted(() => {
-  heroAnimation.destroy()
 })
 </script>
 

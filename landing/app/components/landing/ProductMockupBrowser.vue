@@ -8,15 +8,7 @@ import { PRODUCT_MOCKUP_BROWSER_ENTRIES } from '@/constants/product'
     class="w-full overflow-hidden rounded-lg border bg-background shadow-md"
     data-testid="product-mockup-browser"
   >
-    <!-- Browser chrome -->
-    <div class="flex items-center gap-1.5 border-b bg-muted/50 px-2.5 py-1.5">
-      <span class="size-2 rounded-full bg-red-400" />
-      <span class="size-2 rounded-full bg-yellow-400" />
-      <span class="size-2 rounded-full bg-green-400" />
-      <div class="ml-1.5 flex-1 rounded bg-background px-2 py-0.5 text-[8px] text-muted-foreground">
-        app.pickupqueue.com/dashboard
-      </div>
-    </div>
+    <LandingBrowserChrome size="sm" />
 
     <!-- Dashboard content -->
     <div class="p-2.5">

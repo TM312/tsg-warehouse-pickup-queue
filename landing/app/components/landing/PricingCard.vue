@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { PricingTier, PricingTierKey, BillingCycle } from '@/types/pricing'
-import { PRICING_FEATURES, PRICING_PRICE_ANIMATION_MS, PRICING_PRICE_SUFFIX, PRICING_ANNUAL_NOTE } from '@/constants/pricing'
+import { PRICING_FEATURES, PRICING_PRICE_SUFFIX, PRICING_ANNUAL_NOTE } from '@/constants/pricing'
+import { ANIMATION_DURATION_MS } from '@/constants/animation'
 import { useAnimatedNumber } from '@/composables/useAnimatedNumber'
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const priceSource = computed(() => props.displayPrice ?? 0)
-const { displayed: animatedPrice } = useAnimatedNumber(priceSource, PRICING_PRICE_ANIMATION_MS)
+const { displayed: animatedPrice } = useAnimatedNumber(priceSource, ANIMATION_DURATION_MS)
 
 function featureValue(tierKey: PricingTierKey, featureIndex: number): string {
   return PRICING_FEATURES[featureIndex]?.values[tierKey] ?? ''

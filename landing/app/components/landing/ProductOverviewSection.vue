@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import { PRODUCT_SECTION_HEADING, PRODUCT_FEATURES, PRODUCT_REVEAL_STAGGER_MS } from '@/constants/product'
+import { onMounted, ref } from 'vue'
+import { PRODUCT_SECTION_ID, PRODUCT_SECTION_HEADING, PRODUCT_FEATURES } from '@/constants/product'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 
 const sectionRef = ref<HTMLElement | null>(null)
@@ -11,15 +12,11 @@ onMounted(() => {
     reveal.init(sectionRef.value)
   }
 })
-
-onUnmounted(() => {
-  reveal.destroy()
-})
 </script>
 
 <template>
   <section
-    id="features"
+    :id="PRODUCT_SECTION_ID"
     ref="sectionRef"
     data-testid="product-section"
     class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32"
@@ -34,11 +31,11 @@ onUnmounted(() => {
     <div class="grid gap-8 md:grid-cols-3">
       <LandingProductFeatureCard
         v-for="(feature, i) in PRODUCT_FEATURES"
-        :key="feature.heading"
+        :key="feature.key"
         :feature="feature"
         class="section-reveal"
         :class="{ revealed: reveal.isRevealed.value }"
-        :style="{ transitionDelay: `${i * PRODUCT_REVEAL_STAGGER_MS}ms` }"
+        :style="{ transitionDelay: `${i * REVEAL_STAGGER_MS}ms` }"
       />
     </div>
   </section>

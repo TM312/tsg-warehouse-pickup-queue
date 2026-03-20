@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { effectScope } from 'vue'
 import { useScrolledNav } from '@/composables/useScrolledNav'
 
 describe('useScrolledNav', () => {
@@ -16,42 +17,66 @@ describe('useScrolledNav', () => {
   })
 
   it('isScrolled starts false', () => {
-    const { isScrolled } = useScrolledNav()
-    expect(isScrolled.value).toBe(false)
+    const scope = effectScope()
+    scope.run(() => {
+      const { isScrolled } = useScrolledNav()
+      expect(isScrolled.value).toBe(false)
+    })
+    scope.stop()
   })
 
   it('attaches a passive scroll listener on init', () => {
-    const { init, destroy } = useScrolledNav()
-    init()
-    expect(addSpy).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
-    destroy()
+    const scope = effectScope()
+    scope.run(() => {
+      const { init } = useScrolledNav()
+      init()
+      expect(addSpy).toHaveBeenCalledWith('scroll', expect.any(Function), { passive: true })
+    })
+    scope.stop()
   })
 
   it('toggles isScrolled when scrollY exceeds threshold', () => {
-    const { isScrolled, init, destroy } = useScrolledNav()
-    init()
+    const scope = effectScope()
+    scope.run(() => {
+      const { isScrolled, init } = useScrolledNav()
+      init()
 
-    Object.defineProperty(window, 'scrollY', { value: 50, configurable: true })
-    window.dispatchEvent(new Event('scroll'))
-    expect(isScrolled.value).toBe(true)
+      Object.defineProperty(window, 'scrollY', { value: 50, configurable: true })
+      window.dispatchEvent(new Event('scroll'))
+      expect(isScrolled.value).toBe(true)
 
-    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
-    window.dispatchEvent(new Event('scroll'))
-    expect(isScrolled.value).toBe(false)
-
-    destroy()
+      Object.defineProperty(window, 'scrollY', { value: 0, configurable: true })
+      window.dispatchEvent(new Event('scroll'))
+      expect(isScrolled.value).toBe(false)
+    })
+    scope.stop()
   })
 
   it('destroy removes listener and resets isScrolled', () => {
-    const { isScrolled, init, destroy } = useScrolledNav()
-    init()
+    const scope = effectScope()
+    scope.run(() => {
+      const { isScrolled, init, destroy } = useScrolledNav()
+      init()
 
-    Object.defineProperty(window, 'scrollY', { value: 50, configurable: true })
-    window.dispatchEvent(new Event('scroll'))
-    expect(isScrolled.value).toBe(true)
+      Object.defineProperty(window, 'scrollY', { value: 50, configurable: true })
+      window.dispatchEvent(new Event('scroll'))
+      expect(isScrolled.value).toBe(true)
 
-    destroy()
-    expect(isScrolled.value).toBe(false)
+      destroy()
+      expect(isScrolled.value).toBe(false)
+      expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function))
+    })
+    scope.stop()
+  })
+
+  it('removes listener when scope is disposed', () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const { init } = useScrolledNav()
+      init()
+    })
+    scope.stop()
+
     expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function))
   })
 })

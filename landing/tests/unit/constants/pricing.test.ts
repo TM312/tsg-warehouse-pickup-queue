@@ -8,7 +8,9 @@ import {
   PRICING_ANNUAL_SAVE_LABEL,
   FEATURE_SUPPORTED,
   FEATURE_UNAVAILABLE,
+  formatAnnualSaveLabel,
 } from '@/constants/pricing'
+import { TRIAL_HREF, CONTACT_HREF } from '@/constants/navigation'
 
 describe('pricing constants', () => {
   it('has a non-empty section heading', () => {
@@ -45,6 +47,16 @@ describe('pricing constants', () => {
     expect(highlighted).toHaveLength(1)
   })
 
+  it('tier CTA hrefs reference centralized navigation constants', () => {
+    const starter = PRICING_TIERS.find((t) => t.key === 'starter')!
+    const professional = PRICING_TIERS.find((t) => t.key === 'professional')!
+    const enterprise = PRICING_TIERS.find((t) => t.key === 'enterprise')!
+
+    expect(starter.cta.href).toBe(TRIAL_HREF)
+    expect(professional.cta.href).toBe(TRIAL_HREF)
+    expect(enterprise.cta.href).toBe(CONTACT_HREF)
+  })
+
   it('has exactly 8 feature rows', () => {
     expect(PRICING_FEATURES).toHaveLength(8)
   })
@@ -68,9 +80,8 @@ describe('pricing constants', () => {
     expect(PRICING_ANNUAL_DISCOUNT).toBeLessThan(1)
   })
 
-  it('save label is derived from the discount value', () => {
-    const expectedLabel = `Save ${PRICING_ANNUAL_DISCOUNT * 100}%`
-    expect(PRICING_ANNUAL_SAVE_LABEL).toBe(expectedLabel)
+  it('save label is derived from the discount value via formatAnnualSaveLabel', () => {
+    expect(PRICING_ANNUAL_SAVE_LABEL).toBe(formatAnnualSaveLabel(PRICING_ANNUAL_DISCOUNT))
   })
 
   it('annual Professional price equals 279', () => {

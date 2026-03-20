@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   REVEAL_THRESHOLD,
   DEFAULT_REVEAL_STAGGER_MS,
+  ANIMATION_DURATION_MS,
   EASE_OUT_EXPONENT,
   ROI_ROUNDING_PRECISION,
   NAV_SCROLL_THRESHOLD,
@@ -17,6 +18,10 @@ describe('animation constants', () => {
 
   it('DEFAULT_REVEAL_STAGGER_MS is a positive number', () => {
     expect(DEFAULT_REVEAL_STAGGER_MS).toBeGreaterThan(0)
+  })
+
+  it('ANIMATION_DURATION_MS is a positive number', () => {
+    expect(ANIMATION_DURATION_MS).toBeGreaterThan(0)
   })
 
   it('EASE_OUT_EXPONENT is a positive integer', () => {

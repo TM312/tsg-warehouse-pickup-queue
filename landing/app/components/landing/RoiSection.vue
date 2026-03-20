@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
   ROI_SECTION_ID,
   ROI_SECTION_HEADING,
@@ -23,10 +23,6 @@ onMounted(() => {
   if (sectionRef.value) {
     reveal.init(sectionRef.value)
   }
-})
-
-onUnmounted(() => {
-  reveal.destroy()
 })
 </script>
 

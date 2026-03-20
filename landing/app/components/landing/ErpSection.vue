@@ -1,23 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 import {
   ERP_SECTION_ID,
   ERP_SECTION_HEADING,
   ERP_SECTION_NOTE,
   ERP_BULLETS,
-  ERP_REVEAL_STAGGER_MS,
 } from '@/constants/erp'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 const sectionRef = ref<HTMLElement | null>(null)
 const reveal = useSectionReveal()
 
 onMounted(() => {
   if (sectionRef.value) reveal.init(sectionRef.value)
-})
-
-onUnmounted(() => {
-  reveal.destroy()
 })
 </script>
 
@@ -39,7 +35,7 @@ onUnmounted(() => {
             :key="bullet.icon"
             class="section-reveal"
             :class="{ revealed: reveal.isRevealed.value }"
-            :style="{ transitionDelay: `${i * ERP_REVEAL_STAGGER_MS}ms` }"
+            :style="{ transitionDelay: `${i * REVEAL_STAGGER_MS}ms` }"
           >
             <LandingErpBulletItem :bullet="bullet" />
           </div>
@@ -47,7 +43,7 @@ onUnmounted(() => {
           <p
             class="section-reveal text-sm italic text-muted-foreground"
             :class="{ revealed: reveal.isRevealed.value }"
-            :style="{ transitionDelay: `${ERP_BULLETS.length * ERP_REVEAL_STAGGER_MS}ms` }"
+            :style="{ transitionDelay: `${ERP_BULLETS.length * REVEAL_STAGGER_MS}ms` }"
             data-testid="erp-note"
           >
             {{ ERP_SECTION_NOTE }}
@@ -57,7 +53,7 @@ onUnmounted(() => {
         <div
           class="section-reveal"
           :class="{ revealed: reveal.isRevealed.value }"
-          :style="{ transitionDelay: `${ERP_BULLETS.length * ERP_REVEAL_STAGGER_MS}ms` }"
+          :style="{ transitionDelay: `${ERP_BULLETS.length * REVEAL_STAGGER_MS}ms` }"
         >
           <LandingErpFlowDiagram />
         </div>

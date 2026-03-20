@@ -4,6 +4,8 @@ import { HERO_MOCKUP_QUEUE_ENTRIES, HERO_STATUS_COLORS, heroRowDelay, heroGateDe
 defineProps<{
   animated: boolean
 }>()
+
+const VISIBLE_ROWS_MOBILE = 2
 </script>
 
 <template>
@@ -11,15 +13,7 @@ defineProps<{
     class="w-full overflow-hidden rounded-lg border bg-background shadow-xl"
     data-testid="hero-mockup-dashboard"
   >
-    <!-- Browser chrome -->
-    <div class="flex items-center gap-2 border-b bg-muted/50 px-3 py-2">
-      <span class="size-2.5 rounded-full bg-red-400" />
-      <span class="size-2.5 rounded-full bg-yellow-400" />
-      <span class="size-2.5 rounded-full bg-green-400" />
-      <div class="ml-2 flex-1 rounded bg-background px-3 py-0.5 text-[10px] text-muted-foreground">
-        app.pickupqueue.com/dashboard
-      </div>
-    </div>
+    <LandingBrowserChrome />
 
     <!-- Dashboard content -->
     <div class="p-3">
@@ -39,7 +33,7 @@ defineProps<{
             :key="entry.order"
             class="border-b last:border-0"
             :class="[
-              i >= 2 ? 'hidden lg:table-row' : '',
+              i >= VISIBLE_ROWS_MOBILE ? 'hidden lg:table-row' : '',
               animated ? 'hero-dash-row' : '',
             ]"
             :style="animated ? `animation-delay: ${heroRowDelay(i)}` : ''"

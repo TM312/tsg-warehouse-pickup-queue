@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ProblemSection from '@/components/landing/ProblemSection.vue'
-import { PROBLEM_SECTION_HEADING, PROBLEM_CARDS, REVEAL_STAGGER_MS } from '@/constants/problem'
+import { PROBLEM_SECTION_HEADING, PROBLEM_CARDS, PROBLEM_SECTION_ID } from '@/constants/problem'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 describe('ProblemSection', () => {
   const stubs = {
@@ -25,9 +26,9 @@ describe('ProblemSection', () => {
     expect(cards).toHaveLength(PROBLEM_CARDS.length)
   })
 
-  it('section has id="problem"', () => {
+  it('section has correct id from PROBLEM_SECTION_ID', () => {
     const wrapper = factory()
-    expect(wrapper.find('#problem').exists()).toBe(true)
+    expect(wrapper.find(`#${PROBLEM_SECTION_ID}`).exists()).toBe(true)
   })
 
   it('cards have section-reveal class', () => {
@@ -38,7 +39,7 @@ describe('ProblemSection', () => {
     }
   })
 
-  it('cards receive staggered transitionDelay based on index', () => {
+  it('cards receive staggered transitionDelay based on REVEAL_STAGGER_MS', () => {
     const wrapper = factory()
     const cards = wrapper.findAll('[data-testid="problem-card"]')
     cards.forEach((card, i) => {

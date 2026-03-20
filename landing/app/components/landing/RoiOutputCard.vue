@@ -2,6 +2,7 @@
 import { computed, toRef } from 'vue'
 import type { RoiOutputFormat } from '@/types/roi'
 import { useAnimatedNumber } from '@/composables/useAnimatedNumber'
+import { ANIMATION_DURATION_MS } from '@/constants/animation'
 
 const props = defineProps<{
   label: string
@@ -15,7 +16,7 @@ const numericValue = computed(() => {
   if (typeof props.value !== 'number') return 0
   return props.format === 'multiplier' ? Math.round(props.value * 10) : props.value
 })
-const { displayed } = useAnimatedNumber(numericValue)
+const { displayed } = useAnimatedNumber(numericValue, ANIMATION_DURATION_MS)
 
 const formattedValue = computed(() => {
   switch (props.format) {

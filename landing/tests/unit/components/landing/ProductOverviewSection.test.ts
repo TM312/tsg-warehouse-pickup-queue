@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ProductOverviewSection from '@/components/landing/ProductOverviewSection.vue'
-import { PRODUCT_SECTION_HEADING, PRODUCT_FEATURES, PRODUCT_REVEAL_STAGGER_MS } from '@/constants/product'
+import { PRODUCT_SECTION_HEADING, PRODUCT_FEATURES, PRODUCT_SECTION_ID } from '@/constants/product'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 describe('ProductOverviewSection', () => {
   const stubs = {
@@ -25,9 +26,9 @@ describe('ProductOverviewSection', () => {
     expect(cards).toHaveLength(PRODUCT_FEATURES.length)
   })
 
-  it('section has id="features"', () => {
+  it('section has correct id from PRODUCT_SECTION_ID', () => {
     const wrapper = factory()
-    expect(wrapper.find('#features').exists()).toBe(true)
+    expect(wrapper.find(`#${PRODUCT_SECTION_ID}`).exists()).toBe(true)
   })
 
   it('cards have section-reveal class', () => {
@@ -38,11 +39,11 @@ describe('ProductOverviewSection', () => {
     }
   })
 
-  it('cards receive staggered transitionDelay based on index', () => {
+  it('cards receive staggered transitionDelay based on REVEAL_STAGGER_MS', () => {
     const wrapper = factory()
     const cards = wrapper.findAll('[data-testid="product-feature-card"]')
     cards.forEach((card, i) => {
-      expect(card.attributes('style')).toContain(`transition-delay: ${i * PRODUCT_REVEAL_STAGGER_MS}ms`)
+      expect(card.attributes('style')).toContain(`transition-delay: ${i * REVEAL_STAGGER_MS}ms`)
     })
   })
 })

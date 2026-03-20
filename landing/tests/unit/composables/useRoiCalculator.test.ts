@@ -49,4 +49,10 @@ describe('useRoiCalculator', () => {
     setHourlyCost(45)
     expect(hourlyCost.value).toBe(45)
   })
+
+  it('setHourlyCost(0) clamps to min, never allows 0', () => {
+    const { hourlyCost, setHourlyCost } = useRoiCalculator()
+    setHourlyCost(0)
+    expect(hourlyCost.value).toBe(15)
+  })
 })

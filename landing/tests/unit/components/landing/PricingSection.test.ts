@@ -3,10 +3,11 @@ import { mount } from '@vue/test-utils'
 import PricingSection from '@/components/landing/PricingSection.vue'
 import {
   PRICING_SECTION_HEADING,
+  PRICING_SECTION_ID,
   PRICING_FINE_PRINT,
   PRICING_TIERS,
-  PRICING_REVEAL_STAGGER_MS,
 } from '@/constants/pricing'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 describe('PricingSection', () => {
   const stubs = {
@@ -25,9 +26,9 @@ describe('PricingSection', () => {
     expect(wrapper.find('[data-testid="pricing-heading"]').text()).toBe(PRICING_SECTION_HEADING)
   })
 
-  it('section has id="pricing"', () => {
+  it('section has correct id from PRICING_SECTION_ID', () => {
     const wrapper = factory()
-    expect(wrapper.find('#pricing').exists()).toBe(true)
+    expect(wrapper.find(`#${PRICING_SECTION_ID}`).exists()).toBe(true)
   })
 
   it('renders 1 PricingToggle stub', () => {
@@ -45,7 +46,7 @@ describe('PricingSection', () => {
     const cards = wrapper.findAll('[data-testid="pricing-card"]')
     cards.forEach((card, i) => {
       expect(card.classes()).toContain('section-reveal')
-      expect(card.attributes('style')).toContain(`transition-delay: ${i * PRICING_REVEAL_STAGGER_MS}ms`)
+      expect(card.attributes('style')).toContain(`transition-delay: ${i * REVEAL_STAGGER_MS}ms`)
     })
   })
 

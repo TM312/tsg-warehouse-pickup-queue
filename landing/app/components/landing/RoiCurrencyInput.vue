@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { RoiInputConfig } from '@/types/roi'
-import { clampValue } from '@/composables/useRoiCalculator'
+import { clampValue } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
