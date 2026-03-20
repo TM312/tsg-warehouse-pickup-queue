@@ -2,7 +2,6 @@ import type { HowItWorksStep } from '@/types/howItWorks'
 
 export const HOW_IT_WORKS_SECTION_ID = 'how-it-works'
 export const HOW_IT_WORKS_SECTION_HEADING = 'Live in under a day'
-export const HOW_IT_WORKS_REVEAL_STAGGER_MS = 150
 
 export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
   {

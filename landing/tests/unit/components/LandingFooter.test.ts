@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LandingFooter from '@/components/LandingFooter.vue'
-import { FOOTER_SECTIONS, CONTACT_EMAIL, SUPPORT_HOURS, COPYRIGHT_HOLDER } from '@/constants/navigation'
+import { FOOTER_SECTIONS, CONTACT_EMAIL, SUPPORT_HOURS, COPYRIGHT_HOLDER } from '@/constants/footer'
 
 describe('LandingFooter', () => {
   const stubs = {

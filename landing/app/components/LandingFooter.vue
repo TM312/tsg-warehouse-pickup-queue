@@ -5,7 +5,7 @@ import {
   SUPPORT_HOURS,
   SOCIAL_LINKS,
   COPYRIGHT_HOLDER,
-} from '@/constants/navigation'
+} from '@/constants/footer'
 import { Linkedin } from 'lucide-vue-next'
 
 const currentYear = new Date().getFullYear()

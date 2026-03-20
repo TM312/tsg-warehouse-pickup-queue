@@ -4,7 +4,6 @@ import {
   ERP_SECTION_ID,
   ERP_SECTION_NOTE,
   ERP_BULLETS,
-  ERP_REVEAL_STAGGER_MS,
 } from '@/constants/erp'
 
 describe('erp constants', () => {
@@ -29,9 +28,5 @@ describe('erp constants', () => {
       expect(bullet.icon).toBeTruthy()
       expect(bullet.text).toBeTruthy()
     }
-  })
-
-  it('ERP_REVEAL_STAGGER_MS is a positive number', () => {
-    expect(ERP_REVEAL_STAGGER_MS).toBeGreaterThan(0)
   })
 })

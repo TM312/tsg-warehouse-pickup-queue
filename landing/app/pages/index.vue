@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import { SEO_TITLE, SEO_META } from '@/constants/seo'
+
+useHead({
+  title: SEO_TITLE,
+  htmlAttrs: { lang: 'en' },
+})
+
+useSeoMeta(SEO_META)
+</script>
+
 <template>
   <div>
     <LandingHeroSection />

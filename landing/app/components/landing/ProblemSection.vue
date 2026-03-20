@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import { PROBLEM_SECTION_HEADING, PROBLEM_CARDS, REVEAL_STAGGER_MS } from '@/constants/problem'
+import { onMounted, ref } from 'vue'
+import { PROBLEM_SECTION_ID, PROBLEM_SECTION_HEADING, PROBLEM_CARDS } from '@/constants/problem'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 
 const sectionRef = ref<HTMLElement | null>(null)
@@ -11,15 +12,11 @@ onMounted(() => {
     reveal.init(sectionRef.value)
   }
 })
-
-onUnmounted(() => {
-  reveal.destroy()
-})
 </script>
 
 <template>
   <section
-    id="problem"
+    :id="PROBLEM_SECTION_ID"
     ref="sectionRef"
     data-testid="problem-section"
     class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32"
@@ -34,7 +31,7 @@ onUnmounted(() => {
     <div class="grid gap-8 md:grid-cols-3">
       <LandingProblemCard
         v-for="(card, i) in PROBLEM_CARDS"
-        :key="card.heading"
+        :key="card.key"
         :card="card"
         class="section-reveal"
         :class="{ revealed: reveal.isRevealed.value }"
@@ -43,18 +40,3 @@ onUnmounted(() => {
     </div>
   </section>
 </template>
-
-<style scoped>
-.section-reveal {
-  opacity: 0;
-  transform: translateY(1rem);
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
-}
-
-.section-reveal.revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>

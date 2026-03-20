@@ -12,6 +12,10 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
   waiting: 'bg-muted text-muted-foreground',
   complete: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
 }
+
+const VISIBLE_ROWS_MOBILE = 2
+const ROW_ANIMATION_DELAY_S = 0.8
+const GATE_ANIMATION_OFFSET_S = 2
 </script>
 
 <template>
@@ -19,15 +23,7 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
     class="w-full overflow-hidden rounded-lg border bg-background shadow-xl"
     data-testid="hero-mockup-dashboard"
   >
-    <!-- Browser chrome -->
-    <div class="flex items-center gap-2 border-b bg-muted/50 px-3 py-2">
-      <span class="size-2.5 rounded-full bg-red-400" />
-      <span class="size-2.5 rounded-full bg-yellow-400" />
-      <span class="size-2.5 rounded-full bg-green-400" />
-      <div class="ml-2 flex-1 rounded bg-background px-3 py-0.5 text-[10px] text-muted-foreground">
-        app.pickupqueue.com/dashboard
-      </div>
-    </div>
+    <LandingBrowserChrome />
 
     <!-- Dashboard content -->
     <div class="p-3">
@@ -47,10 +43,10 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
             :key="entry.order"
             class="border-b last:border-0"
             :class="[
-              i >= 2 ? 'hidden lg:table-row' : '',
+              i >= VISIBLE_ROWS_MOBILE ? 'hidden lg:table-row' : '',
               animated ? 'hero-dash-row' : '',
             ]"
-            :style="animated ? `animation-delay: ${i * 0.8}s` : ''"
+            :style="animated ? `animation-delay: ${i * ROW_ANIMATION_DELAY_S}s` : ''"
           >
             <td class="py-1.5 font-medium text-foreground">{{ entry.company }}</td>
             <td class="py-1.5">
@@ -66,7 +62,7 @@ const statusColor: Record<MockupQueueEntry['status'], string> = {
                 v-if="entry.gate"
                 class="hero-dash-gate text-foreground"
                 :class="animated ? 'hero-dash-animate' : ''"
-                :style="animated ? `animation-delay: ${i * 0.8 + 2}s` : ''"
+                :style="animated ? `animation-delay: ${i * ROW_ANIMATION_DELAY_S + GATE_ANIMATION_OFFSET_S}s` : ''"
               >
                 {{ entry.gate }}
               </span>

@@ -1,17 +1,21 @@
+<script setup lang="ts">
+import type { MockupQueueEntry } from '@/types/hero'
+import { PRODUCT_MOCKUP_QUEUE_ENTRIES } from '@/constants/mockup'
+
+const statusColor: Record<MockupQueueEntry['status'], string> = {
+  loading: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
+  called: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-400',
+  waiting: 'bg-muted text-muted-foreground',
+  complete: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400',
+}
+</script>
+
 <template>
   <div
     class="w-full overflow-hidden rounded-lg border bg-background shadow-md"
     data-testid="product-mockup-browser"
   >
-    <!-- Browser chrome -->
-    <div class="flex items-center gap-1.5 border-b bg-muted/50 px-2.5 py-1.5">
-      <span class="size-2 rounded-full bg-red-400" />
-      <span class="size-2 rounded-full bg-yellow-400" />
-      <span class="size-2 rounded-full bg-green-400" />
-      <div class="ml-1.5 flex-1 rounded bg-background px-2 py-0.5 text-[8px] text-muted-foreground">
-        app.pickupqueue.com/dashboard
-      </div>
-    </div>
+    <LandingBrowserChrome size="sm" />
 
     <!-- Dashboard content -->
     <div class="p-2.5">
@@ -26,26 +30,23 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="border-b">
-            <td class="py-1 font-medium text-foreground">Acme Corp</td>
+          <tr
+            v-for="(entry, i) in PRODUCT_MOCKUP_QUEUE_ENTRIES"
+            :key="entry.order"
+            :class="i < PRODUCT_MOCKUP_QUEUE_ENTRIES.length - 1 ? 'border-b' : ''"
+          >
+            <td class="py-1 font-medium text-foreground">{{ entry.company }}</td>
             <td class="py-1">
-              <span class="rounded-full bg-green-100 px-1.5 py-0.5 text-[7px] font-medium text-green-700 dark:bg-green-900 dark:text-green-400">loading</span>
+              <span
+                class="rounded-full px-1.5 py-0.5 text-[7px] font-medium"
+                :class="statusColor[entry.status]"
+              >
+                {{ entry.status }}
+              </span>
             </td>
-            <td class="py-1 text-foreground">Gate 1</td>
-          </tr>
-          <tr class="border-b">
-            <td class="py-1 font-medium text-foreground">BuildRight</td>
-            <td class="py-1">
-              <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[7px] font-medium text-amber-700 dark:bg-amber-900 dark:text-amber-400">called</span>
+            <td class="py-1" :class="entry.gate ? 'text-foreground' : 'text-muted-foreground'">
+              {{ entry.gate ?? '—' }}
             </td>
-            <td class="py-1 text-foreground">Gate 2</td>
-          </tr>
-          <tr>
-            <td class="py-1 font-medium text-foreground">FastHaul</td>
-            <td class="py-1">
-              <span class="rounded-full bg-muted px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground">waiting</span>
-            </td>
-            <td class="py-1 text-muted-foreground">—</td>
           </tr>
         </tbody>
       </table>

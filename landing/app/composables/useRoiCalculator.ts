@@ -8,10 +8,7 @@ import {
   ROI_PICKUPS_CONFIG,
   WORKING_DAYS_PER_MONTH,
 } from '@/constants/roi'
-
-export function clampValue(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
-}
+import { clampValue } from '@/lib/utils'
 
 export function useRoiCalculator() {
   const pickups = ref(ROI_PICKUPS_CONFIG.default)

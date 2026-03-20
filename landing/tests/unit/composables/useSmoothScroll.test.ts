@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { effectScope } from 'vue'
 import { useSmoothScroll, scrollToHash } from '@/composables/useSmoothScroll'
 
 describe('useSmoothScroll', () => {
@@ -15,37 +16,60 @@ describe('useSmoothScroll', () => {
   })
 
   it('attaches a click listener on init', () => {
-    const { init, destroy } = useSmoothScroll()
-    init()
-    expect(addSpy).toHaveBeenCalledWith('click', expect.any(Function))
-    destroy()
+    const scope = effectScope()
+    scope.run(() => {
+      const { init } = useSmoothScroll()
+      init()
+      expect(addSpy).toHaveBeenCalledWith('click', expect.any(Function))
+    })
+    scope.stop()
   })
 
   it('removes the listener on destroy', () => {
-    const { init, destroy } = useSmoothScroll()
-    init()
-    destroy()
-    expect(removeSpy).toHaveBeenCalledWith('click', expect.any(Function))
+    const scope = effectScope()
+    scope.run(() => {
+      const { init, destroy } = useSmoothScroll()
+      init()
+      destroy()
+      expect(removeSpy).toHaveBeenCalledWith('click', expect.any(Function))
+    })
+    scope.stop()
   })
 
   it('does not attach duplicate listeners on the same instance', () => {
-    const { init, destroy } = useSmoothScroll()
-    init()
-    init()
-    const clickCalls = addSpy.mock.calls.filter(([event]) => event === 'click')
-    expect(clickCalls).toHaveLength(1)
-    destroy()
+    const scope = effectScope()
+    scope.run(() => {
+      const { init } = useSmoothScroll()
+      init()
+      init()
+      const clickCalls = addSpy.mock.calls.filter(([event]) => event === 'click')
+      expect(clickCalls).toHaveLength(1)
+    })
+    scope.stop()
   })
 
   it('separate instances attach independent listeners', () => {
-    const a = useSmoothScroll()
-    const b = useSmoothScroll()
-    a.init()
-    b.init()
-    const clickCalls = addSpy.mock.calls.filter(([event]) => event === 'click')
-    expect(clickCalls).toHaveLength(2)
-    a.destroy()
-    b.destroy()
+    const scope = effectScope()
+    scope.run(() => {
+      const a = useSmoothScroll()
+      const b = useSmoothScroll()
+      a.init()
+      b.init()
+      const clickCalls = addSpy.mock.calls.filter(([event]) => event === 'click')
+      expect(clickCalls).toHaveLength(2)
+    })
+    scope.stop()
+  })
+
+  it('removes listener when scope is disposed', () => {
+    const scope = effectScope()
+    scope.run(() => {
+      const { init } = useSmoothScroll()
+      init()
+    })
+    scope.stop()
+
+    expect(removeSpy).toHaveBeenCalledWith('click', expect.any(Function))
   })
 })
 

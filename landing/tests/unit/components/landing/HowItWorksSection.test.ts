@@ -5,8 +5,8 @@ import {
   HOW_IT_WORKS_SECTION_HEADING,
   HOW_IT_WORKS_SECTION_ID,
   HOW_IT_WORKS_STEPS,
-  HOW_IT_WORKS_REVEAL_STAGGER_MS,
 } from '@/constants/howItWorks'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 describe('HowItWorksSection', () => {
   const stubs = {
@@ -43,11 +43,11 @@ describe('HowItWorksSection', () => {
     }
   })
 
-  it('step wrappers receive staggered transitionDelay based on index', () => {
+  it('step wrappers receive staggered transitionDelay based on REVEAL_STAGGER_MS', () => {
     const wrapper = factory()
     const steps = wrapper.findAll('[data-testid="how-it-works-step"]')
     steps.forEach((step, i) => {
-      expect(step.element.parentElement?.style.transitionDelay).toBe(`${i * HOW_IT_WORKS_REVEAL_STAGGER_MS}ms`)
+      expect(step.element.parentElement?.style.transitionDelay).toBe(`${i * REVEAL_STAGGER_MS}ms`)
     })
   })
 

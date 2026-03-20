@@ -1,4 +1,5 @@
 import type { PricingTier, PricingFeature } from '@/types/pricing'
+import { CTA_LABEL, TRIAL_HREF, CONTACT_HREF } from '@/constants/navigation'
 
 export const PRICING_SECTION_ID = 'pricing'
 
@@ -11,15 +12,9 @@ export const PRICING_ANNUAL_DISCOUNT = 0.2
 
 export const PRICING_TOGGLE_LABELS = { monthly: 'Monthly', annual: 'Annual' } as const
 
-export const PRICING_ANNUAL_SAVE_LABEL = `Save ${PRICING_ANNUAL_DISCOUNT * 100}%`
-
 export const PRICING_PRICE_SUFFIX = '/mo'
 
 export const PRICING_ANNUAL_NOTE = 'billed annually'
-
-export const PRICING_REVEAL_STAGGER_MS = 150
-
-export const PRICING_PRICE_ANIMATION_MS = 400
 
 export const FEATURE_SUPPORTED = '✓'
 
@@ -34,7 +29,7 @@ export const PRICING_TIERS: PricingTier[] = [
     monthlyPrice: 149,
     badge: null,
     highlighted: false,
-    cta: { label: 'Start Free Trial', href: '#trial', variant: 'outline' },
+    cta: { label: CTA_LABEL, href: TRIAL_HREF, variant: 'outline' },
   },
   {
     key: 'professional',
@@ -42,7 +37,7 @@ export const PRICING_TIERS: PricingTier[] = [
     monthlyPrice: 349,
     badge: 'Most Popular',
     highlighted: true,
-    cta: { label: 'Start Free Trial', href: '#trial', variant: 'default' },
+    cta: { label: CTA_LABEL, href: TRIAL_HREF, variant: 'default' },
   },
   {
     key: 'enterprise',
@@ -50,7 +45,7 @@ export const PRICING_TIERS: PricingTier[] = [
     monthlyPrice: null,
     badge: null,
     highlighted: false,
-    cta: { label: 'Contact Sales', href: '#contact', variant: 'outline' },
+    cta: { label: 'Contact Sales', href: CONTACT_HREF, variant: 'outline' },
   },
 ]
 
@@ -88,3 +83,9 @@ export const PRICING_FEATURES: PricingFeature[] = [
     values: { starter: FEATURE_UNAVAILABLE, professional: FEATURE_UNAVAILABLE, enterprise: FEATURE_SUPPORTED },
   },
 ]
+
+export function formatAnnualSaveLabel(discount: number): string {
+  return `Save ${discount * 100}%`
+}
+
+export const PRICING_ANNUAL_SAVE_LABEL = formatAnnualSaveLabel(PRICING_ANNUAL_DISCOUNT)

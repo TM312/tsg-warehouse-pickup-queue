@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useSectionReveal } from '@/composables/useSectionReveal'
 import {
   HOW_IT_WORKS_SECTION_ID,
   HOW_IT_WORKS_SECTION_HEADING,
   HOW_IT_WORKS_STEPS,
-  HOW_IT_WORKS_REVEAL_STAGGER_MS,
 } from '@/constants/howItWorks'
+import { REVEAL_STAGGER_MS } from '@/constants/animation'
 
 const sectionRef = ref<HTMLElement | null>(null)
 const reveal = useSectionReveal()
 
 onMounted(() => {
   if (sectionRef.value) reveal.init(sectionRef.value)
-})
-
-onUnmounted(() => {
-  reveal.destroy()
 })
 </script>
 
@@ -44,7 +40,7 @@ onUnmounted(() => {
             :key="step.step"
             class="section-reveal"
             :class="{ revealed: reveal.isRevealed.value }"
-            :style="{ transitionDelay: `${i * HOW_IT_WORKS_REVEAL_STAGGER_MS}ms` }"
+            :style="{ transitionDelay: `${i * REVEAL_STAGGER_MS}ms` }"
           >
             <LandingHowItWorksStep :step="step" />
           </div>

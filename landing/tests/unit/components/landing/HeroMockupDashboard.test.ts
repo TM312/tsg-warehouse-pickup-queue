@@ -4,14 +4,26 @@ import HeroMockupDashboard from '@/components/landing/HeroMockupDashboard.vue'
 import { HERO_MOCKUP_QUEUE_ENTRIES } from '@/constants/hero'
 
 describe('HeroMockupDashboard', () => {
+  const stubs = {
+    LandingBrowserChrome: { template: '<div data-testid="browser-chrome" />' },
+  }
+
   function factory(animated = false) {
-    return mount(HeroMockupDashboard, { props: { animated } })
+    return mount(HeroMockupDashboard, {
+      props: { animated },
+      global: { stubs },
+    })
   }
 
   it('renders all queue entry rows', () => {
     const wrapper = factory()
     const rows = wrapper.findAll('tbody tr')
     expect(rows).toHaveLength(HERO_MOCKUP_QUEUE_ENTRIES.length)
+  })
+
+  it('renders BrowserChrome component', () => {
+    const wrapper = factory()
+    expect(wrapper.find('[data-testid="browser-chrome"]').exists()).toBe(true)
   })
 
   it('displays company name for each entry', () => {
